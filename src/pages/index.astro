@@ -1,11 +1,28 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/sections/Hero.astro';
 import Intro from '../components/sections/Intro.astro';
+import Newcomers from '../components/sections/Newcomers.astro';
+import LifeTogether from '../components/sections/LifeTogether.astro';
+import Events from '../components/sections/Events.astro';
+import PhotoStrip from '../components/sections/PhotoStrip.astro';
+import Ministries from '../components/sections/Ministries.astro';
+import About from '../components/sections/About.astro';
+import Pastor from '../components/sections/Pastor.astro';
+import Visit from '../components/sections/Visit.astro';
+import News from '../components/sections/News.astro';
+import Contact from '../components/sections/Contact.astro';
+import {
+  events,
+  ministries,
+  ministryCategories,
+  news,
+  pastor,
+  photoStrip,
+  site,
+  stories,
+} from '../data/content';
 
-// Moves to Sanity `siteSettings` in phase 3.
-const serviceTime = '10:00 – 13:00';
 const visitHref = '#visit';
 ---
 
@@ -13,9 +30,16 @@ const visitHref = '#visit';
   title="Manna Tabernacle Bible Church (MTBC) — Dar es Salaam"
   description="Manna Tabernacle Bible Church is a Bible-centred family meeting every Sunday 10:00–13:00 at Kisutu Primary School Hall, Posta Mpya, Dar es Salaam."
 >
-  <SiteHeader serviceTime={serviceTime} visitHref={visitHref} />
-  <main id="main">
-    <Hero serviceTime={serviceTime} visitHref={visitHref} nextHref="#intro" />
-    <Intro />
-  </main>
+  <Hero serviceTime={site.serviceTime} visitHref={visitHref} nextHref="#intro" />
+  <Intro />
+  <Newcomers venue={site.venue} visitHref={visitHref} />
+  <LifeTogether stories={stories} allHref="/stories" />
+  <Events events={events} allHref="/events" />
+  <PhotoStrip photos={photoStrip} />
+  <Ministries categories={ministryCategories} ministries={ministries} findHref="#contact" />
+  <About />
+  <Pastor pastor={pastor} />
+  <Visit venue={site.venue} serviceShort={site.serviceShort} mapUrl={site.mapUrl} />
+  <News posts={news} allHref="/news" />
+  <Contact visitHref={visitHref} phone={site.phone} officeHours={site.officeHours} />
 </BaseLayout>

@@ -1,0 +1,118 @@
+---
+/** Ruled list of links: title, italic note and a short line arrow (About / Visit Us). */
+export interface LinkItem {
+  title: string;
+  note: string;
+  href: string;
+  external?: boolean;
+}
+
+interface Props {
+  items: LinkItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="links">
+  {
+    items.map((item) => (
+      <li>
+        <a
+          class="links__row"
+          href={item.href}
+          {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          <span class="links__text">
+            <span class="links__title">{item.title}</span>
+            <span class="links__note">{item.note}</span>
+            {item.external && <span class="visually-hidden">(opens in a new tab)</span>}
+          </span>
+          <span class="links__arrow" aria-hidden="true" />
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .links {
+    width: 100%;
+    border-top: 1px solid var(--line);
+  }
+
+  .links__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .links__text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+    line-height: normal;
+  }
+
+  .links__title {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+  }
+
+  .links__note {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .links__arrow {
+    flex: none;
+    width: 24px;
+    height: 1px;
+    background: var(--ink);
+    transform-origin: right center;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .links__row:hover .links__arrow {
+      transform: scaleX(1.6);
+    }
+
+    .links__row:hover .links__title {
+      color: var(--gold-text);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .links__row {
+      padding-block: 24px;
+    }
+
+    .links__text {
+      column-gap: 14px;
+    }
+
+    .links__title {
+      font-size: 17px;
+      letter-spacing: 0.12em;
+    }
+
+    .links__note {
+      font-size: 16px;
+      letter-spacing: 0.06em;
+    }
+
+    .links__arrow {
+      width: 28px;
+    }
+  }
+</style>

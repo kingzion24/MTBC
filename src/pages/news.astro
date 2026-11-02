@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsList from '../components/NewsList.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import { news } from '../data/content';
+---
+
+<BaseLayout
+  title="News & Announcements — MTBC Dar es Salaam"
+  description="Announcements from Manna Tabernacle Bible Church, Kisutu Hall, Dar es Salaam."
+  solidHeader
+>
+  <div class="page container">
+    <SectionHeading id="page-title" title="News" label="Announcements" layout="stacked" level="h1" />
+    <NewsList posts={news} />
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 960px;
+    padding-block: 64px 96px;
+  }
+
+  @media (min-width: 1024px) {
+    .page {
+      gap: 48px;
+      padding-block: 120px 160px;
+    }
+  }
+</style>

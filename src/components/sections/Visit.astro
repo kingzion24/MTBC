@@ -1,0 +1,30 @@
+---
+/** Figma: desktop 11:126, mobile 19:171 */
+import { photos } from '../../data/content';
+import LinkList from '../ui/LinkList.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Split from '../ui/Split.astro';
+
+interface Props {
+  venue: string;
+  serviceShort: string;
+  mapUrl: string;
+}
+
+const { venue, serviceShort, mapUrl } = Astro.props;
+---
+
+<Split id="visit" labelledby="visit-title" photo={photos.worshipHandsRaised} photoEnd>
+  <SectionHeading id="visit-title" title="Visit Us" label={venue} />
+  <p class="split-lead">
+    One home in the city. Every Sunday from 10:00 we gather in the hall at Kisutu Primary School, Posta Mpya. Come as
+    you are, there is a seat for you.
+  </p>
+  <LinkList
+    items={[
+      { title: venue, note: 'Google Map', href: mapUrl, external: true },
+      { title: 'Service times', note: serviceShort, href: '#contact' },
+    ]}
+  />
+</Split>
+

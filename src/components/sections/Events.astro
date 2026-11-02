@@ -1,0 +1,114 @@
+---
+/** Figma: desktop 11:10, mobile 18:105 */
+import type { EventItem } from '../../data/content';
+import EventCard from '../EventCard.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+interface Props {
+  events: EventItem[];
+  allHref: string;
+}
+
+const { events, allHref } = Astro.props;
+---
+
+<section id="events" class="events" aria-labelledby="events-title">
+  <div class="events__inner container">
+    <div class="events__head" data-reveal>
+      <SectionHeading id="events-title" title="Gatherings" label="Events" layout="stacked" />
+      <p class="events__lead">
+        Whether this is your first visit or your fiftieth, there's always a reason to come together.
+      </p>
+    </div>
+
+    <ul class="events__cards" role="list">
+      {
+        events.slice(0, 2).map((event) => (
+          <li data-reveal>
+            <EventCard event={event} />
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="events__cta">
+      <Button href={allHref} blockOnMobile>All events</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .events {
+    background: var(--sand);
+  }
+
+  .events__inner {
+    display: grid;
+    grid-template-areas: 'head' 'cards' 'cta';
+    gap: 32px;
+    padding-block: 96px;
+  }
+
+  .events__head {
+    grid-area: head;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .events__lead {
+    max-width: 380px;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .events__cards {
+    grid-area: cards;
+    display: grid;
+    gap: 32px;
+  }
+
+  .events__cards > li {
+    display: flex;
+  }
+
+  .events__cards > li > :global(*) {
+    flex: 1;
+  }
+
+  .events__cta {
+    grid-area: cta;
+  }
+
+  @media (min-width: 768px) {
+    .events__cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .events__inner {
+      grid-template-columns: minmax(0, 380fr) minmax(0, 724fr);
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        'head cards'
+        'cta cards'
+        '. cards';
+      column-gap: 96px;
+      row-gap: 40px;
+      padding-block: 160px;
+    }
+
+    .events__head {
+      gap: 40px;
+    }
+
+    .events__lead {
+      line-height: 2.3;
+    }
+  }
+</style>

@@ -1,4 +1,9 @@
 ---
+/**
+ * Fixed site header (Figma 10:24 desktop, 18:38 mobile).
+ * Transparent over the hero, switches to a solid night bar once the page scrolls.
+ * Pages without a hero pass `solid`.
+ */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
 import Button from './ui/Button.astro';
@@ -6,12 +11,13 @@ import Button from './ui/Button.astro';
 interface Props {
   serviceTime: string;
   visitHref: string;
+  solid?: boolean;
 }
 
-const { serviceTime, visitHref } = Astro.props;
+const { serviceTime, visitHref, solid = false } = Astro.props;
 ---
 
-<header class="header">
+<header class="header" data-header data-solid={solid ? '' : undefined} data-fixed-solid={solid ? '' : undefined}>
   <a class="header__logo" href="/">
     <Image
       src={logo}
@@ -28,26 +34,40 @@ const { serviceTime, visitHref } = Astro.props;
       <span class="header__service-time">{serviceTime}</span>
     </p>
     <Button href={visitHref} variant="filled-light" compact class="header__cta">Plan your visit</Button>
-    <button class="menu-toggle" type="button" aria-controls="site-menu" aria-expanded="false">
+    <button class="menu-toggle" type="button" aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open>
       <span class="menu-toggle__lines" aria-hidden="true"></span>
       <span class="menu-toggle__label">Menu</span>
     </button>
   </div>
 </header>
 
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header && !header.hasAttribute('data-fixed-solid')) {
+    const update = () => header.toggleAttribute('data-solid', window.scrollY > 80);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
+</script>
+
 <style>
   .header {
     --focus: var(--gold-light);
 
-    position: absolute;
+    position: fixed;
     inset: 0 0 auto;
-    z-index: 10;
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
+    height: var(--header-h);
     padding-inline: 20px;
     color: var(--paper);
+    transition: background-color 0.4s var(--ease-out);
+  }
+
+  .header[data-solid] {
+    background: var(--night);
   }
 
   .header__logo img {
@@ -91,8 +111,8 @@ const { serviceTime, visitHref } = Astro.props;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
     justify-content: center;
+    gap: 6px;
     /* 44px hit area without shifting the visual position */
     min-width: 44px;
     min-height: 44px;
@@ -104,6 +124,13 @@ const { serviceTime, visitHref } = Astro.props;
     width: 28px;
     height: 7px;
     border-block: 1px solid currentColor;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .menu-toggle:hover .menu-toggle__lines {
+      transform: scaleX(1.15);
+    }
   }
 
   .menu-toggle__label {
@@ -115,7 +142,6 @@ const { serviceTime, visitHref } = Astro.props;
 
   @media (min-width: 768px) {
     .header {
-      height: 96px;
       padding-inline: 48px;
     }
 

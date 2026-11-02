@@ -7,13 +7,21 @@ import '@fontsource/noto-sans/latin-300.css';
 import '@fontsource/noto-sans/latin-400.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
+import Loader from '../components/Loader.astro';
+import MenuOverlay from '../components/MenuOverlay.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { site } from '../data/content';
 
 interface Props {
   title: string;
   description: string;
+  /** Pages without a full-bleed hero get a solid header and top padding. */
+  solidHeader?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, solidHeader = false } = Astro.props;
+const visitHref = '/#visit';
 ---
 
 <!doctype html>
@@ -25,9 +33,48 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#23211f" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        try {
+          var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduce && !sessionStorage.getItem('mtbc-loaded')) root.classList.add('is-loading');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <slot />
+    <Loader />
+    <SiteHeader serviceTime={site.serviceTime} visitHref={visitHref} solid={solidHeader} />
+    <main id="main" class:list={{ 'main--offset': solidHeader }}>
+      <slot />
+    </main>
+    <SiteFooter />
+    <MenuOverlay visitHref={visitHref} />
+
+    <script>
+      // Subtle fade-up as sections enter the viewport (skipped for reduced motion via CSS).
+      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      for (const item of items) observer.observe(item);
+    </script>
   </body>
 </html>
+
+<style>
+  .main--offset {
+    padding-top: var(--header-h);
+  }
+</style>

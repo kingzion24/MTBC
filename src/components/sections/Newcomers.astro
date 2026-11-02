@@ -1,0 +1,81 @@
+---
+/** Figma: desktop 10:72, mobile 18:75 */
+import Button from '../ui/Button.astro';
+
+interface Props {
+  venue: string;
+  visitHref: string;
+}
+
+const { venue, visitHref } = Astro.props;
+---
+
+<section class="newcomers" aria-labelledby="newcomers-title">
+  <div class="newcomers__inner container" data-reveal>
+    <div class="newcomers__text">
+      <p class="newcomers__kicker">New to MTBC? We'd love to meet you.</p>
+      <h2 id="newcomers-title" class="newcomers__title">Join us this Sunday at {venue}</h2>
+    </div>
+    <Button href={visitHref} variant="filled" blockOnMobile>Plan your visit</Button>
+  </div>
+</section>
+
+<style>
+  .newcomers {
+    background: var(--sand);
+  }
+
+  .newcomers__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding-block: 40px;
+  }
+
+  .newcomers__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .newcomers__kicker {
+    font-family: var(--serif-jp);
+    font-size: clamp(0.8125rem, 0.766rem + 0.1905vw, 0.9375rem); /* 13 → 15 */
+    line-height: normal;
+    letter-spacing: 0.08em;
+  }
+
+  .newcomers__title {
+    max-width: 14em;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.375rem, 1.282rem + 0.381vw, 1.625rem); /* 22 → 26 */
+    line-height: 1.6;
+    letter-spacing: 0.1em;
+  }
+
+  @media (min-width: 768px) {
+    .newcomers__inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      padding-block: 56px;
+    }
+
+    .newcomers__title {
+      max-width: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .newcomers__kicker {
+      letter-spacing: 0.12em;
+    }
+
+    .newcomers__title {
+      letter-spacing: 0.14em;
+    }
+  }
+</style>

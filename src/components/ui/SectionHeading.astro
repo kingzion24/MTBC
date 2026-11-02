@@ -1,0 +1,76 @@
+---
+/**
+ * Section title with the italic English label beneath (mobile) or beside it (desktop).
+ * Figma "Section heading" frames.
+ */
+interface Props {
+  id: string;
+  title: string;
+  label: string;
+  /** Desktop layout: label beside the title (default) or stacked below. */
+  layout?: 'inline' | 'stacked';
+  /** Light text for dark/photo backgrounds. */
+  light?: boolean;
+  level?: 'h1' | 'h2';
+}
+
+const { id, title, label, layout = 'inline', light = false, level = 'h2' } = Astro.props;
+const Heading = level;
+---
+
+<div class:list={['heading', `heading--${layout}`, { 'heading--light': light }]}>
+  <Heading id={id} class="heading__title">{title}</Heading>
+  <p class="heading__label">{label}</p>
+</div>
+
+<style>
+  .heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .heading__title {
+    color: var(--ink);
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.625rem, 1.439rem + 0.7619vw, 2.125rem); /* 26 → 34 */
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+  }
+
+  .heading__label {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(1rem, 0.907rem + 0.381vw, 1.25rem); /* 16 → 20 */
+    line-height: normal;
+    letter-spacing: 0.06em;
+  }
+
+  .heading--light .heading__title {
+    color: var(--paper);
+  }
+
+  .heading--light .heading__label {
+    color: var(--gold-light);
+  }
+
+  @media (min-width: 1024px) {
+    .heading {
+      gap: 4px;
+    }
+
+    .heading__title {
+      letter-spacing: 0.12em;
+    }
+
+    .heading--inline {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: baseline;
+      column-gap: 24px;
+    }
+  }
+</style>

@@ -1,0 +1,440 @@
+---
+/**
+ * Figma: desktop 17:34, mobile 19:119.
+ * The portrait is a placeholder in Figma; it becomes a CMS image in phase 3.
+ * The video block becomes a lite YouTube embed of the latest upload in phase 4.
+ */
+import CamIcon from '../../assets/icons/icon-cam.svg';
+import PlayIcon from '../../assets/icons/icon-play.svg';
+import AudioIcon from '../../assets/icons/icon-audio.svg';
+import PlayLarge from '../../assets/icons/play-large.svg';
+import type { pastor as PastorData } from '../../data/content';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+interface Props {
+  pastor: typeof PastorData;
+}
+
+const { pastor } = Astro.props;
+const podcastLive = pastor.podcast.live && pastor.podcast.url !== '';
+
+const channels = [
+  {
+    name: 'Instagram',
+    handle: pastor.instagram.handle,
+    description: 'Daily devotions & moments',
+    action: 'Follow',
+    href: pastor.instagram.url,
+    Icon: CamIcon,
+  },
+  {
+    name: 'YouTube',
+    handle: pastor.youtube.handle,
+    description: 'Sermons & teaching series',
+    action: 'Watch',
+    href: pastor.youtube.url,
+    Icon: PlayIcon,
+  },
+  {
+    name: 'Spotify',
+    handle: 'MTBC Podcast',
+    description: podcastLive ? 'Listen to the MTBC Podcast' : 'Coming soon',
+    action: podcastLive ? 'Listen' : 'Soon',
+    href: podcastLive ? pastor.podcast.url : undefined,
+    Icon: AudioIcon,
+  },
+];
+---
+
+<section id="pastor" class="pastor" aria-labelledby="pastor-title">
+  <div class="pastor__inner container">
+    <div class="pastor__heading" data-reveal>
+      <SectionHeading id="pastor-title" title="Our Pastor" label="Head Pastor" />
+    </div>
+
+    <div class="pastor__portrait" role="img" aria-label={`Portrait of ${pastor.name} (photo coming soon)`}></div>
+
+    <div class="pastor__name" data-reveal>
+      <h3 class="pastor__name-text">{pastor.name}</h3>
+      <p class="pastor__role">{pastor.title}</p>
+    </div>
+
+    <p class="pastor__bio" data-reveal>{pastor.bio}</p>
+
+    <div class="pastor__channels" data-reveal>
+      <p class="pastor__kicker">Follow · Watch · Listen</p>
+      <ul class="channels" role="list">
+        {
+          channels.map(({ name, handle, description, action, href, Icon }) => {
+            const Tag = href ? 'a' : 'div';
+            return (
+              <li>
+                <Tag
+                  class:list={['channel', { 'channel--soon': !href }]}
+                  {...(href ? { href, target: '_blank', rel: 'noopener' } : {})}
+                >
+                  <Icon class="channel__icon" aria-hidden="true" />
+                  <span class="channel__text">
+                    <span class="channel__name">{name}</span>
+                    <span class="channel__handle">
+                      {handle}
+                      {!href && <span class="channel__soon-inline"> · coming soon</span>}
+                    </span>
+                    <span class="channel__desc">{description}</span>
+                  </span>
+                  <span class="channel__action">
+                    {action}
+                    <span class="channel__line" aria-hidden="true" />
+                  </span>
+                  {href && <span class="visually-hidden">(opens in a new tab)</span>}
+                </Tag>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+
+    <div class="pastor__message" data-reveal>
+      <a class="video" href={pastor.youtube.url} target="_blank" rel="noopener">
+        <PlayLarge class="video__play" aria-hidden="true" />
+        <span class="visually-hidden">Watch the latest message on YouTube (opens in a new tab)</span>
+      </a>
+      <div class="pastor__message-row">
+        <p class="pastor__message-text">
+          <span class="pastor__message-label">Latest message</span>
+          <span class="pastor__message-title">{pastor.latestMessage}</span>
+        </p>
+        <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>All sermons</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pastor {
+    background: var(--sand);
+  }
+
+  .pastor__inner {
+    display: grid;
+    grid-template-areas: 'heading' 'portrait' 'name' 'bio' 'channels' 'message';
+    gap: 32px;
+    padding-block: 96px;
+  }
+
+  .pastor__heading {
+    grid-area: heading;
+  }
+
+  .pastor__portrait {
+    grid-area: portrait;
+    aspect-ratio: 342 / 420;
+    background: linear-gradient(129deg, #c7c1b4 14%, #8f8a7e 54%, #4f4b44 86%);
+  }
+
+  .pastor__name {
+    grid-area: name;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pastor__name-text {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.375rem, 1.236rem + 0.5714vw, 1.75rem); /* 22 → 28 */
+    line-height: 1.5;
+    letter-spacing: 0.08em;
+  }
+
+  .pastor__role {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.868rem + 0.2857vw, 1.125rem); /* 15 → 18 */
+    line-height: normal;
+    letter-spacing: 0.04em;
+  }
+
+  .pastor__bio {
+    grid-area: bio;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .pastor__channels {
+    grid-area: channels;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pastor__kicker {
+    color: var(--soft);
+    font-size: 10px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .channels {
+    display: grid;
+    gap: 12px;
+  }
+
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    padding: 18px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    transition: border-color 0.3s var(--ease-out);
+  }
+
+  .channel__icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+  }
+
+  .channel__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: normal;
+  }
+
+  .channel__name {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+  }
+
+  .channel__handle {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .channel__desc {
+    display: none;
+  }
+
+  .channel__action {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .channel__line {
+    width: 18px;
+    height: 1px;
+    background: var(--ink);
+    transform-origin: left center;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .channel--soon .channel__desc {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    a.channel:hover {
+      border-color: var(--ink);
+    }
+
+    a.channel:hover .channel__line {
+      transform: scaleX(1.5);
+    }
+  }
+
+  .pastor__message {
+    grid-area: message;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .video {
+    --focus: var(--gold);
+
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(151deg, #4a4038 14%, #2c2622 57%, #1c1917 86%);
+  }
+
+  .video__play {
+    width: 56px;
+    height: 56px;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .video:hover .video__play {
+      transform: scale(1.08);
+    }
+  }
+
+  .pastor__message-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pastor__message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pastor__message-label {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(0.875rem, 0.829rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: normal;
+    letter-spacing: 0.06em;
+  }
+
+  .pastor__message-title {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.993rem + 0.2857vw, 1.25rem); /* 17 → 20 */
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+  }
+
+  /* Tablet: channel cards side by side in the desktop card style. */
+  @media (min-width: 768px) {
+    .channels {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .channel {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0;
+      padding: 28px 24px;
+    }
+
+    .channel__icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .channel__text {
+      flex: none;
+      gap: 2px;
+      width: 100%;
+      padding-block: 0 16px;
+    }
+
+    .channel__name {
+      font-size: 18px;
+      letter-spacing: 0.08em;
+    }
+
+    .channel__handle {
+      font-size: 16px;
+    }
+
+    .channel__soon-inline {
+      display: none;
+    }
+
+    .channel__desc,
+    .channel--soon .channel__desc {
+      display: block;
+      color: var(--soft);
+      font-weight: 300;
+      font-size: 12px;
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+    }
+
+    .channel__action {
+      justify-content: space-between;
+      width: 100%;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .channel__line {
+      width: 24px;
+    }
+
+    .video__play {
+      width: 76px;
+      height: 76px;
+    }
+
+    .pastor__message-row {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .pastor__message {
+      gap: 20px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .pastor__inner {
+      grid-template-columns: minmax(0, 480fr) minmax(0, 624fr);
+      grid-template-areas:
+        'portrait heading'
+        'portrait name'
+        'portrait bio'
+        'portrait channels'
+        'portrait message';
+      grid-template-rows: auto auto auto auto 1fr;
+      column-gap: 96px;
+      row-gap: 40px;
+      padding-block: 180px;
+    }
+
+    .pastor__portrait {
+      position: sticky;
+      top: calc(var(--header-h) + 40px);
+      align-self: start;
+      aspect-ratio: 480 / 640;
+    }
+
+    .pastor__name {
+      gap: 4px;
+    }
+
+    .pastor__bio {
+      line-height: 2.3;
+    }
+
+    .pastor__channels {
+      gap: 16px;
+    }
+
+    .pastor__kicker {
+      font-size: 11px;
+    }
+  }
+</style>

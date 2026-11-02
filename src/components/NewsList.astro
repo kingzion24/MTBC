@@ -1,0 +1,85 @@
+---
+/** Figma "News list" (11:153 desktop, 19:193 mobile). */
+import type { NewsPost } from '../data/content';
+import Tag from './ui/Tag.astro';
+
+interface Props {
+  posts: NewsPost[];
+}
+
+const { posts } = Astro.props;
+const dotted = (iso: string) => iso.replaceAll('-', '.');
+---
+
+<ul class="news-list" role="list">
+  {
+    posts.map((post) => (
+      <li class="news-item">
+        <time class="news-item__date" datetime={post.date}>
+          {dotted(post.date)}
+        </time>
+        <span class="news-item__tag">
+          <Tag>{post.tag}</Tag>
+        </span>
+        <p class="news-item__title">{post.title}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .news-list {
+    border-top: 1px solid var(--line);
+  }
+
+  .news-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'date tag' 'title title';
+    align-items: center;
+    column-gap: 14px;
+    row-gap: 8px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .news-item__date {
+    grid-area: date;
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: clamp(1rem, 0.953rem + 0.1905vw, 1.125rem); /* 16 → 18 */
+    line-height: normal;
+    letter-spacing: 0.06em;
+  }
+
+  .news-item__tag {
+    grid-area: tag;
+  }
+
+  .news-item__title {
+    grid-area: title;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.7;
+    letter-spacing: 0.06em;
+  }
+
+  @media (min-width: 768px) {
+    .news-item {
+      grid-template-columns: 140px 140px 1fr;
+      grid-template-areas: 'date tag title';
+      column-gap: 0;
+      padding-block: 28px;
+    }
+
+    .news-item__date {
+      letter-spacing: 0.08em;
+    }
+
+    .news-item__title {
+      font-size: 16px;
+      letter-spacing: 0.08em;
+    }
+  }
+</style>

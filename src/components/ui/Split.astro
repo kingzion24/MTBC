@@ -1,0 +1,110 @@
+---
+/**
+ * Half photo / half text band (About MTBC 11:102, Visit Us 11:126).
+ * Mobile stacks the photo above (About) or below (Visit) the text.
+ */
+import { Image } from 'astro:assets';
+import type { Photo } from '../../data/content';
+
+interface Props {
+  id: string;
+  labelledby: string;
+  photo: Photo;
+  /** Photo on the right on desktop, and below the text on mobile. */
+  photoEnd?: boolean;
+}
+
+const { id, labelledby, photo, photoEnd = false } = Astro.props;
+---
+
+<section id={id} class:list={['split', { 'split--end': photoEnd }]} aria-labelledby={labelledby}>
+  <div class="split__media">
+    <Image src={photo.src} alt={photo.alt} widths={[390, 720, 1080, 1440]} sizes="(min-width: 1024px) 50vw, 100vw" />
+  </div>
+  <div class="split__text" data-reveal>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .split {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .split--end {
+    flex-direction: column-reverse;
+  }
+
+  .split__media :global(img) {
+    width: 100%;
+    aspect-ratio: 390 / 300;
+    object-fit: cover;
+  }
+
+  .split--end .split__media :global(img) {
+    aspect-ratio: 390 / 280;
+  }
+
+  .split__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 64px var(--gutter) 96px;
+  }
+
+  .split--end .split__text {
+    padding-block: 96px 56px;
+  }
+
+  .split__text :global(.split-lead) {
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023.98px) {
+    .split__media :global(img),
+    .split--end .split__media :global(img) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .split,
+    .split--end {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .split--end .split__media {
+      order: 2;
+    }
+
+    .split__media :global(img),
+    .split--end .split__media :global(img) {
+      height: 100%;
+      min-height: 100%;
+      aspect-ratio: 1 / 1;
+    }
+
+    .split__text,
+    .split--end .split__text {
+      justify-content: center;
+      gap: 40px;
+      max-width: 720px;
+      padding: 120px var(--gutter) 120px clamp(48px, 7.222vw, 104px);
+    }
+
+    .split__text :global(.split-lead) {
+      line-height: 2.3;
+    }
+
+    .split--end .split__text {
+      justify-self: end;
+      padding: 120px clamp(48px, 7.222vw, 104px) 120px var(--gutter);
+    }
+  }
+</style>

@@ -1,0 +1,317 @@
+---
+/**
+ * Figma: desktop 10:79, mobile 18:82.
+ * Desktop places four stories on the Figma coordinates (scaled with container query units);
+ * below 1024px they become a staggered column.
+ */
+import { Image } from 'astro:assets';
+import type { Story } from '../../data/content';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+interface Props {
+  stories: Story[];
+  allHref: string;
+}
+
+const { stories, allHref } = Astro.props;
+// The collage is designed for exactly four stories.
+const collage = stories.slice(0, 4);
+const lines = (text: string) => text.split('\n');
+---
+
+<section id="stories" class="stories" aria-labelledby="stories-title">
+  <div class="stories__head container" data-reveal>
+    <div class="stories__intro">
+      <SectionHeading id="stories-title" title="Life Together" label="Stories" />
+      <p class="stories__lead">
+        Worship, prayer and friendship, woven into ordinary days.<span class="stories__break"></span> A glimpse of life at
+        MTBC.
+      </p>
+    </div>
+    <Button href={allHref} class="stories__cta stories__cta--desktop">See all stories</Button>
+  </div>
+
+  <ul class="stories__gallery" role="list">
+    {
+      collage.map((story, i) => (
+        <li class={`story story--${i + 1}`}>
+          {story.quote && (
+            <p class="story__quote" data-reveal>
+              {lines(story.quote).map((line) => (
+                <span>{line}</span>
+              ))}
+            </p>
+          )}
+          <figure class="story__figure" data-reveal>
+            <Image
+              src={story.photo.src}
+              alt={story.photo.alt}
+              widths={[320, 480, 640, 960, 1280]}
+              sizes="(min-width: 1024px) 43vw, 94vw"
+              class="story__img"
+            />
+            {story.caption && <figcaption class="story__caption">{story.caption}</figcaption>}
+          </figure>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="container stories__cta--mobile">
+    <Button href={allHref} blockOnMobile>See all stories</Button>
+  </div>
+</section>
+
+<style>
+  .stories {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-block: 96px;
+  }
+
+  .stories__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .stories__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .stories__lead {
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .stories__break {
+    display: none;
+  }
+
+  .stories__head :global(.stories__cta--desktop) {
+    display: none;
+  }
+
+  /* ---------- Mobile / tablet: staggered column ---------- */
+  .stories__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .story {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .story__figure {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .story__img {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .story__quote {
+    color: var(--ink);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(1.625rem, 1.532rem + 0.381vw, 1.875rem); /* 26 → 30 */
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+
+  .story__quote span {
+    display: block;
+  }
+
+  .story__caption {
+    max-width: 300px;
+    color: var(--soft);
+    font-family: var(--serif-jp);
+    font-size: 13px;
+    line-height: 2;
+    letter-spacing: 0.04em;
+  }
+
+  /* 1: wide photo bleeding to the right edge */
+  .story--1 {
+    padding-left: var(--gutter);
+  }
+  .story--1 .story__img {
+    aspect-ratio: 366 / 250;
+  }
+
+  /* 2: quote and smaller photo aligned right */
+  .story--2 {
+    align-items: flex-end;
+    padding-inline: var(--gutter);
+  }
+  .story--2 .story__quote {
+    text-align: left;
+  }
+  .story--2 .story__figure {
+    width: min(280 / 342 * 100%, 420px);
+  }
+  .story--2 .story__img {
+    aspect-ratio: 280 / 200;
+  }
+
+  /* 3: portrait photo left, quote below */
+  .story--3 {
+    flex-direction: column-reverse;
+    padding-inline: var(--gutter);
+  }
+  .story--3 .story__figure {
+    width: min(240 / 342 * 100%, 360px);
+  }
+  .story--3 .story__img {
+    aspect-ratio: 240 / 310;
+  }
+
+  /* 4: wide photo bleeding to the left edge, caption inset */
+  .story--4 {
+    align-items: flex-end;
+    padding-right: var(--gutter);
+  }
+  .story--4 .story__figure {
+    width: 100%;
+  }
+  .story--4 .story__img {
+    aspect-ratio: 366 / 250;
+  }
+  .story--4 .story__caption {
+    align-self: flex-end;
+  }
+
+  .stories__cta--mobile {
+    display: block;
+  }
+
+  /* ---------- Desktop: Figma coordinates on a 1200-unit canvas ---------- */
+  @media (min-width: 1024px) {
+    .stories {
+      gap: 96px;
+      padding-block: 180px 160px;
+    }
+
+    .stories__lead {
+      line-height: 2.3;
+    }
+
+    .stories__break {
+      display: block;
+    }
+
+    .stories__head :global(.stories__cta--desktop) {
+      display: inline-flex;
+      flex: none;
+    }
+
+    .stories__cta--mobile {
+      display: none;
+    }
+
+    .stories__gallery {
+      position: relative;
+      display: block;
+      width: min(100% - 2 * var(--gutter), var(--content-max));
+      max-width: none;
+      aspect-ratio: 1200 / 1240;
+      container-type: inline-size;
+    }
+
+    .story {
+      --u: calc(100cqw / 1200); /* one Figma pixel, resolved against the gallery */
+
+      display: contents;
+    }
+
+    .story__figure,
+    .story__quote {
+      position: absolute;
+    }
+
+    .story__figure {
+      gap: 0;
+    }
+
+    .story__img {
+      width: 100%;
+    }
+
+    .story__caption {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: min(300px, 25cqw);
+      margin-top: calc(40 * var(--u));
+      font-size: 14px;
+      line-height: 2.1;
+    }
+
+    .story--1 .story__figure {
+      left: 0;
+      top: 0;
+      width: calc(620 * var(--u));
+    }
+    .story--1 .story__img {
+      aspect-ratio: 620 / 440;
+    }
+
+    .story--2 .story__quote {
+      left: calc(680 * var(--u));
+      top: calc(80 * var(--u));
+    }
+    .story--2 .story__figure {
+      left: calc(780 * var(--u));
+      top: calc(240 * var(--u));
+      width: calc(420 * var(--u));
+    }
+    .story--2 .story__img {
+      aspect-ratio: 420 / 300;
+    }
+    .story--2 .story__caption {
+      margin-top: calc(50 * var(--u));
+    }
+
+    .story--3 .story__figure {
+      left: calc(300 * var(--u));
+      top: calc(620 * var(--u));
+      width: calc(360 * var(--u));
+    }
+    .story--3 .story__img {
+      aspect-ratio: 360 / 460;
+    }
+    .story--3 .story__quote {
+      left: 0;
+      top: calc(780 * var(--u));
+    }
+
+    .story--4 .story__figure {
+      left: calc(740 * var(--u));
+      top: calc(760 * var(--u));
+      width: calc(460 * var(--u));
+    }
+    .story--4 .story__img {
+      aspect-ratio: 460 / 340;
+    }
+    .story--4 .story__caption {
+      margin-top: calc(30 * var(--u));
+    }
+  }
+</style>

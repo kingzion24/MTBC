@@ -12,6 +12,8 @@ interface Props extends Omit<HTMLAttributes<'a'>, 'class'> {
   variant?: Variant;
   /** Compact padding used in the desktop header. */
   compact?: boolean;
+  /** Generous padding used for the stacked Contact actions. */
+  large?: boolean;
   /** Stretch to the full container width below 768px (label left, arrow right). */
   blockOnMobile?: boolean;
   class?: string;
@@ -21,6 +23,7 @@ const {
   href,
   variant = 'outline',
   compact = false,
+  large = false,
   blockOnMobile = false,
   class: className,
   ...rest
@@ -29,7 +32,7 @@ const {
 
 <a
   href={href}
-  class:list={['btn', `btn--${variant}`, { 'btn--compact': compact, 'btn--block-mobile': blockOnMobile }, className]}
+  class:list={['btn', `btn--${variant}`, { 'btn--compact': compact, 'btn--large': large, 'btn--block-mobile': blockOnMobile }, className]}
   {...rest}
 >
   <span class="btn__label"><slot /></span>
@@ -68,6 +71,13 @@ const {
 
   .btn--compact {
     padding: 14px 26px;
+  }
+
+  @media (min-width: 768px) {
+    .btn--large {
+      justify-content: space-between;
+      padding: 26px 36px;
+    }
   }
 
   .btn--filled {

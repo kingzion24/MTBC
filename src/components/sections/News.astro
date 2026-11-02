@@ -1,0 +1,63 @@
+---
+/** Figma: desktop 11:145, mobile 19:189 */
+import type { NewsPost } from '../../data/content';
+import NewsList from '../NewsList.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+interface Props {
+  posts: NewsPost[];
+  allHref: string;
+}
+
+const { posts, allHref } = Astro.props;
+---
+
+<section id="news" class="news" aria-labelledby="news-title">
+  <div class="news__inner container">
+    <div class="news__heading" data-reveal>
+      <SectionHeading id="news-title" title="News" label="Announcements" layout="stacked" />
+    </div>
+    <div class="news__list" data-reveal>
+      <NewsList posts={posts.slice(0, 3)} />
+    </div>
+    <div class="news__cta">
+      <Button href={allHref} blockOnMobile>All news</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .news__inner {
+    display: grid;
+    grid-template-areas: 'heading' 'list' 'cta';
+    gap: 32px;
+    padding-block: 96px;
+  }
+
+  .news__heading {
+    grid-area: heading;
+  }
+
+  .news__list {
+    grid-area: list;
+  }
+
+  .news__cta {
+    grid-area: cta;
+  }
+
+  @media (min-width: 1200px) {
+    .news__inner {
+      grid-template-columns: minmax(0, 380fr) minmax(0, 724fr);
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        'heading list'
+        'cta list'
+        '. list';
+      column-gap: 96px;
+      row-gap: 48px;
+      padding-block: 160px;
+    }
+  }
+</style>

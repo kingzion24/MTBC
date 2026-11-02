@@ -1,0 +1,30 @@
+---
+/** Figma component "Tag" (Default / Active). */
+interface Props {
+  active?: boolean;
+}
+
+const { active = false } = Astro.props;
+---
+
+<span class:list={['tag', { 'tag--active': active }]}><slot /></span>
+
+<style>
+  .tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border: 1px solid var(--line);
+    color: var(--soft);
+    font-family: var(--sans);
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .tag--active {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+</style>

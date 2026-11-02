@@ -1,0 +1,480 @@
+---
+/**
+ * Full-screen MENU overlay. Not in Figma; designed in the same language:
+ * night background, numbered serif links with italic notes, thin rules, short line arrows.
+ * Built on <dialog> for focus trapping, Esc to close and an inert page behind.
+ */
+import { Image } from 'astro:assets';
+import logo from '../assets/mtbc-logo-white.png';
+import { site } from '../data/content';
+import Button from './ui/Button.astro';
+
+interface Props {
+  visitHref: string;
+}
+
+const { visitHref } = Astro.props;
+
+const items = [
+  { title: 'Visit Us', note: 'Kisutu Hall', href: '/#visit' },
+  { title: 'Life Together', note: 'Stories', href: '/#stories' },
+  { title: 'Gatherings', note: 'Events', href: '/#events' },
+  { title: 'Ministries', note: 'Get involved', href: '/#ministries' },
+  { title: 'About MTBC', note: 'Who we are', href: '/#about' },
+  { title: 'Our Pastor', note: 'Head Pastor', href: '/#pastor' },
+  { title: 'News', note: 'Announcements', href: '/news' },
+  { title: 'Come and See', note: 'Contact us', href: '/#contact' },
+];
+const external = { target: '_blank', rel: 'noopener' };
+---
+
+<dialog id="site-menu" class="menu" aria-label="Site menu" data-menu>
+  <div class="menu__bar">
+    <a class="menu__logo" href="/" data-menu-link>
+      <Image
+        src={logo}
+        alt="Manna Tabernacle Bible Church — home"
+        widths={[112, 160, 224, 320]}
+        sizes="(min-width: 768px) 160px, 112px"
+      />
+    </a>
+    <button class="menu__close" type="button" data-menu-close>
+      <span class="menu__close-x" aria-hidden="true"></span>
+      <span class="menu__close-label">Close</span>
+    </button>
+  </div>
+
+  <div class="menu__body">
+    <nav class="menu__nav" aria-label="Main">
+      <ol class="menu__list">
+        {
+          items.map((item, i) => (
+            <li class="menu__item" style={`--i: ${i}`}>
+              <a class="menu__link" href={item.href} data-menu-link>
+                <span class="menu__num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span class="menu__title">{item.title}</span>
+                <span class="menu__note">{item.note}</span>
+                <span class="menu__arrow" aria-hidden="true" />
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <aside class="menu__aside" aria-label="Service details">
+      <div class="menu__block">
+        <p class="menu__kicker">Sunday Service</p>
+        <p class="menu__time">{site.serviceTime}</p>
+      </div>
+      <div class="menu__block">
+        <p class="menu__kicker">Where</p>
+        <p class="menu__text">{site.venue}<br />{site.address}</p>
+        <a class="menu__small-link" href={site.mapUrl} {...external}>
+          Google Map<span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </div>
+      <div class="menu__block">
+        <p class="menu__kicker">Call us</p>
+        <a class="menu__phone" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+      </div>
+      <Button href={visitHref} variant="filled-light" blockOnMobile data-menu-link>Plan your visit</Button>
+      <ul class="menu__social" role="list">
+        <li>
+          <a href={site.instagram} {...external}>Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+        </li>
+        <li>
+          <a href={site.youtube} {...external}>YouTube<span class="visually-hidden"> (opens in a new tab)</span></a>
+        </li>
+      </ul>
+    </aside>
+  </div>
+
+  <p class="menu__tagline" aria-hidden="true">Daily bread for every soul...</p>
+</dialog>
+
+<script>
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openers = document.querySelectorAll<HTMLButtonElement>('[data-menu-open]');
+
+  if (menu) {
+    const setExpanded = (open: boolean) => {
+      for (const btn of openers) btn.setAttribute('aria-expanded', String(open));
+    };
+
+    for (const btn of openers) {
+      btn.addEventListener('click', () => {
+        menu.showModal();
+        setExpanded(true);
+      });
+    }
+
+    menu.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
+    menu.addEventListener('close', () => setExpanded(false));
+
+    // Close before following in-page links so the page can scroll to the target.
+    for (const link of menu.querySelectorAll('[data-menu-link]')) {
+      link.addEventListener('click', () => menu.close());
+    }
+  }
+</script>
+
+<style>
+  .menu {
+    --focus: var(--gold-light);
+
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--night);
+    color: var(--paper);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .menu[open] {
+    display: flex;
+    flex-direction: column;
+    animation: menu-in 0.5s var(--ease-out);
+  }
+
+  .menu::backdrop {
+    background: var(--night);
+  }
+
+  :global(html:has(dialog[open])) {
+    overflow: hidden;
+  }
+
+  .menu__bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    padding-inline: 20px;
+    background: var(--night);
+  }
+
+  .menu__logo img {
+    width: 112px;
+    height: auto;
+  }
+
+  .menu__close {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    margin-inline: -5px;
+  }
+
+  .menu__close-x {
+    position: relative;
+    width: 28px;
+    height: 7px;
+  }
+
+  .menu__close-x::before,
+  .menu__close-x::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: rotate(14deg);
+  }
+
+  .menu__close-x::after {
+    transform: rotate(-14deg);
+  }
+
+  .menu__close-label {
+    font-size: 9px;
+    line-height: normal;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .menu__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 56px;
+    padding: 24px 24px 40px;
+  }
+
+  .menu__list {
+    border-top: 1px solid var(--night-line);
+  }
+
+  .menu__item {
+    animation: menu-item-in 0.6s var(--ease-out) both;
+    animation-delay: calc(0.1s + var(--i) * 0.04s);
+  }
+
+  .menu__link {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    grid-template-areas: 'num title arrow' 'num note arrow';
+    align-items: baseline;
+    column-gap: 8px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--night-line);
+  }
+
+  .menu__num {
+    grid-area: num;
+    color: var(--gold-light);
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .menu__title {
+    grid-area: title;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .menu__note {
+    grid-area: note;
+    color: var(--night-gold);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 14px;
+    line-height: normal;
+    letter-spacing: 0.06em;
+  }
+
+  .menu__arrow {
+    grid-area: arrow;
+    align-self: center;
+    width: 24px;
+    height: 1px;
+    background: var(--night-muted);
+    transform-origin: right center;
+    transition:
+      transform 0.4s var(--ease-out),
+      background-color 0.3s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .menu__link:hover .menu__title {
+      color: var(--gold-light);
+    }
+
+    .menu__link:hover .menu__arrow {
+      background: var(--paper);
+      transform: scaleX(1.6);
+    }
+  }
+
+  .menu__aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    animation: menu-item-in 0.6s var(--ease-out) 0.3s both;
+  }
+
+  .menu__block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .menu__kicker {
+    color: var(--night-muted);
+    font-size: 10px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .menu__time {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: normal;
+    letter-spacing: 0.14em;
+  }
+
+  .menu__text {
+    color: var(--night-text);
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 1.9;
+    letter-spacing: 0.04em;
+  }
+
+  .menu__small-link {
+    align-self: flex-start;
+    color: var(--night-text);
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.14em;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-transform: uppercase;
+  }
+
+  .menu__phone {
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: 26px;
+    line-height: normal;
+    letter-spacing: 0.08em;
+  }
+
+  .menu__aside :global(.btn) {
+    align-self: stretch;
+  }
+
+  .menu__social {
+    display: flex;
+    gap: 24px;
+    color: var(--night-text);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  @media (hover: hover) {
+    .menu__social a:hover,
+    .menu__small-link:hover,
+    .menu__phone:hover {
+      color: var(--gold-light);
+    }
+  }
+
+  .menu__tagline {
+    flex: none;
+    padding: 0 24px 32px;
+    color: var(--night-gold);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+  }
+
+  @media (min-width: 768px) {
+    .menu__bar {
+      padding-inline: 48px;
+    }
+
+    .menu__logo img {
+      width: 160px;
+    }
+
+    .menu__close-x {
+      width: 34px;
+    }
+
+    .menu__close-label {
+      font-size: 10px;
+    }
+
+    .menu__aside :global(.btn) {
+      align-self: flex-start;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .menu__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+      align-items: center;
+      gap: clamp(60px, 8.333vw, 120px);
+      width: min(100% - 2 * var(--gutter), var(--content-max));
+      margin-inline: auto;
+      padding: 40px 0;
+    }
+
+    .menu__list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 56px;
+      border-top: 0;
+    }
+
+    .menu__link {
+      grid-template-columns: 48px 1fr auto;
+      padding-block: 24px;
+    }
+
+    .menu__item:nth-child(-n + 2) .menu__link {
+      border-top: 1px solid var(--night-line);
+    }
+
+    .menu__num {
+      font-size: 22px;
+    }
+
+    .menu__title {
+      font-size: clamp(1.375rem, 0.9rem + 0.9vw, 1.75rem); /* 22 → 28 */
+      letter-spacing: 0.12em;
+    }
+
+    .menu__note {
+      font-size: 16px;
+    }
+
+    .menu__arrow {
+      width: 28px;
+    }
+
+    .menu__aside {
+      gap: 32px;
+      padding-left: clamp(40px, 4vw, 56px);
+      border-left: 1px solid var(--night-line);
+    }
+
+    .menu__tagline {
+      width: min(100% - 2 * var(--gutter), var(--content-max));
+      margin-inline: auto;
+      padding: 0 0 48px;
+      font-size: 18px;
+    }
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes menu-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu[open],
+    .menu__item,
+    .menu__aside {
+      animation: none;
+    }
+  }
+</style>

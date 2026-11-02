@@ -11,8 +11,16 @@
   --paper: #ffffff;
   --sand: #f5f2ec;
   --gold: #9c8460; /* 3.6:1 on white — large text (24px+) and decoration only */
-  --gold-light: #d8c7a6;
+  --gold-text: #806a48; /* small gold text: 5.2:1 on paper, 4.6:1 on sand */
+  --gold-light: #d8c7a6; /* gold on dark/photo backgrounds */
   --night: #23211f;
+
+  /* Footer / dark surfaces */
+  --night-raised: #332f2c;
+  --night-line: #403b37;
+  --night-text: #d9d4cc;
+  --night-gold: #a8977c;
+  --night-muted: #958e85; /* Figma #8a837a is 4.3:1 on night; nudged to 5:1 */
 
   /* Type families */
   --serif-jp: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
@@ -26,6 +34,15 @@
   /* Focus ring (overridden on dark surfaces) */
   --focus: var(--gold);
 
+  /* Header */
+  --header-h: 72px;
+
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 96px;
+  }
 }

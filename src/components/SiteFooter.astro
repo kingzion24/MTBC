@@ -1,0 +1,336 @@
+---
+/** Figma: desktop 11:189, mobile 19:230 */
+import { Image } from 'astro:assets';
+import logo from '../assets/mtbc-logo-white.png';
+import { site } from '../data/content';
+import { sitemap } from '../data/navigation';
+
+const year = new Date().getFullYear();
+const external = { target: '_blank', rel: 'noopener' };
+---
+
+<footer class="footer">
+  <div class="footer__inner container">
+    <div class="footer__main">
+      <div class="footer__info">
+        <a href="/" class="footer__logo">
+          <Image src={logo} alt="Manna Tabernacle Bible Church — home" widths={[180, 240, 360, 480]} sizes="(min-width: 768px) 240px, 180px" />
+        </a>
+        <address class="footer__address">
+          <span class="footer__venue">{site.venue}</span>
+          <span class="footer__street">{site.address}</span>
+          <a class="footer__map-link" href={site.mapUrl} {...external}>
+            Google Map<span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
+        </address>
+        <a class="footer__map" href={site.mapUrl} {...external}>
+          <span>Map — Kisutu, Dar es Salaam</span>
+          <span class="visually-hidden"> (opens Google Maps in a new tab)</span>
+        </a>
+      </div>
+
+      <nav class="footer__sitemap" aria-label="Sitemap">
+        {
+          sitemap.map((group) => (
+            <div class="footer__group">
+              <p class="footer__group-title">
+                <span>{group.title}</span>
+                <span class="footer__group-note">{group.note}</span>
+              </p>
+              <ul class="footer__links">
+                {group.links.map((link) => (
+                  <li>
+                    <a href={link.href} {...(link.external ? external : {})}>
+                      {link.label}
+                      {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__tagline">Daily bread for every soul...</p>
+      <ul class="footer__legal" role="list">
+        <li><a href="/#contact">Contact</a></li>
+        <li><a href={site.instagram} {...external}>Instagram</a></li>
+        <li><a href={site.youtube} {...external}>YouTube</a></li>
+      </ul>
+      <p class="footer__copy">© {year} Manna Tabernacle Bible Church</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    --focus: var(--gold-light);
+
+    background: var(--night);
+    color: var(--paper);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-block: 72px 40px;
+  }
+
+  .footer__main {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .footer__info {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .footer__logo {
+    align-self: flex-start;
+  }
+
+  .footer__logo :global(img) {
+    width: 180px;
+    height: auto;
+  }
+
+  .footer__address {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-style: normal;
+  }
+
+  .footer__venue {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 15px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .footer__street {
+    color: var(--night-text);
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 2;
+    letter-spacing: 0.04em;
+  }
+
+  .footer__map-link {
+    color: var(--night-text);
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.14em;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-transform: uppercase;
+  }
+
+  .footer__map {
+    position: relative;
+    display: block;
+    height: 170px;
+    border: 1px solid var(--night-line);
+    background: var(--night-raised);
+    color: var(--night-muted);
+    transition: border-color 0.3s var(--ease-out);
+  }
+
+  .footer__map > span:first-child {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    font-size: 10px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .footer__sitemap {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 24px;
+  }
+
+  .footer__group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer__group-title {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .footer__group-note {
+    color: var(--night-gold);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  .footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--night-text);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: normal;
+    letter-spacing: 0.04em;
+  }
+
+  .footer__links a {
+    display: inline-block;
+    padding-block: 2px;
+  }
+
+  @media (hover: hover) {
+    .footer__links a:hover,
+    .footer__legal a:hover,
+    .footer__map-link:hover {
+      color: var(--paper);
+    }
+
+    .footer__map:hover {
+      border-color: var(--night-muted);
+    }
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 24px;
+    border-top: 1px solid var(--night-line);
+    line-height: normal;
+  }
+
+  .footer__tagline {
+    color: var(--night-gold);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+  }
+
+  .footer__legal,
+  .footer__copy {
+    color: var(--night-muted);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .footer__legal li + li::before {
+    content: '·';
+    padding-inline: 0.8em;
+  }
+
+  @media (min-width: 768px) {
+    .footer__sitemap {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 40px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer__inner {
+      gap: 120px;
+      padding-block: 120px 48px;
+    }
+
+    .footer__main {
+      flex-direction: row;
+      gap: clamp(60px, 8.333vw, 120px);
+    }
+
+    .footer__info {
+      flex: none;
+      width: min(420px, 38%);
+    }
+
+    .footer__logo :global(img) {
+      width: 240px;
+    }
+
+    .footer__venue {
+      letter-spacing: 0.12em;
+    }
+
+    .footer__address {
+      padding-bottom: 20px;
+    }
+
+    .footer__map {
+      height: 200px;
+    }
+
+    .footer__map > span:first-child {
+      bottom: 16px;
+      left: 16px;
+    }
+
+    .footer__sitemap {
+      flex: 1;
+      align-self: flex-start;
+    }
+
+    .footer__group {
+      gap: 20px;
+    }
+
+    .footer__group-title {
+      font-size: 15px;
+      letter-spacing: 0.12em;
+    }
+
+    .footer__group-note {
+      font-size: 13px;
+    }
+
+    .footer__links {
+      font-size: 13px;
+    }
+
+    .footer__bottom {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+    }
+
+    .footer__tagline {
+      font-size: 18px;
+      letter-spacing: 0.1em;
+    }
+
+    .footer__legal,
+    .footer__copy {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+    }
+  }
+</style>

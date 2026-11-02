@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EventCard from '../components/EventCard.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import { events } from '../data/content';
+---
+
+<BaseLayout
+  title="Gatherings & Events — MTBC Dar es Salaam"
+  description="Weekly gatherings at Manna Tabernacle Bible Church, Kisutu Hall, Dar es Salaam: prayer, youth fellowship and more."
+  solidHeader
+>
+  <div class="page container">
+    <SectionHeading id="page-title" title="Gatherings" label="Events" layout="stacked" level="h1" />
+    <p class="page__lead">Whether this is your first visit or your fiftieth, there's always a reason to come together.</p>
+    <ul class="page__grid" role="list">
+      {
+        events.map((event) => (
+          <li>
+            <EventCard event={event} headingLevel="h2" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-block: 64px 96px;
+  }
+
+  .page__lead {
+    max-width: 32em;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem);
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 32px;
+  }
+
+  .page__grid > li {
+    display: flex;
+    background: var(--sand);
+  }
+
+  .page__grid > li > :global(*) {
+    flex: 1;
+    border: 1px solid var(--line);
+  }
+
+  @media (min-width: 1024px) {
+    .page {
+      gap: 48px;
+      padding-block: 120px 160px;
+    }
+  }
+</style>

@@ -1,0 +1,126 @@
+---
+/** Figma "Event card" (11:20 desktop, 18:110 mobile). */
+import { Image } from 'astro:assets';
+import type { EventItem } from '../data/content';
+import Tag from './ui/Tag.astro';
+
+interface Props {
+  event: EventItem;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { event, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class="event">
+  <Image
+    src={event.photo.src}
+    alt={event.photo.alt}
+    widths={[342, 480, 684, 960]}
+    sizes="(min-width: 768px) 342px, 100vw"
+    class="event__img"
+  />
+  <div class="event__body">
+    <ul class="event__tags" aria-label="Tags">
+      <li><Tag active>{event.category}</Tag></li>
+      {
+        event.tags.map((tag) => (
+          <li>
+            <Tag>{tag}</Tag>
+          </li>
+        ))
+      }
+    </ul>
+    <Heading class="event__title">
+      <span>{event.title}</span>
+      <span>{event.subtitle}</span>
+    </Heading>
+    <p class="event__meta">
+      <span>{event.when}</span>
+      <span>{event.place}</span>
+    </p>
+  </div>
+</article>
+
+<style>
+  .event {
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+  }
+
+  .event__img {
+    width: 100%;
+    aspect-ratio: 342 / 210;
+    object-fit: cover;
+  }
+
+  .event__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px 20px 28px;
+  }
+
+  .event__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .event__title {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.993rem + 0.2857vw, 1.25rem); /* 17 → 20 */
+    line-height: 1.7;
+    letter-spacing: 0.06em;
+    text-wrap: pretty;
+  }
+
+  .event__title span {
+    display: block;
+  }
+
+  .event__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: var(--soft);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: normal;
+    letter-spacing: 0.04em;
+  }
+
+  @media (min-width: 1024px) {
+    .event__img {
+      aspect-ratio: 342 / 300;
+    }
+
+    .event__body {
+      gap: 20px;
+      padding: 32px 32px 40px;
+    }
+
+    .event__tags {
+      gap: 8px;
+    }
+
+    .event__title {
+      letter-spacing: 0.08em;
+    }
+
+    .event__meta {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 16px;
+      font-size: 13px;
+    }
+  }
+</style>
