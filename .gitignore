@@ -14,3 +14,6 @@ npm-debug.log*
 
 # macOS
 .DS_Store
+
+# Raw hero video sources (large); encoded loops live in public/videos/hero
+src/assets/videos/

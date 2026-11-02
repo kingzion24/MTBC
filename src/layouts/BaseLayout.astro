@@ -39,14 +39,20 @@ const visitHref = '/#visit';
         root.classList.add('js');
         try {
           var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (!reduce && !sessionStorage.getItem('mtbc-loaded')) root.classList.add('is-loading');
+          if (!reduce && !sessionStorage.getItem('mtbc-loaded')) {
+            root.classList.add('is-loading');
+            // Failsafe: never leave the page locked behind the loader.
+            setTimeout(function () {
+              root.classList.remove('is-loading', 'is-loaded');
+            }, 4000);
+          }
         } catch (e) {}
       })();
     </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Loader />
+    <Loader framed={!solidHeader} />
     <SiteHeader serviceTime={site.serviceTime} visitHref={visitHref} solid={solidHeader} />
     <main id="main" class:list={{ 'main--offset': solidHeader }}>
       <slot />

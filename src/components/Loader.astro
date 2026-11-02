@@ -3,17 +3,27 @@
  * First-visit loading screen with a percentage counter.
  * Shown only when JS runs, once per browser session, and never for reduced-motion users
  * (the `is-loading` class is set by an inline script in BaseLayout's <head>).
- * A CSS failsafe hides it after 3.5s even if the script below never runs.
+ * On pages with the video hero, the clips sit as a small window between the logo and the
+ * counter and open to full bleed when loading finishes (see Hero.astro).
+ * An inline failsafe in BaseLayout clears the loading state after 4s even if this script never runs.
  */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
+
+interface Props {
+  framed?: boolean;
+}
+
+const { framed = false } = Astro.props;
 ---
 
-<div class="loader" aria-hidden="true" data-loader>
+<div class:list={['loader', { 'loader--framed': framed }]} aria-hidden="true" data-loader>
   <div class="loader__inner">
     <Image src={logo} alt="" widths={[160, 320]} sizes="160px" loading="eager" class="loader__logo" />
-    <p class="loader__count">Loading <span data-loader-count>0</span>%</p>
-    <span class="loader__bar"><span class="loader__fill" data-loader-fill></span></span>
+    <div class="loader__progress">
+      <p class="loader__count">Loading <span data-loader-count>0</span>%</p>
+      <span class="loader__bar"><span class="loader__fill" data-loader-fill></span></span>
+    </div>
   </div>
 </div>
 
@@ -37,7 +47,8 @@ import logo from '../assets/mtbc-logo-white.png';
       } catch {
         /* storage blocked: the loader just shows again next time */
       }
-      loader.addEventListener('transitionend', () => root.classList.remove('is-loading', 'is-loaded'), { once: true });
+      // Leave time for the hero clips to open to full bleed before clearing the state.
+      window.setTimeout(() => root.classList.remove('is-loading', 'is-loaded'), 1500);
     };
 
     const tick = (now: number) => {
@@ -64,6 +75,10 @@ import logo from '../assets/mtbc-logo-white.png';
     display: none;
   }
 
+  :global(html.is-loading) {
+    overflow: hidden;
+  }
+
   :global(html.is-loading) .loader {
     position: fixed;
     inset: 0;
@@ -73,9 +88,8 @@ import logo from '../assets/mtbc-logo-white.png';
     background: var(--night);
     color: var(--paper);
     transition:
-      opacity 0.6s var(--ease-out),
-      visibility 0.6s;
-    animation: loader-failsafe 0.6s 3.5s forwards;
+      opacity 0.8s var(--ease-out),
+      visibility 0.8s;
   }
 
   :global(html.is-loaded) .loader {
@@ -90,9 +104,24 @@ import logo from '../assets/mtbc-logo-white.png';
     gap: 24px;
   }
 
+  /* Logo above and counter below the half-size hero window in the middle of the screen. */
+  .loader--framed .loader__inner {
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding-block: max(32px, 8vh);
+  }
+
   .loader__logo {
     width: 160px;
     height: auto;
+  }
+
+  .loader__progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
   }
 
   .loader__count {
@@ -117,12 +146,5 @@ import logo from '../assets/mtbc-logo-white.png';
     background: var(--gold-light);
     transform: scaleX(0);
     transform-origin: left center;
-  }
-
-  @keyframes loader-failsafe {
-    to {
-      opacity: 0;
-      visibility: hidden;
-    }
   }
 </style>

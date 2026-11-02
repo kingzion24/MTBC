@@ -1,7 +1,15 @@
 ---
-/** Figma: desktop 10:22, mobile 18:37 */
-import { Picture } from 'astro:assets';
-import heroImage from '../../assets/photos/hero-worship.jpg';
+/**
+ * Figma: desktop 10:22, mobile 18:37. The Figma photo is replaced by three vertical clips:
+ * - landscape screens: side by side as a triptych, all looping;
+ * - portrait screens: one at a time, cross-fading to the next when a clip ends.
+ * Posters are shown without JS, with reduced motion, or with Data Saver on.
+ * Clips are encoded by scripts/encode-hero-videos.sh into public/videos/hero/.
+ */
+import { getImage } from 'astro:assets';
+import poster1 from '../../assets/photos/hero-poster-1.jpg';
+import poster2 from '../../assets/photos/hero-poster-2.jpg';
+import poster3 from '../../assets/photos/hero-poster-3.jpg';
 import Button from '../ui/Button.astro';
 
 interface Props {
@@ -12,20 +20,33 @@ interface Props {
 }
 
 const { serviceTime, visitHref, nextHref } = Astro.props;
+
+const clips = await Promise.all(
+  [poster1, poster2, poster3].map(async (poster, i) => ({
+    src: `/videos/hero/hero-${i + 1}.mp4`,
+    poster: (await getImage({ src: poster, width: 480, format: 'webp', quality: 70 })).src,
+  })),
+);
 ---
 
 <section class="hero" aria-labelledby="hero-title">
-  <div class="hero__media">
-    <Picture
-      src={heroImage}
-      alt="A woman in a patterned dress raises both hands in worship during a Sunday service at MTBC."
-      formats={['avif', 'webp']}
-      widths={[480, 768, 1080, 1440, 1920, 2560]}
-      sizes="(min-aspect-ratio: 2313/1000) 100vw, 232vh"
-      quality={70}
-      loading="eager"
-      fetchpriority="high"
-    />
+  <div class="hero__media" data-hero-media>
+    {
+      clips.map((clip, i) => (
+        <video
+          class="hero__clip"
+          src={clip.src}
+          poster={clip.poster}
+          muted
+          playsinline
+          preload="none"
+          disablepictureinpicture
+          disableremoteplayback
+          aria-hidden="true"
+          data-active={i === 0 ? '' : undefined}
+        />
+      ))
+    }
   </div>
 
   <div class="hero__body container">
@@ -45,11 +66,90 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
     <Button href={visitHref} variant="filled-light" blockOnMobile class="hero__cta">Plan your visit</Button>
   </div>
 
+  <button class="hero__toggle" type="button" aria-pressed="false" hidden data-hero-toggle>
+    <span data-hero-toggle-label>Pause</span><span class="visually-hidden"> background video</span>
+  </button>
+
   <a class="hero__scroll" href={nextHref}>
     <span>Scroll</span>
     <span class="hero__scroll-line" aria-hidden="true"></span>
   </a>
 </section>
+
+<script>
+  const media = document.querySelector<HTMLElement>('[data-hero-media]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+  const label = toggle?.querySelector('[data-hero-toggle-label]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
+  if (media && toggle && !reduceMotion.matches && !saveData) {
+    const clips = [...media.querySelectorAll<HTMLVideoElement>('video')];
+    const triptych = window.matchMedia('(min-aspect-ratio: 6/5)');
+    let active = 0;
+    let paused = false;
+
+    const play = (video: HTMLVideoElement) => {
+      video.play().catch(() => {
+        /* Autoplay refused (e.g. Low Power Mode): the poster stays. */
+      });
+    };
+
+    const show = (index: number) => {
+      clips.forEach((clip, i) => clip.toggleAttribute('data-active', i === index));
+      active = index;
+    };
+
+    const start = () => {
+      if (paused) return;
+      if (triptych.matches) {
+        for (const clip of clips) {
+          clip.loop = true;
+          play(clip);
+        }
+      } else {
+        clips.forEach((clip, i) => {
+          clip.loop = false;
+          if (i !== active) clip.pause();
+        });
+        play(clips[active]!);
+      }
+    };
+
+    for (const clip of clips) {
+      // If a clip can't be decoded, drop its source so the browser shows the poster instead of black.
+      clip.addEventListener(
+        'error',
+        () => {
+          clip.removeAttribute('src');
+          clip.load();
+        },
+        { once: true },
+      );
+
+      // Portrait: hand over to the next clip when one finishes.
+      clip.addEventListener('ended', () => {
+        if (triptych.matches || paused) return;
+        const next = (active + 1) % clips.length;
+        clips[next]!.currentTime = 0;
+        show(next);
+        play(clips[next]!);
+      });
+    }
+
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      toggle.setAttribute('aria-pressed', String(paused));
+      if (label) label.textContent = paused ? 'Play' : 'Pause';
+      if (paused) for (const clip of clips) clip.pause();
+      else start();
+    });
+
+    triptych.addEventListener('change', start);
+    start();
+  }
+</script>
 
 <style>
   .hero {
@@ -72,15 +172,32 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
     inset: 0;
   }
 
-  .hero__media :global(picture) {
-    display: contents;
-  }
-
-  .hero__media :global(img) {
+  /* Portrait: clips stacked, the active one visible. */
+  .hero__clip {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 50%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-out);
+  }
+
+  .hero__clip[data-active] {
+    opacity: 1;
+  }
+
+  /* Landscape: three clips side by side. */
+  @media (min-aspect-ratio: 6/5) {
+    .hero__media {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .hero__clip {
+      position: static;
+      opacity: 1;
+    }
   }
 
   /* Mobile: top-to-bottom scrim so copy at the bottom stays legible. */
@@ -94,6 +211,40 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
       rgb(18 15 13 / 0.85) 75%,
       rgb(18 15 13 / 0.95) 100%
     );
+  }
+
+  /* First visit: the clips start as a small window inside the loading screen, then open to full bleed. */
+  :global(html.is-loading) .hero__media {
+    z-index: 101;
+    transform: scale(0.5);
+  }
+
+  :global(html.is-loaded) .hero__media {
+    transform: none;
+    transition: transform 1.4s var(--ease-out);
+  }
+
+  .hero__toggle {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 16px;
+    z-index: 1;
+    padding: 8px 0;
+    font-size: 10px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .hero__toggle[hidden] {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .hero__toggle:hover {
+      opacity: 1;
+    }
   }
 
   .hero__body {
@@ -163,22 +314,11 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
       padding-block: 160px clamp(80px, 11vw, 159px);
     }
 
-    /* Figma anchors the photo left on landscape screens; portrait tablets keep the subject centred. */
-    .hero__media :global(img) {
-      object-position: 0% 50%;
-    }
-
-    @media (max-aspect-ratio: 4/3) {
-      .hero__media :global(img) {
-        object-position: 55% 50%;
-      }
-    }
-
     /* Desktop: soft left-to-right scrim over a light overall dim. */
     .hero__media::after {
       background:
-        linear-gradient(90deg, rgb(20 18 15 / 0.25), rgb(20 18 15 / 0.25)),
-        linear-gradient(90deg, rgb(20 18 15 / 0.6) 0%, rgb(20 18 15 / 0.1) 60%, rgb(20 18 15 / 0.05) 100%);
+        linear-gradient(90deg, rgb(20 18 15 / 0.3), rgb(20 18 15 / 0.3)),
+        linear-gradient(90deg, rgb(20 18 15 / 0.65) 0%, rgb(20 18 15 / 0.2) 60%, rgb(20 18 15 / 0.05) 100%);
     }
 
     .hero__body {
@@ -217,6 +357,12 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
       width: 1px;
       height: 96px;
       background: var(--paper);
+    }
+
+    .hero__toggle {
+      right: auto;
+      bottom: 32px;
+      left: 48px;
     }
   }
 
