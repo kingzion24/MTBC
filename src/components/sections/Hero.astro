@@ -1,0 +1,233 @@
+---
+/** Figma: desktop 10:22, mobile 18:37 */
+import { Picture } from 'astro:assets';
+import heroImage from '../../assets/hero-worship.jpg';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  serviceTime: string;
+  visitHref: string;
+  /** In-page anchor the "Scroll" cue jumps to. */
+  nextHref: string;
+}
+
+const { serviceTime, visitHref, nextHref } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__media">
+    <Picture
+      src={heroImage}
+      alt="A woman in a patterned dress raises both hands in worship during a Sunday service at MTBC."
+      formats={['avif', 'webp']}
+      widths={[480, 768, 1080, 1440, 1920, 2560]}
+      sizes="(min-aspect-ratio: 2313/1000) 100vw, 232vh"
+      quality={70}
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="hero__body container">
+    <h1 id="hero-title" class="hero__title">
+      <span>Daily bread</span>
+      <span>for every soul.</span>
+    </h1>
+    <p class="hero__lead">
+      <span>Manna Tabernacle Bible Church.</span>
+      <span>A family gathered around the Word,<span class="hero__break"></span> in the heart of Dar es Salaam.</span>
+    </p>
+
+    <p class="hero__service">
+      <span class="hero__service-label">Sunday Service</span>
+      <span class="hero__service-time">{serviceTime}</span>
+    </p>
+    <Button href={visitHref} variant="filled-light" blockOnMobile class="hero__cta">Plan your visit</Button>
+  </div>
+
+  <a class="hero__scroll" href={nextHref}>
+    <span>Scroll</span>
+    <span class="hero__scroll-line" aria-hidden="true"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    --focus: var(--gold-light);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: max(100svh, 640px);
+    padding-block: 120px 50px;
+    overflow: hidden;
+    background: var(--night);
+    color: var(--paper);
+  }
+
+  .hero__media,
+  .hero__media::after {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero__media :global(picture) {
+    display: contents;
+  }
+
+  .hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  /* Mobile: top-to-bottom scrim so copy at the bottom stays legible. */
+  .hero__media::after {
+    content: '';
+    background: linear-gradient(
+      180deg,
+      rgb(18 15 13 / 0.35) 0%,
+      rgb(18 15 13 / 0.1) 30%,
+      rgb(18 15 13 / 0.55) 50%,
+      rgb(18 15 13 / 0.85) 75%,
+      rgb(18 15 13 / 0.95) 100%
+    );
+  }
+
+  .hero__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .hero__title {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 1.786rem + 1.905vw, 3.5rem); /* 36 → 56 */
+    line-height: 1.6;
+    letter-spacing: 0.1em;
+  }
+
+  .hero__title span,
+  .hero__lead > span {
+    display: block;
+  }
+
+  .hero__lead {
+    font-family: var(--serif-jp);
+    font-weight: 400;
+    font-size: clamp(0.8125rem, 0.743rem + 0.2857vw, 1rem); /* 13 → 16 */
+    line-height: 2.1;
+    letter-spacing: 0.08em;
+  }
+
+  .hero__break {
+    display: block;
+  }
+
+  .hero__service {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid rgb(255 255 255 / 0.4);
+    line-height: normal;
+    white-space: nowrap;
+  }
+
+  .hero__service-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .hero__service-time {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+  }
+
+  .hero__scroll {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      min-height: max(100svh, 720px);
+      padding-block: 160px clamp(80px, 11vw, 159px);
+    }
+
+    /* Figma anchors the photo left on landscape screens; portrait tablets keep the subject centred. */
+    .hero__media :global(img) {
+      object-position: 0% 50%;
+    }
+
+    @media (max-aspect-ratio: 4/3) {
+      .hero__media :global(img) {
+        object-position: 55% 50%;
+      }
+    }
+
+    /* Desktop: soft left-to-right scrim over a light overall dim. */
+    .hero__media::after {
+      background:
+        linear-gradient(90deg, rgb(20 18 15 / 0.25), rgb(20 18 15 / 0.25)),
+        linear-gradient(90deg, rgb(20 18 15 / 0.6) 0%, rgb(20 18 15 / 0.1) 60%, rgb(20 18 15 / 0.05) 100%);
+    }
+
+    .hero__body {
+      gap: 32px;
+    }
+
+    .hero__title {
+      line-height: 1.7;
+    }
+
+    .hero__lead {
+      line-height: 2.2;
+    }
+
+    .hero__break,
+    .hero__service,
+    .hero__body :global(.hero__cta) {
+      display: none;
+    }
+
+    .hero__scroll {
+      position: absolute;
+      right: 54px;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      font-size: 10px;
+      line-height: normal;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .hero__scroll-line {
+      width: 1px;
+      height: 96px;
+      background: var(--paper);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero__title {
+      letter-spacing: 0.14em;
+    }
+
+    .hero__lead {
+      letter-spacing: 0.12em;
+    }
+  }
+
+</style>

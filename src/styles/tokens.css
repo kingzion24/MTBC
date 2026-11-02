@@ -1,0 +1,31 @@
+/*
+ * Design tokens from the Figma file (MJceBhXtRutX3gj8FlumC1).
+ * Fluid sizes interpolate linearly between the 390px (mobile) and 1440px (desktop) frames:
+ *   value = mobile + (desktop - mobile) * (100vw - 390px) / 1050px
+ */
+:root {
+  /* Colour */
+  --ink: #2a2826;
+  --soft: #6b655e;
+  --line: #dcd6cc;
+  --paper: #ffffff;
+  --sand: #f5f2ec;
+  --gold: #9c8460; /* 3.6:1 on white — large text (24px+) and decoration only */
+  --gold-light: #d8c7a6;
+  --night: #23211f;
+
+  /* Type families */
+  --serif-jp: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --serif-en: 'Cormorant Garamond', Garamond, Georgia, serif;
+  --sans: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Layout */
+  --content-max: 1200px;
+  --gutter: clamp(24px, 9.1429vw - 11.657px, 120px); /* 24 @390 → 120 @1440 */
+
+  /* Focus ring (overridden on dark surfaces) */
+  --focus: var(--gold);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

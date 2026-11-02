@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Hero from '../components/sections/Hero.astro';
+import Intro from '../components/sections/Intro.astro';
+
+// Moves to Sanity `siteSettings` in phase 3.
+const serviceTime = '10:00 – 13:00';
+const visitHref = '#visit';
+---
+
+<BaseLayout
+  title="Manna Tabernacle Bible Church (MTBC) — Dar es Salaam"
+  description="Manna Tabernacle Bible Church is a Bible-centred family meeting every Sunday 10:00–13:00 at Kisutu Primary School Hall, Posta Mpya, Dar es Salaam."
+>
+  <SiteHeader serviceTime={serviceTime} visitHref={visitHref} />
+  <main id="main">
+    <Hero serviceTime={serviceTime} visitHref={visitHref} nextHref="#intro" />
+    <Intro />
+  </main>
+</BaseLayout>

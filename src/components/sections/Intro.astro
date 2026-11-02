@@ -1,0 +1,162 @@
+---
+/** Figma: desktop 10:49, mobile 18:53 */
+import Button from '../ui/Button.astro';
+
+const points = [
+  {
+    title: 'Rooted in the Word.',
+    body: 'Everything we do starts with the Bible. Clear, faithful teaching that meets you where you live, Monday to Saturday too.',
+  },
+  {
+    title: 'Worship in Spirit and truth.',
+    body: 'Heartfelt praise and honest prayer. We come expecting to meet God, and we leave room for what He wants to do.',
+  },
+  {
+    title: 'Always, a seat at the table.',
+    body: 'No dress code, no prerequisites, no one too far gone. Every person who walks in is someone we have been waiting for.',
+  },
+];
+---
+
+<section id="intro" class="intro container" aria-labelledby="intro-title">
+  <h2 id="intro-title" class="intro__title">
+    <span>Not only to welcome you,</span>
+    <span>but to feed you.</span>
+  </h2>
+  <p class="intro__lead">
+    Like manna in the wilderness, God's Word is fresh every morning. At MTBC we gather to be fed by Scripture, to
+    worship together, and to carry that bread out into our city.
+  </p>
+
+  <ol class="intro__points">
+    {
+      points.map((point, i) => (
+        <li class="point">
+          <span class="point__num" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="point__title">{point.title}</h3>
+          <p class="point__body">{point.body}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="intro__cta">
+    <Button href="#about">About MTBC</Button>
+  </div>
+</section>
+
+<style>
+  .intro {
+    display: grid;
+    grid-template-areas: 'title' 'lead' 'points' 'cta';
+    row-gap: 32px;
+    padding-block: 96px 80px;
+  }
+
+  .intro__title {
+    grid-area: title;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.625rem, 1.439rem + 0.7619vw, 2.125rem); /* 26 → 34 */
+    line-height: 1.7;
+    letter-spacing: 0.08em;
+  }
+
+  .intro__title span {
+    display: block;
+  }
+
+  .intro__lead {
+    grid-area: lead;
+    font-family: var(--serif-jp);
+    font-weight: 400;
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .intro__points {
+    grid-area: points;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .intro__cta {
+    grid-area: cta;
+  }
+
+  .point {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'num title' 'body body';
+    align-items: baseline;
+    column-gap: 16px;
+    row-gap: 10px;
+    padding-block: 28px;
+    border-top: 1px solid var(--line);
+  }
+
+  .point__num {
+    grid-area: num;
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: clamp(1.875rem, 1.55rem + 1.3333vw, 2.75rem); /* 30 → 44 */
+    line-height: 1;
+    color: var(--gold); /* large text: 3.6:1 passes AA */
+  }
+
+  .point__title {
+    grid-area: title;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.946rem + 0.4762vw, 1.375rem); /* 17 → 22 */
+    line-height: 1.6;
+    letter-spacing: 0.08em;
+  }
+
+  .point__body {
+    grid-area: body;
+    color: var(--soft);
+    font-weight: 300;
+    font-size: clamp(0.8125rem, 0.7893rem + 0.0952vw, 0.875rem); /* 13 → 14 */
+    line-height: 2;
+    letter-spacing: 0.04em;
+  }
+
+  @media (min-width: 1024px) {
+    .intro {
+      grid-template-columns: minmax(0, 520fr) minmax(0, 560fr);
+      grid-template-rows: auto auto auto 1fr;
+      grid-template-areas:
+        'title points'
+        'lead points'
+        'cta points'
+        '. points';
+      column-gap: var(--gutter);
+      row-gap: 48px;
+      padding-block: 200px 180px;
+    }
+
+    .intro__title {
+      line-height: 1.8;
+    }
+
+    .intro__lead {
+      line-height: 2.3;
+    }
+
+    .point {
+      grid-template-columns: 96px 1fr;
+      grid-template-areas: 'num title' 'num body';
+      align-items: start;
+      column-gap: 0;
+      row-gap: 14px;
+      padding-block: 44px;
+    }
+
+    .point__title {
+      letter-spacing: 0.12em;
+    }
+  }
+</style>

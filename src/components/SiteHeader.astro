@@ -1,0 +1,142 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/mtbc-logo-white.png';
+import Button from './ui/Button.astro';
+
+interface Props {
+  serviceTime: string;
+  visitHref: string;
+}
+
+const { serviceTime, visitHref } = Astro.props;
+---
+
+<header class="header">
+  <a class="header__logo" href="/">
+    <Image
+      src={logo}
+      alt="Manna Tabernacle Bible Church — home"
+      widths={[112, 160, 224, 320]}
+      sizes="(min-width: 768px) 160px, 112px"
+      loading="eager"
+    />
+  </a>
+
+  <div class="header__right">
+    <p class="header__service">
+      <span class="header__service-label">Sunday Service</span>
+      <span class="header__service-time">{serviceTime}</span>
+    </p>
+    <Button href={visitHref} variant="filled-light" compact class="header__cta">Plan your visit</Button>
+    <button class="menu-toggle" type="button" aria-controls="site-menu" aria-expanded="false">
+      <span class="menu-toggle__lines" aria-hidden="true"></span>
+      <span class="menu-toggle__label">Menu</span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .header {
+    --focus: var(--gold-light);
+
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    padding-inline: 20px;
+    color: var(--paper);
+  }
+
+  .header__logo img {
+    width: 112px;
+    height: auto;
+  }
+
+  .header__right {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+
+  .header__service,
+  .header__right :global(.header__cta) {
+    display: none;
+  }
+
+  .header__service {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    line-height: normal;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .header__service-label {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .header__service-time {
+    font-family: var(--serif-jp);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+  }
+
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    /* 44px hit area without shifting the visual position */
+    min-width: 44px;
+    min-height: 44px;
+    margin-inline: -5px;
+  }
+
+  .menu-toggle__lines {
+    display: block;
+    width: 28px;
+    height: 7px;
+    border-block: 1px solid currentColor;
+  }
+
+  .menu-toggle__label {
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    line-height: normal;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .header {
+      height: 96px;
+      padding-inline: 48px;
+    }
+
+    .header__logo img {
+      width: 160px;
+    }
+
+    .header__service {
+      display: flex;
+    }
+
+    .header__right :global(.header__cta) {
+      display: inline-flex;
+    }
+
+    .menu-toggle__lines {
+      width: 34px;
+    }
+
+    .menu-toggle__label {
+      font-size: 10px;
+    }
+  }
+</style>
