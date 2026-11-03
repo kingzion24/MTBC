@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { languages, pageUrl, type Lang } from '../i18n';
 
 // Every public page (language-neutral path). Add new pages here.
-const pages = ['/', '/events/', '/news/', '/stories/'] as const;
+const pages = ['/', '/events/', '/news/'] as const;
 const langs = Object.keys(languages) as Lang[];
 
 export const GET: APIRoute = ({ site }) => {

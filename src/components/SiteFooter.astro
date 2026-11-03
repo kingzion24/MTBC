@@ -1,18 +1,32 @@
 ---
-/** Figma: desktop 11:189, mobile 19:230 */
+/**
+ * Figma: desktop 11:189, mobile 19:230 — trimmed: the four-column sitemap became one list of
+ * pages plus a contact column, and the map placeholder is a real (lazy-loaded) Google Map.
+ */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
 import { getContent } from '../data/content';
-import { buildSitemap } from '../data/navigation';
 import { pageUrl, toLang, ui } from '../i18n';
 
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const { site } = getContent(lang);
-const sitemap = buildSitemap(lang, site.youtube);
 const newTab = ` ${t.opensInNewTab}`;
-const year = new Date().getFullYear();
 const external = { target: '_blank', rel: 'noopener' };
+const year = new Date().getFullYear();
+
+const targets = {
+  visit: '/#visit',
+  events: '/events/',
+  ministries: '/#ministries',
+  pastor: '/#pastor',
+  news: '/news/',
+  contact: '/#contact',
+} as const;
+const pages = (Object.keys(targets) as (keyof typeof targets)[]).map((key) => ({
+  label: t.nav[key].title,
+  href: pageUrl(lang, targets[key]),
+}));
 ---
 
 <footer class="footer">
@@ -29,43 +43,54 @@ const external = { target: '_blank', rel: 'noopener' };
             {t.googleMap}<span class="visually-hidden">{newTab}</span>
           </a>
         </address>
-        <a class="footer__map" href={site.mapUrl} {...external}>
-          <span>{t.mapLabel}</span>
-          <span class="visually-hidden"> {t.opensGoogleMaps}</span>
-        </a>
+        <div class="footer__map">
+          <iframe
+            src={`${site.mapEmbed}&hl=${lang}`}
+            title={t.mapTitle}
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+        </div>
       </div>
 
-      <nav class="footer__sitemap" aria-label={t.sitemap}>
-        {
-          sitemap.map((group) => (
-            <div class="footer__group">
-              <p class="footer__group-title">
-                <span>{group.title}</span>
-                <span class="footer__group-note">{group.note}</span>
-              </p>
-              <ul class="footer__links">
-                {group.links.map((link) => (
-                  <li>
-                    <a href={link.href} {...(link.external ? external : {})}>
-                      {link.label}
-                      {link.external && <span class="visually-hidden">{newTab}</span>}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </nav>
+      <div class="footer__columns">
+        <nav class="footer__group" aria-label={t.sitemap}>
+          <p class="footer__group-title">
+            <span>{t.footerPages.title}</span>
+            <span class="footer__group-note">{t.footerPages.note}</span>
+          </p>
+          <ul class="footer__links">
+            {
+              pages.map((page) => (
+                <li>
+                  <a href={page.href}>{page.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="footer__group">
+          <p class="footer__group-title">
+            <span>{t.footerConnect.title}</span>
+            <span class="footer__group-note">{t.footerConnect.note}</span>
+          </p>
+          <ul class="footer__links">
+            <li class="footer__service">{t.sundayService} · {site.serviceTime}</li>
+            <li><a href={`tel:${site.phone.tel}`}>{site.phone.display}</a></li>
+            <li>
+              <a href={site.instagram} {...external}>Instagram<span class="visually-hidden">{newTab}</span></a>
+            </li>
+            <li>
+              <a href={site.youtube} {...external}>YouTube<span class="visually-hidden">{newTab}</span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="footer__bottom">
       <p class="footer__tagline">{t.tagline}</p>
-      <ul class="footer__legal" role="list">
-        <li><a href={pageUrl(lang, '/#contact')}>{t.contact}</a></li>
-        <li><a href={site.instagram} {...external}>Instagram</a></li>
-        <li><a href={site.youtube} {...external}>YouTube</a></li>
-      </ul>
       <p class="footer__copy">© {year} Manna Tabernacle Bible Church</p>
     </div>
   </div>
@@ -89,13 +114,13 @@ const external = { target: '_blank', rel: 'noopener' };
   .footer__main {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 48px;
   }
 
   .footer__info {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 32px;
   }
 
   .footer__logo {
@@ -141,27 +166,29 @@ const external = { target: '_blank', rel: 'noopener' };
     text-transform: uppercase;
   }
 
+  /* Muted to sit quietly on the dark footer; full colour on hover or keyboard focus. */
   .footer__map {
-    position: relative;
-    display: block;
-    height: 170px;
+    height: 200px;
+    overflow: hidden;
     border: 1px solid var(--night-line);
     background: var(--night-raised);
-    color: #a39c93; /* 4.9:1 on the raised panel (--night-muted is 4.1:1 here) */
-    transition: border-color 0.3s var(--ease-out);
   }
 
-  .footer__map > span:first-child {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    font-size: 10px;
-    line-height: normal;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+  .footer__map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(1) contrast(1.05) brightness(0.9);
+    transition: filter 0.4s var(--ease-out);
   }
 
-  .footer__sitemap {
+  .footer__map:hover iframe,
+  .footer__map:focus-within iframe {
+    filter: none;
+  }
+
+  .footer__columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 32px 24px;
@@ -170,7 +197,7 @@ const external = { target: '_blank', rel: 'noopener' };
   .footer__group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
   }
 
   .footer__group-title {
@@ -198,25 +225,21 @@ const external = { target: '_blank', rel: 'noopener' };
     gap: 6px;
     color: var(--night-text);
     font-weight: 300;
-    font-size: 12px;
+    font-size: 13px;
     line-height: normal;
     letter-spacing: 0.04em;
   }
 
-  .footer__links a {
+  .footer__links a,
+  .footer__service {
     display: inline-block;
-    padding-block: 2px;
+    padding-block: 3px;
   }
 
   @media (hover: hover) {
     .footer__links a:hover,
-    .footer__legal a:hover,
     .footer__map-link:hover {
       color: var(--paper);
-    }
-
-    .footer__map:hover {
-      border-color: var(--night-muted);
     }
   }
 
@@ -237,7 +260,6 @@ const external = { target: '_blank', rel: 'noopener' };
     letter-spacing: 0.08em;
   }
 
-  .footer__legal,
   .footer__copy {
     color: var(--night-muted);
     font-size: 10px;
@@ -245,26 +267,9 @@ const external = { target: '_blank', rel: 'noopener' };
     text-transform: uppercase;
   }
 
-  .footer__legal {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .footer__legal li + li::before {
-    content: '·';
-    padding-inline: 0.8em;
-  }
-
-  @media (min-width: 768px) {
-    .footer__sitemap {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 40px;
-    }
-  }
-
   @media (min-width: 1024px) {
     .footer__inner {
-      gap: 120px;
+      gap: 96px;
       padding-block: 120px 48px;
     }
 
@@ -275,7 +280,7 @@ const external = { target: '_blank', rel: 'noopener' };
 
     .footer__info {
       flex: none;
-      width: min(420px, 38%);
+      width: min(480px, 44%);
     }
 
     .footer__logo :global(img) {
@@ -286,22 +291,14 @@ const external = { target: '_blank', rel: 'noopener' };
       letter-spacing: 0.12em;
     }
 
-    .footer__address {
-      padding-bottom: 20px;
-    }
-
     .footer__map {
-      height: 200px;
+      height: 240px;
     }
 
-    .footer__map > span:first-child {
-      bottom: 16px;
-      left: 16px;
-    }
-
-    .footer__sitemap {
+    .footer__columns {
       flex: 1;
       align-self: flex-start;
+      gap: 40px;
     }
 
     .footer__group {
@@ -317,10 +314,6 @@ const external = { target: '_blank', rel: 'noopener' };
       font-size: 13px;
     }
 
-    .footer__links {
-      font-size: 13px;
-    }
-
     .footer__bottom {
       flex-direction: row;
       align-items: center;
@@ -333,7 +326,6 @@ const external = { target: '_blank', rel: 'noopener' };
       letter-spacing: 0.1em;
     }
 
-    .footer__legal,
     .footer__copy {
       font-size: 11px;
       letter-spacing: 0.16em;

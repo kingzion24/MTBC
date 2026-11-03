@@ -25,6 +25,7 @@ import pastorPreaching from '../assets/photos/pastor-preaching.jpg';
 import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
 import prayerKneelingPoster from '../assets/photos/prayer-kneeling-poster.jpg';
 import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
+import sundayPrayerPoster from '../assets/photos/sunday-prayer-poster.jpg';
 
 /* ------------------------------------------------------------------ */
 /* Localisation helpers                                                */
@@ -80,6 +81,7 @@ export interface Site {
   venue: string;
   address: string;
   mapUrl: string;
+  mapEmbed: string;
   phone: { display: string; tel: string };
   officeHours: string;
   instagram: string;
@@ -171,6 +173,8 @@ const site: Raw<Site> = {
     en: mapAddress,
   },
   mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`,
+  /** Google Maps embed (no API key) shown in the footer. */
+  mapEmbed: `https://maps.google.com/maps?q=${encodeURIComponent('Kisutu Primary School, Dar es Salaam')}&z=16&output=embed`,
   phone: { display: '+255 700 000 000', tel: '+255700000000' },
   officeHours: {
     sw: 'Saa za ofisi 9:00 – 17:00 · Tunafunga Jumatatu',
@@ -286,13 +290,20 @@ const photos = {
       en: 'Members stand holding hands in prayer between rows of chairs.',
     },
   },
+  sundayPrayer: {
+    src: sundayPrayerPoster,
+    alt: {
+      sw: 'Wanaume wawili wakiomba pamoja, vichwa vimeinama, kabla ya ibada ya Jumapili.',
+      en: 'Two men pray together, heads bowed, before the Sunday service.',
+    },
+  },
 } satisfies Record<string, Raw<Photo>>;
 
 const stories: Raw<Story>[] = [
   {
     photo: photos.worshipHandsRaised,
     caption: {
-      sw: 'Kila Jumapili, sauti kutoka kila pembe ya jiji zinainua wimbo mmoja. Kiswahili, Kiingereza, na kila kitu katikati.',
+      sw: 'Kila Jumapili, kwapamoja tunainua sauti zetu kumuabudu na kumtukuza Mungu.',
       en: 'Every Sunday, voices from across the city lift one song. Swahili, English, and everything in between.',
     },
   },
@@ -301,20 +312,20 @@ const stories: Raw<Story>[] = [
     moment: { src: '/videos/moments/prayer-bowed.mp4', position: '55% 12%' },
     quote: { sw: 'Mahali pa kukubalika,\nhata kabla ya kuamini', en: 'A place to belong,\nbefore you believe' },
     caption: {
-      sw: 'Katika maombi tunaweka kila kitu chini, na tunagundua kwamba tumebebwa.',
+      sw: 'Katika maombi tunainua mikono yetu tukikuabudu Mungu.',
       en: 'In prayer we lay everything down, and find that we are carried.',
     },
   },
   {
     photo: photos.prayerKneelingMoment,
     moment: { src: '/videos/moments/prayer-kneeling.mp4', position: '50% 60%' },
-    quote: { sw: 'Imani inayoonekana\nmahali pa kawaida', en: 'Faith that shows up\nin ordinary places' },
+    quote: { sw: 'Imani yenye \nUshuda', en: 'Faith that shows up\nin ordinary places' },
   },
   {
     photo: photos.worshipTeam,
     caption: {
-      sw: 'Timu yetu ya sifa inatuongoza kwa nyimbo kila Jumapili, kwa Kiswahili na Kiingereza.',
-      en: 'Our worship team leads us in song every Sunday, in Swahili and English.',
+      sw: 'Nafasi ya kuwa na ibada na sifa.',
+      en: 'A chance to have an impactful worship and praise session.',
     },
   },
 ];
@@ -338,6 +349,16 @@ const events: Raw<EventItem>[] = [
     online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
     endDate: '2026-12-18',
   },
+  {
+    title: { sw: 'Maombi ya Jumapili', en: 'Sunday Morning Prayer' },
+    subtitle: { sw: 'Kabla ya ibada', en: 'Before the service' },
+    photo: photos.sundayPrayer,
+    moment: { src: '/videos/moments/sunday-prayer.mp4', position: '50% 35%' },
+    category: { sw: 'Maombi', en: 'Prayer' },
+    tags: [{ sw: 'Kila Jumapili', en: 'Every Sunday' }],
+    when: [{ sw: 'Jumapili · 08:00–10:00', en: 'Sunday · 08:00–10:00' }],
+    place: { sw: 'Ukumbi wa Kisutu', en: 'Kisutu Hall' },
+  },
 ];
 
 const photoStrip: Raw<Photo>[] = [
@@ -350,7 +371,7 @@ const photoStrip: Raw<Photo>[] = [
 
 const ministries: Raw<Ministry>[] = [
   {
-    title: { sw: 'Huduma ya Wanaume', en: "Men's Ministry" },
+    title: { sw: 'Idara ya Wanaume', en: "Men's Ministry" },
     description: {
       sw: 'Wanaume wakikua pamoja katika imani, nyumbani, kazini na kanisani.',
       en: 'Men growing in faith together, at home, at work and in the church.',
@@ -358,7 +379,7 @@ const ministries: Raw<Ministry>[] = [
     photo: photos.worshipTeam,
   },
   {
-    title: { sw: 'Huduma ya Akina Mama', en: "Mothers' Ministry" },
+    title: { sw: 'Idara ya Akina Mama', en: "Mothers' Ministry" },
     description: {
       sw: 'Akina mama wakitiana moyo katika maombi na Neno.',
       en: 'Mothers encouraging one another in prayer and the Word.',
@@ -374,7 +395,7 @@ const ministries: Raw<Ministry>[] = [
     photo: photos.youngProfessionals,
   },
   {
-    title: { sw: 'Huduma ya Maombi', en: 'Prayer Ministry' },
+    title: { sw: 'Idara ya Maombi', en: 'Prayer Ministry' },
     description: {
       sw: 'Tukisimama pamoja katika maombi kwa ajili ya kanisa, familia zetu na jiji letu.',
       en: 'Standing together in prayer for the church, our families and our city.',
@@ -382,7 +403,7 @@ const ministries: Raw<Ministry>[] = [
     photo: photos.prayerKneeling,
   },
   {
-    title: { sw: 'Huduma ya Watoto', en: "Children's Ministry" },
+    title: { sw: 'Idara ya Watoto', en: "Children's Ministry" },
     description: {
       sw: 'Mafundisho ya Biblia, ibada na malezi kwa watoto wetu.',
       en: 'Bible teaching, worship and care for our youngest.',

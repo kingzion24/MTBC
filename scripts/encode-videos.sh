@@ -21,6 +21,7 @@ CLIPS=(
   "prayer/ZNV1183.MP4|2|5|540|moments/prayer-bowed"
   "prayer/ZNV1185.MP4|10|5|540|moments/prayer-kneeling"
   "prayer/ZNV1205.MP4|1|5|540|moments/prayer-circle"
+  "prayer/ZNV1207.MP4|5|2.9|540|moments/sunday-prayer"
 )
 
 for line in "${CLIPS[@]}"; do

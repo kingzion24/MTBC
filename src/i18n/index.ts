@@ -81,7 +81,6 @@ const en = {
   storiesTitle: 'Life Together',
   storiesLabel: 'Stories',
   storiesLead: ['Worship, prayer and friendship, woven into ordinary days.', 'A glimpse of life at MTBC.'],
-  seeAllStories: 'See all stories',
 
   // Events
   eventsTitle: 'Gatherings',
@@ -161,9 +160,9 @@ const en = {
 
   // Footer
   sitemap: 'Sitemap',
-  mapLabel: 'Map — Kisutu, Dar es Salaam',
-  opensGoogleMaps: '(opens Google Maps in a new tab)',
-  contact: 'Contact',
+  footerPages: { title: 'Explore', note: 'On this site' },
+  footerConnect: { title: 'Connect', note: 'Stay in touch' },
+  mapTitle: 'Map: Kisutu Primary School Hall, Posta Mpya, Dar es Salaam',
   tagline: 'Daily bread for every soul...',
 
   // Pages
@@ -175,9 +174,6 @@ const en = {
     'Gatherings at Manna Tabernacle Bible Church, Dar es Salaam: prayer, fasting and fellowship.',
   newsPageTitle: 'News & Announcements — MTBC Dar es Salaam',
   newsPageDescription: 'Announcements from Manna Tabernacle Bible Church, Kisutu Hall, Dar es Salaam.',
-  storiesPageTitle: 'Life Together — Stories from MTBC Dar es Salaam',
-  storiesPageDescription:
-    'Worship, prayer and friendship, woven into ordinary days. A glimpse of life at Manna Tabernacle Bible Church.',
   shareImageAlt: 'Manna Tabernacle Bible Church logo over a full Sunday service in Kisutu Hall',
   churchDescription: 'A Bible-centred church family meeting every Sunday in Kisutu, Dar es Salaam.',
 
@@ -191,24 +187,7 @@ const en = {
     pastor: { title: 'Our Pastor', note: 'Head Pastor' },
     news: { title: 'News', note: 'Announcements' },
     contact: { title: 'Come and See', note: 'Contact us' },
-  },
-
-  // Footer sitemap
-  sitemapGroups: {
-    visit: {
-      title: 'Visit',
-      note: 'Plan a visit',
-      links: ['Service times', 'What to expect', 'Kids & families', "Newcomers' lunch"],
-    },
-    connect: {
-      title: 'Connect',
-      note: 'Get involved',
-      links: ['Men', 'Mothers', 'Young adults', 'Prayer', 'Children', 'Events'],
-    },
-    watch: { title: 'Watch', note: 'Sermons', links: ['Latest message', 'Series archive', 'Live stream'] },
-    about: { title: 'About', note: 'Who we are', links: ['Beliefs', 'Leadership', 'Location', 'Give', 'News'] },
-  },
-};
+  },};
 
 /** Widen literal string types so each language can use its own words. */
 type Strings<T> = T extends string
@@ -242,7 +221,7 @@ const sw: UI = {
   backgroundVideo: 'video ya nyuma',
   heroTitle: ['Mkate wa kila siku', 'kwa kila nafsi.'],
   heroLeadName: 'Manna Tabernacle Bible Church.',
-  heroLead: ['Familia iliyokusanyika kuzunguka Neno,', 'katikati ya jiji la Dar es Salaam.'],
+  heroLead: ['Familia inayosimama ndani ya Neno,', 'katikati ya jiji la Dar es Salaam.'],
 
   introTitle: ['Si kukukaribisha tu,', 'bali kukulisha.'],
   introLead:
@@ -250,15 +229,15 @@ const sw: UI = {
   introPoints: [
     {
       title: 'Tumejengwa juu ya Neno.',
-      body: 'Kila tunachofanya kinaanzia kwenye Biblia. Mafundisho yaliyo wazi na ya uaminifu yanayokufikia katika maisha yako ya kila siku, hata Jumatatu hadi Jumamosi.',
+      body: 'Kila tunachofanya kinaanzia kwenye Biblia. Mafundisho yaliyo wazi na ya uaminifu yanayokufikia katika maisha yako ya kila siku.',
     },
     {
       title: 'Ibada katika Roho na kweli.',
-      body: 'Sifa za moyoni na maombi ya kweli. Tunakuja tukitarajia kukutana na Mungu, na tunampa nafasi afanye anachotaka.',
+      body: 'Sifa za moyoni na maombi ya kweli. Tunakuja tukitarajia kukutana na Mungu, na tunampa nafasi ndani yetu.',
     },
     {
       title: 'Daima, kuna nafasi mezani.',
-      body: 'Hakuna sharti la mavazi, hakuna masharti, hakuna aliye mbali mno. Kila anayeingia ni mtu tuliyekuwa tukimsubiri.',
+      body: 'Hakuna masharti, hakuna aliye mbali mno. Kila anayeingia ni mtu tuliyekuwa tukimsubiri.',
     },
   ],
   aboutMtbc: 'Kuhusu MTBC',
@@ -268,14 +247,13 @@ const sw: UI = {
 
   storiesTitle: 'Maisha Pamoja',
   storiesLabel: 'Hadithi',
-  storiesLead: ['Ibada, maombi na urafiki, vimefumwa katika siku za kawaida.', 'Taswira ya maisha ya MTBC.'],
-  seeAllStories: 'Tazama hadithi zote',
+  storiesLead: ['Ibada, maombi na umoja, ndani ya jamii yetu.', 'Msingi wa maisha ya MTBC.'],
 
-  eventsTitle: 'Mikusanyiko',
-  eventsLabel: 'Matukio',
+  eventsTitle: 'Matukio',
+  eventsLabel: 'Umoja',
   eventsLead: 'Iwe ni ziara yako ya kwanza au ya hamsini, daima kuna sababu ya kukusanyika pamoja.',
   allEvents: 'Matukio yote',
-  noEvents: 'Mikusanyiko mipya itatangazwa hapa hivi karibuni.',
+  noEvents: 'Matukio mapya yatatangazwa hapa hivi karibuni.',
   tags: 'Lebo',
   joinOnZoom: 'Jiunge kupitia Zoom',
   meetingId: 'Meeting ID',
@@ -283,10 +261,10 @@ const sw: UI = {
 
   photoStrip: 'Picha za maisha ya kanisa',
 
-  ministriesTitle: 'Huduma',
+  ministriesTitle: 'Idara',
   ministriesLabel: 'Jihusishe',
   ministriesLead:
-    'Kanisa si kitu cha kutazama, ni familia unayokuwa sehemu yake. Tafuta huduma unayofaa, na familia itakayokua pamoja nawe.',
+    'Kanisa si kitu cha kutazama, ni familia unayokuwa sehemu yake. Jumuika kwenye idara inayokufaa, na familia itakayokua pamoja nawe.',
   findYourPlace: 'Tafuta nafasi yako',
   whereAndWhen: 'Wapi na lini',
 
@@ -297,7 +275,7 @@ const sw: UI = {
   aboutLinks: [
     { title: 'Tunachoamini', note: 'Imani' },
     { title: 'Uongozi wetu', note: 'Wachungaji na Wazee' },
-    { title: 'Toa na tumika', note: 'Ukarimu' },
+    { title: 'Toa na Hudumu', note: 'Ukarimu' },
   ],
 
   pastorTitle: 'Mchungaji Wetu',
@@ -340,48 +318,30 @@ const sw: UI = {
   byPhone: 'kwa simu',
 
   sitemap: 'Ramani ya tovuti',
-  mapLabel: 'Ramani — Kisutu, Dar es Salaam',
-  opensGoogleMaps: '(inafungua Ramani za Google kwenye kichupo kipya)',
-  contact: 'Mawasiliano',
+  footerPages: { title: 'Gundua', note: 'Katika tovuti hii' },
+  footerConnect: { title: 'Ungana nasi', note: 'Tuwasiliane' },
+  mapTitle: 'Ramani: Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam',
   tagline: 'Mkate wa kila siku kwa kila nafsi...',
 
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
   homeDescription:
     'Manna Tabernacle Bible Church ni familia iliyojengwa juu ya Biblia, inayokutana kila Jumapili 10:00–13:00 katika Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam.',
-  eventsPageTitle: 'Mikusanyiko na Matukio — MTBC Dar es Salaam',
+  eventsPageTitle: 'Matukio — MTBC Dar es Salaam',
   eventsPageDescription: 'Mikusanyiko ya Manna Tabernacle Bible Church, Dar es Salaam: maombi, kufunga na ushirika.',
   newsPageTitle: 'Habari na Matangazo — MTBC Dar es Salaam',
   newsPageDescription: 'Matangazo kutoka Manna Tabernacle Bible Church, Ukumbi wa Kisutu, Dar es Salaam.',
-  storiesPageTitle: 'Maisha Pamoja — Hadithi za MTBC Dar es Salaam',
-  storiesPageDescription:
-    'Ibada, maombi na urafiki, vimefumwa katika siku za kawaida. Taswira ya maisha ya Manna Tabernacle Bible Church.',
   shareImageAlt: 'Nembo ya Manna Tabernacle Bible Church juu ya ibada ya Jumapili iliyojaa katika Ukumbi wa Kisutu',
   churchDescription: 'Familia ya kanisa iliyojengwa juu ya Biblia, inayokutana kila Jumapili Kisutu, Dar es Salaam.',
 
   nav: {
     visit: { title: 'Tutembelee', note: 'Ukumbi wa Kisutu' },
     stories: { title: 'Maisha Pamoja', note: 'Hadithi' },
-    events: { title: 'Mikusanyiko', note: 'Matukio' },
-    ministries: { title: 'Huduma', note: 'Jihusishe' },
+    events: { title: 'Matukio', note: 'Umoja' },
+    ministries: { title: 'Idara', note: 'Jihusishe' },
     about: { title: 'Kuhusu MTBC', note: 'Sisi ni nani' },
     pastor: { title: 'Mchungaji Wetu', note: 'Mchungaji Mkuu' },
     news: { title: 'Habari', note: 'Matangazo' },
     contact: { title: 'Njoo Uone', note: 'Wasiliana nasi' },
-  },
-
-  sitemapGroups: {
-    visit: {
-      title: 'Tembelea',
-      note: 'Panga ziara',
-      links: ['Muda wa ibada', 'Utarajie nini', 'Watoto na familia', 'Chakula cha wageni'],
-    },
-    connect: {
-      title: 'Ungana',
-      note: 'Jihusishe',
-      links: ['Wanaume', 'Akina mama', 'Vijana', 'Maombi', 'Watoto', 'Matukio'],
-    },
-    watch: { title: 'Tazama', note: 'Mahubiri', links: ['Ujumbe wa karibuni', 'Mahubiri ya zamani', 'Mubashara'] },
-    about: { title: 'Kuhusu', note: 'Sisi ni nani', links: ['Imani', 'Uongozi', 'Mahali', 'Toa', 'Habari'] },
   },
 };
 

@@ -6,17 +6,15 @@
  */
 import { Image } from 'astro:assets';
 import type { Story } from '../../data/content';
-import Button from '../ui/Button.astro';
 import MomentVideo from '../ui/MomentVideo.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { toLang, ui } from '../../i18n';
 
 interface Props {
   stories: Story[];
-  allHref: string;
 }
 
-const { stories, allHref } = Astro.props;
+const { stories } = Astro.props;
 const t = ui[toLang(Astro.currentLocale)];
 // The collage is designed for exactly four stories.
 const collage = stories.slice(0, 4);
@@ -31,7 +29,6 @@ const lines = (text: string) => text.split('\n');
         {t.storiesLead[0]}<span class="stories__break"></span> {t.storiesLead[1]}
       </p>
     </div>
-    <Button href={allHref} class="stories__cta stories__cta--desktop">{t.seeAllStories}</Button>
   </div>
 
   <ul class="stories__gallery" role="list">
@@ -70,9 +67,6 @@ const lines = (text: string) => text.split('\n');
     }
   </ul>
 
-  <div class="container stories__cta--mobile">
-    <Button href={allHref} blockOnMobile>{t.seeAllStories}</Button>
-  </div>
 </section>
 
 <style>
@@ -104,10 +98,6 @@ const lines = (text: string) => text.split('\n');
   }
 
   .stories__break {
-    display: none;
-  }
-
-  .stories__head :global(.stories__cta--desktop) {
     display: none;
   }
 
@@ -210,10 +200,6 @@ const lines = (text: string) => text.split('\n');
     align-self: flex-end;
   }
 
-  .stories__cta--mobile {
-    display: block;
-  }
-
   /* ---------- Desktop: Figma coordinates on a 1200-unit canvas ---------- */
   @media (min-width: 1024px) {
     .stories {
@@ -227,15 +213,6 @@ const lines = (text: string) => text.split('\n');
 
     .stories__break {
       display: block;
-    }
-
-    .stories__head :global(.stories__cta--desktop) {
-      display: inline-flex;
-      flex: none;
-    }
-
-    .stories__cta--mobile {
-      display: none;
     }
 
     .stories__gallery {
