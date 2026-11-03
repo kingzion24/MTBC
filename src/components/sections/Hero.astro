@@ -1,8 +1,9 @@
 ---
 /**
- * Figma: desktop 10:22, mobile 18:37. The Figma photo is replaced by three vertical clips:
- * - landscape screens: side by side as a triptych, all looping;
- * - portrait screens: one at a time, cross-fading to the next when a clip ends.
+ * Figma: desktop 10:22, mobile 18:37. The Figma photo is replaced by five short vertical clips:
+ * - landscape screens: three panels side by side; when a panel's clip ends it moves on to a clip
+ *   that isn't showing in another panel, so the panels never play the same video at once;
+ * - portrait screens: one panel that cycles through all five.
  * Posters are shown without JS, with reduced motion, or with Data Saver on.
  * Clips are encoded by scripts/encode-videos.sh into public/videos/hero/.
  *
@@ -13,6 +14,8 @@ import { getImage } from 'astro:assets';
 import poster1 from '../../assets/photos/hero-1-poster.jpg';
 import poster2 from '../../assets/photos/hero-2-poster.jpg';
 import poster3 from '../../assets/photos/hero-3-poster.jpg';
+import poster4 from '../../assets/photos/hero-4-poster.jpg';
+import poster5 from '../../assets/photos/hero-5-poster.jpg';
 import Button from '../ui/Button.astro';
 import { toLang, ui } from '../../i18n';
 import { withBase } from '../../utils/url';
@@ -25,8 +28,9 @@ interface Props {
 const { serviceTime, visitHref } = Astro.props;
 const t = ui[toLang(Astro.currentLocale)];
 
+const PANELS = 3;
 const clips = await Promise.all(
-  [poster1, poster2, poster3].map(async (poster, i) => ({
+  [poster1, poster2, poster3, poster4, poster5].map(async (poster, i) => ({
     src: withBase(`/videos/hero/hero-${i + 1}.mp4`),
     poster: (await getImage({ src: poster, width: 720, format: 'webp', quality: 70 })).src,
   })),
@@ -34,13 +38,14 @@ const clips = await Promise.all(
 ---
 
 <div class="hero-wrap" data-hero-wrap>
-  <div class="hero__media" data-hero-media>
+  <div class="hero__media" data-hero-media data-clips={JSON.stringify(clips)}>
     {
-      clips.map((clip, i) => (
+      clips.slice(0, PANELS).map((clip, i) => (
         <video
           class="hero__clip"
           src={clip.src}
           poster={clip.poster}
+          data-clip={i}
           muted
           playsinline
           preload="none"
@@ -92,6 +97,11 @@ const clips = await Promise.all(
 </div>
 
 <script>
+  interface Clip {
+    src: string;
+    poster: string;
+  }
+
   const media = document.querySelector<HTMLElement>('[data-hero-media]');
   const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
   const label = toggle?.querySelector('[data-hero-toggle-label]');
@@ -99,13 +109,17 @@ const clips = await Promise.all(
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
   if (media && toggle && !reduceMotion.matches && !saveData) {
-    const clips = [...media.querySelectorAll<HTMLVideoElement>('video')];
+    const library = JSON.parse(media.dataset['clips'] ?? '[]') as Clip[];
+    const panels = [...media.querySelectorAll<HTMLVideoElement>('video')];
     const triptych = window.matchMedia('(min-aspect-ratio: 6/5)');
-    let active = 0;
     let paused = false;
     let visible = true;
     // Don't compete with fonts and images for the first paint: start the clips after `load`.
     let ready = document.readyState === 'complete';
+
+    const clipOf = (panel: HTMLVideoElement) => Number(panel.dataset['clip']);
+    // Portrait shows only the first panel; landscape shows all three.
+    const visiblePanels = () => (triptych.matches ? panels : panels.slice(0, 1));
 
     const play = (video: HTMLVideoElement) => {
       video.play().catch(() => {
@@ -113,45 +127,60 @@ const clips = await Promise.all(
       });
     };
 
-    const show = (index: number) => {
-      clips.forEach((clip, i) => clip.toggleAttribute('data-active', i === index));
-      active = index;
+    const load = (panel: HTMLVideoElement, index: number) => {
+      const clip = library[index];
+      if (!clip) return;
+      panel.dataset['clip'] = String(index);
+      panel.poster = clip.poster;
+      panel.src = clip.src;
+    };
+
+    /** Next clip after `from` that no other visible panel is showing. */
+    const nextFor = (panel: HTMLVideoElement) => {
+      const taken = new Set(visiblePanels().filter((p) => p !== panel).map(clipOf));
+      for (let step = 1; step <= library.length; step++) {
+        const candidate = (clipOf(panel) + step) % library.length;
+        if (!taken.has(candidate)) return candidate;
+      }
+      return clipOf(panel);
+    };
+
+    /** After switching layouts, make sure no two visible panels share a clip. */
+    const dedupe = () => {
+      const seen = new Set<number>();
+      for (const panel of visiblePanels()) {
+        if (seen.has(clipOf(panel))) load(panel, nextFor(panel));
+        seen.add(clipOf(panel));
+      }
     };
 
     const start = () => {
       if (paused || !visible || !ready) return;
-      if (triptych.matches) {
-        for (const clip of clips) {
-          clip.loop = true;
-          play(clip);
-        }
-      } else {
-        clips.forEach((clip, i) => {
-          clip.loop = false;
-          if (i !== active) clip.pause();
-        });
-        play(clips[active]!);
-      }
+      dedupe();
+      panels.forEach((panel, i) => {
+        if (visiblePanels().includes(panel)) play(panel);
+        else if (i > 0) panel.pause();
+      });
     };
 
-    for (const clip of clips) {
-      // If a clip can't be decoded, drop its source so the browser shows the poster instead of black.
-      clip.addEventListener(
-        'error',
-        () => {
-          clip.removeAttribute('src');
-          clip.load();
-        },
-        { once: true },
-      );
+    for (const panel of panels) {
+      // If a clip can't be decoded, skip to the next one (the poster shows meanwhile).
+      let failures = 0;
+      panel.addEventListener('error', () => {
+        if (!panel.getAttribute('src')) return;
+        if (++failures >= library.length) {
+          // Nothing decodes here: keep the poster and stop trying.
+          panel.removeAttribute('src');
+          panel.load();
+          return;
+        }
+        load(panel, nextFor(panel));
+        if (!paused && visible && ready) play(panel);
+      });
 
-      // Portrait: hand over to the next clip when one finishes.
-      clip.addEventListener('ended', () => {
-        if (triptych.matches || paused) return;
-        const next = (active + 1) % clips.length;
-        clips[next]!.currentTime = 0;
-        show(next);
-        play(clips[next]!);
+      panel.addEventListener('ended', () => {
+        load(panel, nextFor(panel));
+        if (!paused && visible) play(panel);
       });
     }
 
@@ -160,7 +189,7 @@ const clips = await Promise.all(
       paused = !paused;
       toggle.setAttribute('aria-pressed', String(paused));
       if (label) label.textContent = (paused ? toggle.dataset['labelPlay'] : toggle.dataset['labelPause']) ?? '';
-      if (paused) for (const clip of clips) clip.pause();
+      if (paused) for (const panel of panels) panel.pause();
       else start();
     });
 
@@ -172,7 +201,7 @@ const clips = await Promise.all(
       new IntersectionObserver(([entry]) => {
         visible = entry?.isIntersecting ?? true;
         if (visible) start();
-        else for (const clip of clips) clip.pause();
+        else for (const panel of panels) panel.pause();
       }).observe(wrap);
     }
 
