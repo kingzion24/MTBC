@@ -5,6 +5,9 @@
  * - portrait screens: one at a time, cross-fading to the next when a clip ends.
  * Posters are shown without JS, with reduced motion, or with Data Saver on.
  * Clips are encoded by scripts/encode-hero-videos.sh into public/videos/hero/.
+ *
+ * The clips are pinned (sticky) for the whole wrapper: the headline and then the slotted
+ * content (the Intro) scroll over them, like a film behind changing words.
  */
 import { getImage } from 'astro:assets';
 import poster1 from '../../assets/photos/hero-poster-1.jpg';
@@ -16,11 +19,9 @@ import { withBase } from '../../utils/url';
 interface Props {
   serviceTime: string;
   visitHref: string;
-  /** In-page anchor the "Scroll" cue jumps to. */
-  nextHref: string;
 }
 
-const { serviceTime, visitHref, nextHref } = Astro.props;
+const { serviceTime, visitHref } = Astro.props;
 
 const clips = await Promise.all(
   [poster1, poster2, poster3].map(async (poster, i) => ({
@@ -30,7 +31,7 @@ const clips = await Promise.all(
 );
 ---
 
-<section class="hero" aria-labelledby="hero-title">
+<div class="hero-wrap" data-hero-wrap>
   <div class="hero__media" data-hero-media>
     {
       clips.map((clip, i) => (
@@ -50,6 +51,7 @@ const clips = await Promise.all(
     }
   </div>
 
+  <section class="hero" aria-labelledby="hero-title">
   <div class="hero__body container">
     <h1 id="hero-title" class="hero__title">
       <span>Daily bread</span>
@@ -71,11 +73,12 @@ const clips = await Promise.all(
     <span data-hero-toggle-label>Pause</span><span class="visually-hidden"> background video</span>
   </button>
 
-  <a class="hero__scroll" href={nextHref}>
-    <span>Scroll</span>
-    <span class="hero__scroll-line" aria-hidden="true"></span>
-  </a>
-</section>
+  </section>
+
+  <div class="hero-wrap__after">
+    <slot />
+  </div>
+</div>
 
 <script>
   const media = document.querySelector<HTMLElement>('[data-hero-media]');
@@ -89,6 +92,7 @@ const clips = await Promise.all(
     const triptych = window.matchMedia('(min-aspect-ratio: 6/5)');
     let active = 0;
     let paused = false;
+    let visible = true;
 
     const play = (video: HTMLVideoElement) => {
       video.play().catch(() => {
@@ -102,7 +106,7 @@ const clips = await Promise.all(
     };
 
     const start = () => {
-      if (paused) return;
+      if (paused || !visible) return;
       if (triptych.matches) {
         for (const clip of clips) {
           clip.loop = true;
@@ -148,29 +152,62 @@ const clips = await Promise.all(
     });
 
     triptych.addEventListener('change', start);
+
+    // Only play while the pinned clips can be seen.
+    const wrap = document.querySelector('[data-hero-wrap]');
+    if (wrap) {
+      new IntersectionObserver(([entry]) => {
+        visible = entry?.isIntersecting ?? true;
+        if (visible) start();
+        else for (const clip of clips) clip.pause();
+      }).observe(wrap);
+    }
+
     start();
   }
 </script>
 
 <style>
-  .hero {
+  .hero-wrap {
     --focus: var(--gold-light);
 
     position: relative;
+    background: var(--night);
+    color: var(--paper);
+  }
+
+  /* Pinned for the height of the wrapper; the negative margin lets the content start on top of it. */
+  .hero__media {
+    position: sticky;
+    top: 0;
+    height: 100lvh;
+    margin-bottom: -100lvh;
+    overflow: hidden;
+  }
+
+  .hero__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero,
+  .hero-wrap__after {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     min-height: max(100svh, 640px);
     padding-block: 120px 50px;
-    overflow: hidden;
-    background: var(--night);
-    color: var(--paper);
   }
 
-  .hero__media,
-  .hero__media::after {
-    position: absolute;
-    inset: 0;
+  /* Darken the film as the next words arrive so they stay legible. */
+  .hero-wrap__after {
+    background: linear-gradient(180deg, rgb(20 18 15 / 0) 0, rgb(20 18 15 / 0.62) min(40vh, 320px));
   }
 
   /* Portrait: clips stacked, the active one visible. */
@@ -203,7 +240,6 @@ const clips = await Promise.all(
 
   /* Mobile: top-to-bottom scrim so copy at the bottom stays legible. */
   .hero__media::after {
-    content: '';
     background: linear-gradient(
       180deg,
       rgb(18 15 13 / 0.35) 0%,
@@ -305,10 +341,6 @@ const clips = await Promise.all(
     letter-spacing: 0.12em;
   }
 
-  .hero__scroll {
-    display: none;
-  }
-
   @media (min-width: 768px) {
     .hero {
       min-height: max(100svh, 720px);
@@ -338,26 +370,6 @@ const clips = await Promise.all(
     .hero__service,
     .hero__body :global(.hero__cta) {
       display: none;
-    }
-
-    .hero__scroll {
-      position: absolute;
-      right: 54px;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      font-size: 10px;
-      line-height: normal;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-    }
-
-    .hero__scroll-line {
-      width: 1px;
-      height: 96px;
-      background: var(--paper);
     }
 
     .hero__toggle {

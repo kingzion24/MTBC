@@ -31,8 +31,9 @@ const visitHref = '#visit';
   title="Manna Tabernacle Bible Church (MTBC) — Dar es Salaam"
   description="Manna Tabernacle Bible Church is a Bible-centred family meeting every Sunday 10:00–13:00 at Kisutu Primary School Hall, Posta Mpya, Dar es Salaam."
 >
-  <Hero serviceTime={site.serviceTime} visitHref={visitHref} nextHref="#intro" />
-  <Intro />
+  <Hero serviceTime={site.serviceTime} visitHref={visitHref}>
+    <Intro onMedia />
+  </Hero>
   <Newcomers venue={site.venue} visitHref={visitHref} />
   <LifeTogether stories={stories} allHref={withBase('/stories/')} />
   <Events events={events} allHref={withBase('/events/')} />

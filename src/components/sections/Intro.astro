@@ -2,6 +2,13 @@
 /** Figma: desktop 10:49, mobile 18:53 */
 import Button from '../ui/Button.astro';
 
+interface Props {
+  /** Light text for when the section scrolls over the pinned hero film. */
+  onMedia?: boolean;
+}
+
+const { onMedia = false } = Astro.props;
+
 const points = [
   {
     title: 'Rooted in the Word.',
@@ -18,12 +25,12 @@ const points = [
 ];
 ---
 
-<section id="intro" class="intro container" aria-labelledby="intro-title">
-  <h2 id="intro-title" class="intro__title">
+<section id="intro" class:list={['intro container', { 'intro--on-media': onMedia }]} aria-labelledby="intro-title">
+  <h2 id="intro-title" class="intro__title" data-reveal>
     <span>Not only to welcome you,</span>
     <span>but to feed you.</span>
   </h2>
-  <p class="intro__lead">
+  <p class="intro__lead" data-reveal>
     Like manna in the wilderness, God's Word is fresh every morning. At MTBC we gather to be fed by Scripture, to
     worship together, and to carry that bread out into our city.
   </p>
@@ -31,7 +38,7 @@ const points = [
   <ol class="intro__points">
     {
       points.map((point, i) => (
-        <li class="point">
+        <li class="point" data-reveal>
           <span class="point__num" aria-hidden="true">
             {String(i + 1).padStart(2, '0')}
           </span>
@@ -42,8 +49,8 @@ const points = [
     }
   </ol>
 
-  <div class="intro__cta">
-    <Button href="#about">About MTBC</Button>
+  <div class="intro__cta" data-reveal>
+    <Button href="#about" variant={onMedia ? 'outline-light' : 'outline'}>About MTBC</Button>
   </div>
 </section>
 
@@ -158,5 +165,22 @@ const points = [
     .point__title {
       letter-spacing: 0.12em;
     }
+  }
+
+  .intro--on-media {
+    color: var(--paper);
+  }
+
+  .intro--on-media .intro__points,
+  .intro--on-media .point {
+    border-color: rgb(255 255 255 / 0.22);
+  }
+
+  .intro--on-media .point__num {
+    color: var(--gold-light);
+  }
+
+  .intro--on-media .point__body {
+    color: var(--night-text);
   }
 </style>
