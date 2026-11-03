@@ -155,8 +155,6 @@ const en = {
     'Our doors, and our lunch table, are always open.',
   ],
   planFirstVisit: 'Plan your first visit',
-  requestPrayer: 'Request prayer',
-  byPhone: 'by phone',
 
   // Footer
   sitemap: 'Sitemap',
@@ -298,7 +296,7 @@ const sw: UI = {
 
   visitTitle: 'Tutembelee',
   visitLead:
-    'Nyumba moja katikati ya jiji. Kila Jumapili kuanzia 10:00 tunakusanyika katika ukumbi wa Shule ya Msingi Kisutu, Posta Mpya. Njoo kama ulivyo, kuna nafasi yako.',
+    'Nyumba moja katikati ya jiji. Kila Jumapili kuanzia saa 4 asubuhi tunakusanyika katika ukumbi wa Shule ya Msingi Kisutu, Posta Mpya. Njoo kama ulivyo, kuna nafasi yako.',
   googleMap: 'Ramani ya Google',
   serviceTimes: 'Muda wa ibada',
 
@@ -314,8 +312,6 @@ const sw: UI = {
     'Milango yetu, na meza yetu ya chakula, iko wazi daima.',
   ],
   planFirstVisit: 'Panga ziara yako ya kwanza',
-  requestPrayer: 'Omba kuombewa',
-  byPhone: 'kwa simu',
 
   sitemap: 'Ramani ya tovuti',
   footerPages: { title: 'Gundua', note: 'Katika tovuti hii' },
@@ -325,7 +321,7 @@ const sw: UI = {
 
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
   homeDescription:
-    'Manna Tabernacle Bible Church ni familia iliyojengwa juu ya Biblia, inayokutana kila Jumapili 10:00–13:00 katika Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam.',
+    'Manna Tabernacle Bible Church ni familia iliyojengwa juu ya Biblia, inayokutana kila Jumapili saa 4 asubuhi – 7 mchana katika Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam.',
   eventsPageTitle: 'Matukio — MTBC Dar es Salaam',
   eventsPageDescription: 'Mikusanyiko ya Manna Tabernacle Bible Church, Dar es Salaam: maombi, kufunga na ushirika.',
   newsPageTitle: 'Habari na Matangazo — MTBC Dar es Salaam',

@@ -5,7 +5,7 @@
 #
 #   ./scripts/encode-videos.sh
 #
-# Each line: source | start (s) | duration (s) | width (px) | output name
+# Each line: source | start (s) | duration (s) | width (px) | output name | optional crop (ffmpeg filter)
 set -euo pipefail
 
 SRC="src/assets/videos"
@@ -13,10 +13,10 @@ OUT="public/videos"
 POSTERS="src/assets/photos"
 
 CLIPS=(
-  # Hero: three 12 s loops from the "MTBC Praise Worship" edit (title card skipped).
+  # Hero: three different videos, so the side-by-side panels never repeat.
   "hero/Timeline 12.mov|5|12|720|hero/hero-1"
-  "hero/Timeline 12.mov|17|12|720|hero/hero-2"
-  "hero/Timeline 12.mov|29|12|720|hero/hero-3"
+  "ZNV0041.MP4|1|10|720|hero/hero-2"
+  "ZNV0069.MP4|0|6|720|hero/hero-3|crop=ih*9/16:ih:200:0"
   # Prayer moments: 5 s each, played once when scrolled into view.
   "prayer/ZNV1183.MP4|2|5|540|moments/prayer-bowed"
   "prayer/ZNV1185.MP4|10|5|540|moments/prayer-kneeling"
@@ -25,9 +25,10 @@ CLIPS=(
 )
 
 for line in "${CLIPS[@]}"; do
-  IFS='|' read -r src start dur width name <<<"$line"
+  IFS='|' read -r src start dur width name crop <<<"$line"
   mkdir -p "$OUT/$(dirname "$name")"
-  vf="fps=30,scale=$width:-2:flags=lanczos,format=yuv420p"
+  pre="${crop:+$crop,}"
+  vf="${pre}fps=30,scale=$width:-2:flags=lanczos,format=yuv420p"
   echo "$name  <-  $src  [$start s + $dur s, ${width}px]"
 
   ffmpeg -v error -y -ss "$start" -t "$dur" -i "$SRC/$src" -an -vf "$vf" \
@@ -35,8 +36,8 @@ for line in "${CLIPS[@]}"; do
     "$OUT/$name.mp4"
 
   # Poster: half a second in, to avoid catching a cut.
-  ffmpeg -v error -y -ss "$(echo "$start + 0.5" | bc)" -i "$SRC/$src" -frames:v 1 \
-    -vf "scale=$width:-2:flags=lanczos" -q:v 3 "$POSTERS/$(basename "$name")-poster.jpg"
+  ffmpeg -v error -y -ss "$(printf '%.2f' "$(echo "$start + 0.5" | bc)")" -i "$SRC/$src" -frames:v 1 \
+    -vf "${pre}scale=$width:-2:flags=lanczos" -q:v 3 "$POSTERS/$(basename "$name")-poster.jpg"
 done
 
 ls -lh "$OUT"/*/

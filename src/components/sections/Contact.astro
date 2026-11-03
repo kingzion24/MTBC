@@ -33,9 +33,6 @@ const { photos } = getContent(lang);
 
     <div class="contact__actions" data-reveal>
       <Button href={visitHref} variant="outline-light" large blockOnMobile>{t.planFirstVisit}</Button>
-      <Button href={`tel:${phone.tel}`} variant="filled-light" large blockOnMobile
-        >{t.requestPrayer}<span class="visually-hidden"> {t.byPhone}</span></Button
-      >
       <p class="contact__phone">
         <a class="contact__number" href={`tel:${phone.tel}`}>{phone.display}</a>
         <span class="contact__hours">{officeHours}</span>

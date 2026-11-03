@@ -26,6 +26,8 @@ import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
 import prayerKneelingPoster from '../assets/photos/prayer-kneeling-poster.jpg';
 import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
 import sundayPrayerPoster from '../assets/photos/sunday-prayer-poster.jpg';
+import sundayWelcome from '../assets/photos/sunday-welcome.jpg';
+import sundayHallBack from '../assets/photos/sunday-hall-back.jpg';
 
 /* ------------------------------------------------------------------ */
 /* Localisation helpers                                                */
@@ -161,12 +163,15 @@ export interface NewsPost {
 /* ------------------------------------------------------------------ */
 
 const mapAddress = 'Kisutu Primary School Hall, Posta Mpya, Dar es Salaam';
-const instagram = 'https://www.instagram.com/carloskirimbai/';
+/** The church's Instagram (footer, menu); the pastor's own account is on his card. */
+const instagram = 'https://www.instagram.com/mtbc_church/';
+const pastorInstagram = 'https://www.instagram.com/carloskirimbai/';
 const youtube = 'https://www.youtube.com/channel/UCY2Bpc2UZqd_4Px-B7ZuhtQ';
 
 const site: Raw<Site> = {
-  serviceTime: '10:00 – 13:00',
-  serviceShort: { sw: 'Jumapili 10:00', en: 'Sundays 10:00' },
+  // Kiswahili uses Swahili time (saa 4 asubuhi = 10:00).
+  serviceTime: { sw: 'Saa 4:00 asubuhi – 7:00 mchana', en: '10:00 – 13:00' },
+  serviceShort: { sw: 'Jumapili, saa 4 asubuhi', en: 'Sundays 10:00' },
   venue: { sw: 'Ukumbi wa Kisutu', en: 'Kisutu Hall' },
   address: {
     sw: 'Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam',
@@ -177,7 +182,7 @@ const site: Raw<Site> = {
   mapEmbed: `https://maps.google.com/maps?q=${encodeURIComponent('Kisutu Primary School, Dar es Salaam')}&z=16&output=embed`,
   phone: { display: '+255 700 000 000', tel: '+255700000000' },
   officeHours: {
-    sw: 'Saa za ofisi 9:00 – 17:00 · Tunafunga Jumatatu',
+    sw: 'Saa za ofisi: saa 3 asubuhi – 11 jioni · Tunafunga Jumatatu',
     en: 'Office hours 9:00 – 17:00 · Closed Mondays',
   },
   instagram,
@@ -290,6 +295,20 @@ const photos = {
       en: 'Members stand holding hands in prayer between rows of chairs.',
     },
   },
+  sundayWelcome: {
+    src: sundayWelcome,
+    alt: {
+      sw: 'Mwanamume aliyevaa shati la bluu akitabasamu na kumsalimu mwanamke kwa mkono baada ya ibada.',
+      en: 'A man in a light blue shirt smiles and shakes hands with a woman after the service.',
+    },
+  },
+  sundayHallBack: {
+    src: sundayHallBack,
+    alt: {
+      sw: 'Ukumbi mzima umejaa waumini waliosimama wakiabudu, ukitazamwa kutoka nyuma.',
+      en: 'The full hall seen from the back, with the congregation standing in worship.',
+    },
+  },
   sundayPrayer: {
     src: sundayPrayerPoster,
     alt: {
@@ -342,8 +361,8 @@ const events: Raw<EventItem>[] = [
       { sw: '26 Okt – 18 Des', en: '26 Oct – 18 Dec' },
     ],
     when: [
-      { sw: 'Jumatatu – Alhamisi · 17:00–20:00', en: 'Mon–Thu · 17:00–20:00' },
-      { sw: 'Ijumaa · 21:00–05:00 usiku kucha', en: 'Fri · 21:00–05:00 overnight' },
+      { sw: 'Jumatatu – Alhamisi · saa 11 jioni – 2 usiku', en: 'Mon–Thu · 17:00–20:00' },
+      { sw: 'Ijumaa · saa 3 usiku – 11 alfajiri (usiku kucha)', en: 'Fri · 21:00–05:00 overnight' },
     ],
     place: { sw: 'Chumba cha Maombi, Kisutu Girls High School', en: 'Prayer Room, Kisutu Girls High School' },
     online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
@@ -356,15 +375,15 @@ const events: Raw<EventItem>[] = [
     moment: { src: '/videos/moments/sunday-prayer.mp4', position: '50% 35%' },
     category: { sw: 'Maombi', en: 'Prayer' },
     tags: [{ sw: 'Kila Jumapili', en: 'Every Sunday' }],
-    when: [{ sw: 'Jumapili · 08:00–10:00', en: 'Sunday · 08:00–10:00' }],
+    when: [{ sw: 'Jumapili · saa 2 – 4 asubuhi', en: 'Sunday · 08:00–10:00' }],
     place: { sw: 'Ukumbi wa Kisutu', en: 'Kisutu Hall' },
   },
 ];
 
 const photoStrip: Raw<Photo>[] = [
-  photos.prayerKneeling,
+  photos.sundayWelcome,
   photos.youthFellowship,
-  photos.fellowshipGreeting,
+  photos.sundayHallBack,
   photos.congregationWorship,
   photos.sundayWorshipStage,
 ];
@@ -422,7 +441,7 @@ const pastor: Raw<Pastor> = {
     sw: 'Mchungaji Carlos Kirimbai anaamini kwamba Mungu amemwita kufundisha Mwili wa Kristo, wito anaoushikilia kutoka Isaya 45:13. Mbali na kuiongoza MTBC, hufundisha semina za Biblia na kuhudumu katika vyuo vya elimu ya juu.',
     en: 'Pastor Carlos Kirimbai believes God has called him to teach the Body of Christ, a calling he holds to from Isaiah 45:13. Alongside leading MTBC, he teaches Bible seminars and speaks at institutions of higher learning.',
   },
-  instagram: { handle: '@carloskirimbai', url: instagram },
+  instagram: { handle: '@carloskirimbai', url: pastorInstagram },
   youtube: { handle: '@carloskirimbai', url: youtube, channelId: 'UCY2Bpc2UZqd_4Px-B7ZuhtQ' },
   podcast: { live: false, url: '' },
   portrait: {

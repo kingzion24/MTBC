@@ -154,10 +154,6 @@ const t = ui[lang];
       width: 160px;
     }
 
-    .header__service {
-      display: flex;
-    }
-
     .header__right {
       gap: 28px;
     }
@@ -172,6 +168,13 @@ const t = ui[lang];
 
     .menu-toggle__label {
       font-size: 10px;
+    }
+  }
+
+  /* The service time (longer in Kiswahili) joins the header once there's room for it. */
+  @media (min-width: 1024px) {
+    .header__service {
+      display: flex;
     }
   }
 </style>
