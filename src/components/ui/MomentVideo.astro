@@ -1,0 +1,74 @@
+---
+/**
+ * A short, silent "living photo": plays once (≈5 s) each time it scrolls into view, then rests
+ * on its last frame. Motion that stops within 5 s needs no pause control (WCAG 2.2.2).
+ * Reduced motion / Data Saver / no JS: the poster frame is shown instead.
+ */
+import { getImage } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+import type { Photo } from '../../data/content';
+import { withBase } from '../../utils/url';
+
+interface Props extends Omit<HTMLAttributes<'video'>, 'src' | 'poster'> {
+  /** Path under public/, e.g. "/videos/moments/prayer-bowed.mp4". */
+  src: `/${string}`;
+  /** Poster frame; its alt text describes the clip. */
+  poster: Photo;
+  /** Poster width to generate (match the clip's encoded width). */
+  width: number;
+  /** CSS object-position for cropping, e.g. "60% 30%". */
+  position?: string | undefined;
+}
+
+const { src, poster, width, position, ...rest } = Astro.props;
+const posterUrl = (await getImage({ src: poster.src, width, format: 'webp', quality: 70 })).src;
+---
+
+<video
+  src={withBase(src)}
+  poster={posterUrl}
+  muted
+  playsinline
+  preload="none"
+  disablepictureinpicture
+  disableremoteplayback
+  aria-hidden="true"
+  data-moment
+  style={position ? `object-position: ${position}` : undefined}
+  {...rest}
+></video>
+<span class="visually-hidden">{poster.alt}</span>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+  const videos = document.querySelectorAll<HTMLVideoElement>('video[data-moment]');
+
+  for (const video of videos) {
+    // Undecodable clip: fall back to the poster instead of a black box.
+    video.addEventListener('error', () => {
+      video.removeAttribute('src');
+      video.load();
+    }, { once: true });
+  }
+
+  if (!reduce && !saveData) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const { target, isIntersecting } of entries) {
+          const video = target as HTMLVideoElement;
+          if (isIntersecting) {
+            video.currentTime = 0;
+            video.play().catch(() => {
+              /* Autoplay refused: the poster stays. */
+            });
+          } else {
+            video.pause();
+          }
+        }
+      },
+      { threshold: 0.6 },
+    );
+    for (const video of videos) observer.observe(video);
+  }
+</script>

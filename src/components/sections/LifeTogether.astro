@@ -7,6 +7,7 @@
 import { Image } from 'astro:assets';
 import type { Story } from '../../data/content';
 import Button from '../ui/Button.astro';
+import MomentVideo from '../ui/MomentVideo.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 
 interface Props {
@@ -44,6 +45,15 @@ const lines = (text: string) => text.split('\n');
             </p>
           )}
           <figure class="story__figure" data-reveal>
+            {story.moment ? (
+              <MomentVideo
+                src={story.moment.src}
+                poster={story.photo}
+                width={540}
+                position={story.moment.position}
+                class="story__img"
+              />
+            ) : (
             <Image
               src={story.photo.src}
               alt={story.photo.alt}
@@ -51,6 +61,7 @@ const lines = (text: string) => text.split('\n');
               sizes="(min-width: 1024px) 43vw, 94vw"
               class="story__img"
             />
+            )}
             {story.caption && <figcaption class="story__caption">{story.caption}</figcaption>}
           </figure>
         </li>

@@ -2,6 +2,7 @@
 /** Figma "Event card" (11:20 desktop, 18:110 mobile). */
 import { Image } from 'astro:assets';
 import type { EventItem } from '../data/content';
+import MomentVideo from './ui/MomentVideo.astro';
 import Tag from './ui/Tag.astro';
 
 interface Props {
@@ -14,13 +15,25 @@ const Heading = headingLevel;
 ---
 
 <article class="event">
-  <Image
-    src={event.photo.src}
-    alt={event.photo.alt}
-    widths={[342, 480, 684, 960]}
-    sizes="(min-width: 768px) 342px, 100vw"
-    class="event__img"
-  />
+  {
+    event.moment ? (
+      <MomentVideo
+        src={event.moment.src}
+        poster={event.photo}
+        width={540}
+        position={event.moment.position}
+        class="event__img"
+      />
+    ) : (
+    <Image
+        src={event.photo.src}
+        alt={event.photo.alt}
+        widths={[342, 480, 684, 960]}
+        sizes="(min-width: 768px) 342px, 100vw"
+        class="event__img"
+      />
+    )
+  }
   <div class="event__body">
     <ul class="event__tags" aria-label="Tags">
       <li><Tag active>{event.category}</Tag></li>

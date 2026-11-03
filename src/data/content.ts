@@ -8,12 +8,14 @@ import worshipHandsRaised from '../assets/photos/worship-hands-raised.jpg';
 import prayerKneeling from '../assets/photos/prayer-kneeling.jpg';
 import congregationWorship from '../assets/photos/congregation-worship.jpg';
 import worshipTeam from '../assets/photos/worship-team.jpg';
-import prayerRoom from '../assets/photos/prayer-room.png';
 import youthFellowship from '../assets/photos/youth-fellowship.jpg';
 import fellowshipGreeting from '../assets/photos/fellowship-greeting.jpg';
 import youngProfessionals from '../assets/photos/young-professionals.jpg';
 import womenOfGrace from '../assets/photos/women-of-grace.jpg';
 import contactPreacher from '../assets/photos/contact-preacher.jpg';
+import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
+import prayerKneelingPoster from '../assets/photos/prayer-kneeling-poster.jpg';
+import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
 
 export interface Photo {
   src: ImageMetadata;
@@ -51,10 +53,6 @@ export const photos = {
     src: worshipTeam,
     alt: 'Two worship leaders sing into microphones on stage, in black and white.',
   },
-  prayerRoom: {
-    src: prayerRoom,
-    alt: 'A woman lifts her hands toward a screen that reads “MTBC Prayer Room”.',
-  },
   youthFellowship: {
     src: youthFellowship,
     alt: 'Young people sing and clap together during Youth Fellowship.',
@@ -75,10 +73,28 @@ export const photos = {
     src: contactPreacher,
     alt: 'A preacher raises his arms on stage as the congregation lifts their hands.',
   },
+  prayerBowed: { src: prayerBowedPoster, alt: 'A woman in blue bows her head over a chair in prayer.' },
+  prayerKneelingMoment: {
+    src: prayerKneelingPoster,
+    alt: 'A young man kneels between the chairs, hands clasped in prayer.',
+  },
+  prayerCircle: {
+    src: prayerCirclePoster,
+    alt: 'Members stand holding hands in prayer between rows of chairs.',
+  },
 } satisfies Record<string, Photo>;
 
+/** A short silent clip (encoded by scripts/encode-videos.sh) shown in place of a photo. */
+export interface Moment {
+  src: `/${string}`;
+  /** CSS object-position used when the clip is cropped to its slot. */
+  position?: string;
+}
+
 export interface Story {
+  /** Shown as-is, or as the poster and fallback when `moment` is set. */
   photo: Photo;
+  moment?: Moment;
   /** Large italic line shown beside the photo. Use a line break to control wrapping. */
   quote?: string;
   /** Small caption under the photo. */
@@ -91,12 +107,14 @@ export const stories: Story[] = [
     caption: 'Every Sunday, voices from across the city lift one song. Swahili, English, and everything in between.',
   },
   {
-    photo: photos.prayerKneeling,
+    photo: photos.prayerBowed,
+    moment: { src: '/videos/moments/prayer-bowed.mp4', position: '55% 12%' },
     quote: 'A place to belong,\nbefore you believe',
     caption: 'In prayer we lay everything down, and find that we are carried.',
   },
   {
-    photo: photos.congregationWorship,
+    photo: photos.prayerKneelingMoment,
+    moment: { src: '/videos/moments/prayer-kneeling.mp4', position: '50% 60%' },
     quote: 'Faith that shows up\nin ordinary places',
   },
   {
@@ -115,7 +133,9 @@ export interface OnlineMeeting {
 export interface EventItem {
   title: string;
   subtitle: string;
+  /** Shown as-is, or as the poster and fallback when `moment` is set. */
   photo: Photo;
+  moment?: Moment;
   category: string;
   tags: string[];
   /** One line per time slot. */
@@ -130,7 +150,8 @@ export const events: EventItem[] = [
   {
     title: 'Prayer & Fasting',
     subtitle: 'Grand Finale 2026',
-    photo: photos.prayerRoom,
+    photo: photos.prayerCircle,
+    moment: { src: '/videos/moments/prayer-circle.mp4' },
     category: 'Prayer',
     tags: ['40 days', '26 Oct – 18 Dec'],
     when: ['Mon–Thu · 17:00–20:00', 'Fri · 21:00–05:00 overnight'],

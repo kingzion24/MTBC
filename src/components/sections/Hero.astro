@@ -4,15 +4,15 @@
  * - landscape screens: side by side as a triptych, all looping;
  * - portrait screens: one at a time, cross-fading to the next when a clip ends.
  * Posters are shown without JS, with reduced motion, or with Data Saver on.
- * Clips are encoded by scripts/encode-hero-videos.sh into public/videos/hero/.
+ * Clips are encoded by scripts/encode-videos.sh into public/videos/hero/.
  *
  * The clips are pinned (sticky) for the whole wrapper: the headline and then the slotted
  * content (the Intro) scroll over them, like a film behind changing words.
  */
 import { getImage } from 'astro:assets';
-import poster1 from '../../assets/photos/hero-poster-1.jpg';
-import poster2 from '../../assets/photos/hero-poster-2.jpg';
-import poster3 from '../../assets/photos/hero-poster-3.jpg';
+import poster1 from '../../assets/photos/hero-1-poster.jpg';
+import poster2 from '../../assets/photos/hero-2-poster.jpg';
+import poster3 from '../../assets/photos/hero-3-poster.jpg';
 import Button from '../ui/Button.astro';
 import { withBase } from '../../utils/url';
 
@@ -26,7 +26,7 @@ const { serviceTime, visitHref } = Astro.props;
 const clips = await Promise.all(
   [poster1, poster2, poster3].map(async (poster, i) => ({
     src: withBase(`/videos/hero/hero-${i + 1}.mp4`),
-    poster: (await getImage({ src: poster, width: 480, format: 'webp', quality: 70 })).src,
+    poster: (await getImage({ src: poster, width: 720, format: 'webp', quality: 70 })).src,
   })),
 );
 ---
