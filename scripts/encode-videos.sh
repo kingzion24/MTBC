@@ -13,10 +13,11 @@ OUT="public/videos"
 POSTERS="src/assets/photos"
 
 CLIPS=(
-  # Hero: three different videos, so the side-by-side panels never repeat.
+  # Hero: one clip from each of three different videos in videos/hero/, so the panels never repeat.
+  # (WhatsApp 00.47.04 is skipped: it carries a photographer watermark on every frame.)
   "hero/Timeline 12.mov|5|12|720|hero/hero-1"
-  "ZNV0041.MP4|1|10|720|hero/hero-2"
-  "ZNV0069.MP4|0|6|720|hero/hero-3|crop=ih*9/16:ih:200:0"
+  "hero/WhatsApp Video 2026-11-03 at 00.45.03.mp4|4|12|720|hero/hero-2"
+  "hero/WhatsApp Video 2026-11-03 at 00.46.13.mp4|16|12|720|hero/hero-3"
   # Prayer moments: 5 s each, played once when scrolled into view.
   "prayer/ZNV1183.MP4|2|5|540|moments/prayer-bowed"
   "prayer/ZNV1185.MP4|10|5|540|moments/prayer-kneeling"
