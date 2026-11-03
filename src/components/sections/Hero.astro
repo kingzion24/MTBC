@@ -51,6 +51,7 @@ const clips = await Promise.all(
     }
   </div>
 
+  <div class="hero-wrap__content">
   <section class="hero" aria-labelledby="hero-title">
   <div class="hero__body container">
     <h1 id="hero-title" class="hero__title">
@@ -77,6 +78,7 @@ const clips = await Promise.all(
 
   <div class="hero-wrap__after">
     <slot />
+  </div>
   </div>
 </div>
 
@@ -168,21 +170,36 @@ const clips = await Promise.all(
 </script>
 
 <style>
+  /*
+   * The film and the words share one grid cell. The film is sticky inside that cell, so it stays
+   * pinned while the words scroll over it and is released exactly when the wrapper ends.
+   */
   .hero-wrap {
     --focus: var(--gold-light);
 
     position: relative;
+    display: grid;
     background: var(--night);
     color: var(--paper);
   }
 
-  /* Pinned for the height of the wrapper; the negative margin lets the content start on top of it. */
+  .hero__media,
+  .hero-wrap__content {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
   .hero__media {
     position: sticky;
     top: 0;
+    align-self: start;
     height: 100lvh;
-    margin-bottom: -100lvh;
     overflow: hidden;
+  }
+
+  .hero-wrap__content {
+    position: relative;
+    z-index: 1;
   }
 
   .hero__media::after {
@@ -191,10 +208,8 @@ const clips = await Promise.all(
     inset: 0;
   }
 
-  .hero,
-  .hero-wrap__after {
+  .hero {
     position: relative;
-    z-index: 1;
   }
 
   .hero {
