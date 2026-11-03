@@ -13,7 +13,7 @@ import Visit from '../components/sections/Visit.astro';
 import News from '../components/sections/News.astro';
 import Contact from '../components/sections/Contact.astro';
 import {
-  events,
+  currentEvents,
   ministries,
   ministryCategories,
   news,
@@ -36,7 +36,7 @@ const visitHref = '#visit';
   </Hero>
   <Newcomers venue={site.venue} visitHref={visitHref} />
   <LifeTogether stories={stories} allHref={withBase('/stories/')} />
-  <Events events={events} allHref={withBase('/events/')} />
+  <Events events={currentEvents()} allHref={withBase('/events/')} />
   <PhotoStrip photos={photoStrip} />
   <Ministries categories={ministryCategories} ministries={ministries} findHref="#contact" />
   <About />

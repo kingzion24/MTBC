@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EventCard from '../components/EventCard.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
-import { events } from '../data/content';
+import { currentEvents } from '../data/content';
+
+const events = currentEvents();
 ---
 
 <BaseLayout

@@ -9,6 +9,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Daily rebuild at 06:00 Dar es Salaam (03:00 UTC) so events past their end date drop off.
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions:

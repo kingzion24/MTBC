@@ -36,8 +36,21 @@ const Heading = headingLevel;
       <span>{event.title}</span>
       <span>{event.subtitle}</span>
     </Heading>
+    {
+      event.online && (
+        <div class="event__online">
+          <a class="event__zoom" href={event.online.url} target="_blank" rel="noopener">
+            Join on Zoom<span class="visually-hidden"> (opens in a new tab)</span>
+            <span class="event__zoom-line" aria-hidden="true" />
+          </a>
+          <p class="event__zoom-meta">
+            Meeting ID <span>{event.online.meetingId}</span> · Passcode <span>{event.online.passcode}</span>
+          </p>
+        </div>
+      )
+    }
     <p class="event__meta">
-      <span>{event.when}</span>
+      {event.when.map((line) => <span>{line}</span>)}
       <span>{event.place}</span>
     </p>
   </div>
@@ -97,6 +110,51 @@ const Heading = headingLevel;
     letter-spacing: 0.04em;
   }
 
+  .event__online {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .event__zoom {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding-block: 4px;
+    font-size: 13px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .event__zoom-line {
+    width: 24px;
+    height: 1px;
+    background: currentColor;
+    transform-origin: left center;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .event__zoom:hover .event__zoom-line {
+      transform: scaleX(1.5);
+    }
+  }
+
+  .event__zoom-meta {
+    color: var(--soft);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  .event__zoom-meta span {
+    color: var(--ink);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
   @media (min-width: 1024px) {
     .event__img {
       aspect-ratio: 342 / 300;
@@ -116,9 +174,7 @@ const Heading = headingLevel;
     }
 
     .event__meta {
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 16px;
+      gap: 4px;
       padding-top: 16px;
       font-size: 13px;
     }

@@ -105,25 +105,38 @@ export const stories: Story[] = [
   },
 ];
 
+export interface OnlineMeeting {
+  /** Zoom join link. The passcode is shown separately so it can be typed in. */
+  url: string;
+  meetingId: string;
+  passcode: string;
+}
+
 export interface EventItem {
   title: string;
   subtitle: string;
   photo: Photo;
   category: string;
   tags: string[];
-  when: string;
+  /** One line per time slot. */
+  when: string[];
   place: string;
+  online?: OnlineMeeting;
+  /** Last day (yyyy-mm-dd, Dar es Salaam time). The event disappears on the first build after it. */
+  endDate?: string;
 }
 
 export const events: EventItem[] = [
   {
-    title: 'MTBC Prayer Room',
-    subtitle: 'An evening of prayer together',
+    title: 'Prayer & Fasting',
+    subtitle: 'Grand Finale 2026',
     photo: photos.prayerRoom,
     category: 'Prayer',
-    tags: ['Weekly', 'Open to all'],
-    when: 'Every Wednesday · 18:00',
-    place: 'Kisutu Hall',
+    tags: ['40 days', '26 Oct – 18 Dec'],
+    when: ['Mon–Thu · 17:00–20:00', 'Fri · 21:00–05:00 overnight'],
+    place: 'Prayer Room, Kisutu Girls High School',
+    online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
+    endDate: '2026-12-18',
   },
   {
     title: 'Youth Fellowship',
@@ -131,10 +144,16 @@ export const events: EventItem[] = [
     photo: photos.youthFellowship,
     category: 'Youth',
     tags: ['Music'],
-    when: 'Every Friday · 18:30',
+    when: ['Every Friday · 18:30'],
     place: 'Kisutu Hall',
   },
 ];
+
+/** Events whose end date hasn't passed yet, judged in Dar es Salaam time at build. */
+export const currentEvents = (now = new Date()): EventItem[] => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Dar_es_Salaam' }).format(now);
+  return events.filter((event) => !event.endDate || event.endDate >= today);
+};
 
 export const photoStrip: Photo[] = [
   photos.prayerKneeling,
@@ -201,6 +220,7 @@ export interface NewsPost {
 
 export const news: NewsPost[] = [
   { date: '2026-10-28', tag: 'Notice', title: 'Christmas service times are now confirmed' },
+  { date: '2026-10-26', tag: 'Event', title: 'Prayer & Fasting Grand Finale: 40 days, 26 Oct – 18 Dec' },
   { date: '2026-10-14', tag: 'Outreach', title: 'Thank you for a wonderful Youth Sunday' },
   { date: '2026-09-30', tag: 'Sermon', title: 'New series begins: “Bread for the Journey”' },
 ];
