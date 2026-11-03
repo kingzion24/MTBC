@@ -13,6 +13,10 @@ import fellowshipGreeting from '../assets/photos/fellowship-greeting.jpg';
 import youngProfessionals from '../assets/photos/young-professionals.jpg';
 import womenOfGrace from '../assets/photos/women-of-grace.jpg';
 import contactPreacher from '../assets/photos/contact-preacher.jpg';
+import sundayServiceHall from '../assets/photos/sunday-service-hall.jpg';
+import sundayWorshipStage from '../assets/photos/sunday-worship-stage.jpg';
+import pastorPortrait from '../assets/photos/pastor-portrait.jpg';
+import pastorPreaching from '../assets/photos/pastor-preaching.jpg';
 import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
 import prayerKneelingPoster from '../assets/photos/prayer-kneeling-poster.jpg';
 import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
@@ -72,6 +76,14 @@ export const photos = {
   contactPreacher: {
     src: contactPreacher,
     alt: 'A preacher raises his arms on stage as the congregation lifts their hands.',
+  },
+  sundayServiceHall: {
+    src: sundayServiceHall,
+    alt: 'A full hall on Sunday: the congregation lifts their hands as the worship team leads from the stage beneath “JESUS” signs.',
+  },
+  sundayWorshipStage: {
+    src: sundayWorshipStage,
+    alt: 'The worship team leads from the stage while the congregation stands among rows of red chairs.',
   },
   prayerBowed: { src: prayerBowedPoster, alt: 'A woman in blue bows her head over a chair in prayer.' },
   prayerKneelingMoment: {
@@ -181,7 +193,7 @@ export const photoStrip: Photo[] = [
   photos.youthFellowship,
   photos.fellowshipGreeting,
   photos.congregationWorship,
-  photos.youngProfessionals,
+  photos.sundayWorshipStage,
 ];
 
 export const ministryCategories = ['Small Groups', 'Serve Teams', 'Care & Prayer'] as const;
@@ -230,6 +242,12 @@ export const pastor = {
   instagram: { handle: '@carloskirimbai', url: site.instagram },
   youtube: { handle: '@carloskirimbai', url: site.youtube },
   podcast: { live: false, url: '' },
+  portrait: {
+    src: pastorPortrait,
+    alt: 'Pastor Carlos Kirimbai, in a green shirt, speaks into a microphone at the lectern.',
+  },
+  /** Behind the play button of the latest-message block (until the YouTube thumbnail is wired in). */
+  preaching: { src: pastorPreaching, alt: '' },
   latestMessage: 'Bread for the Journey — Part 1',
 } as const;
 

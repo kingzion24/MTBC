@@ -17,3 +17,9 @@ npm-debug.log*
 
 # Raw hero video sources (large); encoded loops live in public/videos/hero
 src/assets/videos/
+
+# Raw camera originals and source posters (web-sized crops live in src/assets/photos)
+src/assets/photos/pastor/
+src/assets/photos/IMG_*.jpg
+src/assets/posters/
+src/assets/photos/*.ARW

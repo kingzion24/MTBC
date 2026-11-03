@@ -1,13 +1,13 @@
 ---
 /**
  * Figma: desktop 17:34, mobile 19:119.
- * The portrait is a placeholder in Figma; it becomes a CMS image in phase 3.
  * The video block becomes a lite YouTube embed of the latest upload in phase 4.
  */
 import CamIcon from '../../assets/icons/icon-cam.svg';
 import PlayIcon from '../../assets/icons/icon-play.svg';
 import AudioIcon from '../../assets/icons/icon-audio.svg';
 import PlayLarge from '../../assets/icons/play-large.svg';
+import { Image } from 'astro:assets';
 import type { pastor as PastorData } from '../../data/content';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
@@ -53,7 +53,14 @@ const channels = [
       <SectionHeading id="pastor-title" title="Our Pastor" label="Head Pastor" />
     </div>
 
-    <div class="pastor__portrait" role="img" aria-label={`Portrait of ${pastor.name} (photo coming soon)`}></div>
+    <div class="pastor__portrait">
+      <Image
+        src={pastor.portrait.src}
+        alt={pastor.portrait.alt}
+        widths={[342, 480, 684, 960]}
+        sizes="(min-width: 1200px) 480px, 100vw"
+      />
+    </div>
 
     <div class="pastor__name" data-reveal>
       <h3 class="pastor__name-text">{pastor.name}</h3>
@@ -98,6 +105,13 @@ const channels = [
 
     <div class="pastor__message" data-reveal>
       <a class="video" href={pastor.youtube.url} target="_blank" rel="noopener">
+        <Image
+          src={pastor.preaching.src}
+          alt={pastor.preaching.alt}
+          widths={[480, 624, 960, 1248]}
+          sizes="(min-width: 1200px) 624px, 100vw"
+          class="video__img"
+        />
         <PlayLarge class="video__play" aria-hidden="true" />
         <span class="visually-hidden">Watch the latest message on YouTube (opens in a new tab)</span>
       </a>
@@ -131,7 +145,15 @@ const channels = [
   .pastor__portrait {
     grid-area: portrait;
     aspect-ratio: 342 / 420;
-    background: linear-gradient(129deg, #c7c1b4 14%, #8f8a7e 54%, #4f4b44 86%);
+    overflow: hidden;
+    background: var(--line);
+  }
+
+  .pastor__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
   }
 
   .pastor__name {
@@ -276,7 +298,35 @@ const channels = [
     display: grid;
     place-items: center;
     aspect-ratio: 16 / 9;
-    background: linear-gradient(151deg, #4a4038 14%, #2c2622 57%, #1c1917 86%);
+    overflow: hidden;
+    background: var(--night);
+  }
+
+  .video::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(20 18 15 / 0.45);
+    transition: background-color 0.4s var(--ease-out);
+  }
+
+  .video :global(.video__img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video__play {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (hover: hover) {
+    .video:hover::after {
+      background: rgb(20 18 15 / 0.3);
+    }
   }
 
   .video__play {
