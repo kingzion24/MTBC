@@ -14,6 +14,7 @@ import poster1 from '../../assets/photos/hero-1-poster.jpg';
 import poster2 from '../../assets/photos/hero-2-poster.jpg';
 import poster3 from '../../assets/photos/hero-3-poster.jpg';
 import Button from '../ui/Button.astro';
+import { toLang, ui } from '../../i18n';
 import { withBase } from '../../utils/url';
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 const { serviceTime, visitHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 
 const clips = await Promise.all(
   [poster1, poster2, poster3].map(async (poster, i) => ({
@@ -55,23 +57,30 @@ const clips = await Promise.all(
   <section class="hero" aria-labelledby="hero-title">
   <div class="hero__body container">
     <h1 id="hero-title" class="hero__title">
-      <span>Daily bread</span>
-      <span>for every soul.</span>
+      {t.heroTitle.map((line) => <span>{line}</span>)}
     </h1>
     <p class="hero__lead">
-      <span>Manna Tabernacle Bible Church.</span>
-      <span>A family gathered around the Word,<span class="hero__break"></span> in the heart of Dar es Salaam.</span>
+      <span>{t.heroLeadName}</span>
+      <span>{t.heroLead[0]}<span class="hero__break"></span> {t.heroLead[1]}</span>
     </p>
 
     <p class="hero__service">
-      <span class="hero__service-label">Sunday Service</span>
+      <span class="hero__service-label">{t.sundayService}</span>
       <span class="hero__service-time">{serviceTime}</span>
     </p>
-    <Button href={visitHref} variant="filled-light" blockOnMobile class="hero__cta">Plan your visit</Button>
+    <Button href={visitHref} variant="filled-light" blockOnMobile class="hero__cta">{t.planYourVisit}</Button>
   </div>
 
-  <button class="hero__toggle" type="button" aria-pressed="false" hidden data-hero-toggle>
-    <span data-hero-toggle-label>Pause</span><span class="visually-hidden"> background video</span>
+  <button
+    class="hero__toggle"
+    type="button"
+    aria-pressed="false"
+    hidden
+    data-hero-toggle
+    data-label-pause={t.pause}
+    data-label-play={t.play}
+  >
+    <span data-hero-toggle-label>{t.pause}</span><span class="visually-hidden"> {t.backgroundVideo}</span>
   </button>
 
   </section>
@@ -150,7 +159,7 @@ const clips = await Promise.all(
     toggle.addEventListener('click', () => {
       paused = !paused;
       toggle.setAttribute('aria-pressed', String(paused));
-      if (label) label.textContent = paused ? 'Play' : 'Pause';
+      if (label) label.textContent = (paused ? toggle.dataset['labelPlay'] : toggle.dataset['labelPause']) ?? '';
       if (paused) for (const clip of clips) clip.pause();
       else start();
     });
@@ -329,6 +338,18 @@ const clips = await Promise.all(
   .hero__title span,
   .hero__lead > span {
     display: block;
+  }
+
+  /* Kiswahili lines run longer: keep "Mkate wa kila siku" on one line on phones. */
+  :global(html[lang='sw']) .hero__title {
+    font-size: clamp(1.75rem, 1.3rem + 2.3vw, 3.5rem);
+    letter-spacing: 0.06em;
+  }
+
+  @media (min-width: 768px) {
+    :global(html[lang='sw']) .hero__title {
+      letter-spacing: 0.1em;
+    }
   }
 
   .hero__lead {

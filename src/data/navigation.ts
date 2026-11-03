@@ -1,9 +1,8 @@
 /**
- * Sitemap shared by the footer and the MENU overlay.
- * There's only one page plus the Events / News / Stories lists, so most links are in-page anchors.
+ * Footer sitemap: labels come from the i18n dictionary, link targets are defined here once.
+ * Most links are in-page anchors on the home page of the same language.
  */
-import { site } from './content';
-import { withBase } from '../utils/url';
+import { pageUrl, ui, type Lang } from '../i18n';
 
 export interface NavLink {
   label: string;
@@ -17,52 +16,27 @@ export interface NavGroup {
   links: NavLink[];
 }
 
-const groups: NavGroup[] = [
-  {
-    title: 'Visit',
-    note: 'Plan a visit',
-    links: [
-      { label: 'Service times', href: '/#visit' },
-      { label: 'What to expect', href: '/#intro' },
-      { label: 'Kids & families', href: '/#ministries' },
-      { label: "Newcomers' lunch", href: '/#contact' },
-    ],
-  },
-  {
-    title: 'Connect',
-    note: 'Get involved',
-    links: [
-      { label: 'Men', href: '/#ministries' },
-      { label: 'Mothers', href: '/#ministries' },
-      { label: 'Young adults', href: '/#ministries' },
-      { label: 'Prayer', href: '/#ministries' },
-      { label: 'Children', href: '/#ministries' },
-      { label: 'Events', href: '/events/' },
-    ],
-  },
-  {
-    title: 'Watch',
-    note: 'Sermons',
-    links: [
-      { label: 'Latest message', href: '/#pastor' },
-      { label: 'Series archive', href: site.youtube, external: true },
-      { label: 'Live stream', href: site.youtube, external: true },
-    ],
-  },
-  {
-    title: 'About',
-    note: 'Who we are',
-    links: [
-      { label: 'Beliefs', href: '/#intro' },
-      { label: 'Leadership', href: '/#pastor' },
-      { label: 'Location', href: '/#visit' },
-      { label: 'Give', href: '/#ministries' },
-      { label: 'News', href: '/news/' },
-    ],
-  },
-];
+/** Site path, or 'youtube' for the channel. One per label in ui[lang].sitemapGroups. */
+type Target = `/${string}` | 'youtube';
 
-export const sitemap: NavGroup[] = groups.map((group) => ({
-  ...group,
-  links: group.links.map((link) => (link.external ? link : { ...link, href: withBase(link.href as `/${string}`) })),
-}));
+const targets: Record<keyof (typeof ui)['en']['sitemapGroups'], Target[]> = {
+  visit: ['/#visit', '/#intro', '/#ministries', '/#contact'],
+  connect: ['/#ministries', '/#ministries', '/#ministries', '/#ministries', '/#ministries', '/events/'],
+  watch: ['/#pastor', 'youtube', 'youtube'],
+  about: ['/#intro', '/#pastor', '/#visit', '/#ministries', '/news/'],
+};
+
+export const buildSitemap = (lang: Lang, youtubeUrl: string): NavGroup[] =>
+  (Object.keys(targets) as (keyof typeof targets)[]).map((key) => {
+    const group = ui[lang].sitemapGroups[key];
+    return {
+      title: group.title,
+      note: group.note,
+      links: group.links.map((label, i) => {
+        const target = targets[key][i] ?? '/';
+        return target === 'youtube'
+          ? { label, href: youtubeUrl, external: true }
+          : { label, href: pageUrl(lang, target) };
+      }),
+    };
+  });

@@ -9,6 +9,7 @@ import type { Story } from '../../data/content';
 import Button from '../ui/Button.astro';
 import MomentVideo from '../ui/MomentVideo.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   stories: Story[];
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const { stories, allHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 // The collage is designed for exactly four stories.
 const collage = stories.slice(0, 4);
 const lines = (text: string) => text.split('\n');
@@ -24,13 +26,12 @@ const lines = (text: string) => text.split('\n');
 <section id="stories" class="stories" aria-labelledby="stories-title">
   <div class="stories__head container" data-reveal>
     <div class="stories__intro">
-      <SectionHeading id="stories-title" title="Life Together" label="Stories" />
+      <SectionHeading id="stories-title" title={t.storiesTitle} label={t.storiesLabel} />
       <p class="stories__lead">
-        Worship, prayer and friendship, woven into ordinary days.<span class="stories__break"></span> A glimpse of life at
-        MTBC.
+        {t.storiesLead[0]}<span class="stories__break"></span> {t.storiesLead[1]}
       </p>
     </div>
-    <Button href={allHref} class="stories__cta stories__cta--desktop">See all stories</Button>
+    <Button href={allHref} class="stories__cta stories__cta--desktop">{t.seeAllStories}</Button>
   </div>
 
   <ul class="stories__gallery" role="list">
@@ -70,7 +71,7 @@ const lines = (text: string) => text.split('\n');
   </ul>
 
   <div class="container stories__cta--mobile">
-    <Button href={allHref} blockOnMobile>See all stories</Button>
+    <Button href={allHref} blockOnMobile>{t.seeAllStories}</Button>
   </div>
 </section>
 

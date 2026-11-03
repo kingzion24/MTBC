@@ -7,7 +7,8 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
 import Button from './ui/Button.astro';
-import { withBase } from '../utils/url';
+import LangSwitch from './ui/LangSwitch.astro';
+import { pageUrl, toLang, ui } from '../i18n';
 
 interface Props {
   serviceTime: string;
@@ -16,13 +17,15 @@ interface Props {
 }
 
 const { serviceTime, visitHref, solid = false } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
 ---
 
 <header class="header" data-header data-solid={solid ? '' : undefined} data-fixed-solid={solid ? '' : undefined}>
-  <a class="header__logo" href={withBase('/')}>
+  <a class="header__logo" href={pageUrl(lang, '/')}>
     <Image
       src={logo}
-      alt="Manna Tabernacle Bible Church — home"
+      alt={t.homeLogoAlt}
       widths={[112, 160, 224, 320]}
       sizes="(min-width: 768px) 160px, 112px"
       loading="eager"
@@ -31,13 +34,14 @@ const { serviceTime, visitHref, solid = false } = Astro.props;
 
   <div class="header__right">
     <p class="header__service">
-      <span class="header__service-label">Sunday Service</span>
+      <span class="header__service-label">{t.sundayService}</span>
       <span class="header__service-time">{serviceTime}</span>
     </p>
-    <Button href={visitHref} variant="filled-light" compact class="header__cta">Plan your visit</Button>
+    <Button href={visitHref} variant="filled-light" compact class="header__cta">{t.planYourVisit}</Button>
+    <LangSwitch />
     <button class="menu-toggle" type="button" aria-haspopup="dialog" aria-controls="site-menu" aria-expanded="false" data-menu-open>
       <span class="menu-toggle__lines" aria-hidden="true"></span>
-      <span class="menu-toggle__label">Menu</span>
+      <span class="menu-toggle__label">{t.menu}</span>
     </button>
   </div>
 </header>
@@ -79,7 +83,7 @@ const { serviceTime, visitHref, solid = false } = Astro.props;
   .header__right {
     display: flex;
     align-items: center;
-    gap: 36px;
+    gap: 16px;
   }
 
   .header__service,
@@ -152,6 +156,10 @@ const { serviceTime, visitHref, solid = false } = Astro.props;
 
     .header__service {
       display: flex;
+    }
+
+    .header__right {
+      gap: 28px;
     }
 
     .header__right :global(.header__cta) {

@@ -1,6 +1,7 @@
 ---
 /** Figma: desktop 10:72, mobile 18:75 */
 import Button from '../ui/Button.astro';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   venue: string;
@@ -8,15 +9,16 @@ interface Props {
 }
 
 const { venue, visitHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <section class="newcomers" aria-labelledby="newcomers-title">
   <div class="newcomers__inner container" data-reveal>
     <div class="newcomers__text">
-      <p class="newcomers__kicker">New to MTBC? We'd love to meet you.</p>
-      <h2 id="newcomers-title" class="newcomers__title">Join us this Sunday at {venue}</h2>
+      <p class="newcomers__kicker">{t.newcomersKicker}</p>
+      <h2 id="newcomers-title" class="newcomers__title">{t.newcomersTitle} {venue}</h2>
     </div>
-    <Button href={visitHref} variant="filled" blockOnMobile>Plan your visit</Button>
+    <Button href={visitHref} variant="filled" blockOnMobile>{t.planYourVisit}</Button>
   </div>
 </section>
 

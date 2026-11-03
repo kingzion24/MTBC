@@ -4,6 +4,7 @@ import type { NewsPost } from '../../data/content';
 import NewsList from '../NewsList.astro';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   posts: NewsPost[];
@@ -11,18 +12,19 @@ interface Props {
 }
 
 const { posts, allHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <section id="news" class="news" aria-labelledby="news-title">
   <div class="news__inner container">
     <div class="news__heading" data-reveal>
-      <SectionHeading id="news-title" title="News" label="Announcements" layout="stacked" />
+      <SectionHeading id="news-title" title={t.newsTitle} label={t.newsLabel} layout="stacked" />
     </div>
     <div class="news__list" data-reveal>
       <NewsList posts={posts.slice(0, 3)} />
     </div>
     <div class="news__cta">
-      <Button href={allHref} blockOnMobile>All news</Button>
+      <Button href={allHref} blockOnMobile>{t.allNews}</Button>
     </div>
   </div>
 </section>

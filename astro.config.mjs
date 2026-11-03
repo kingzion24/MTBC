@@ -11,6 +11,12 @@ export default defineConfig({
   site,
   base,
   output: 'static',
+  // Kiswahili is the main language at the site root; English lives under /en/.
+  i18n: {
+    locales: ['sw', 'en'],
+    defaultLocale: 'sw',
+    routing: { prefixDefaultLocale: false },
+  },
   // YouTube thumbnails for the latest-message block are downloaded and optimised at build.
   image: { domains: ['i.ytimg.com'] },
 });

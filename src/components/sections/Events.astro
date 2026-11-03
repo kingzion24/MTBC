@@ -4,6 +4,7 @@ import type { EventItem } from '../../data/content';
 import EventCard from '../EventCard.astro';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   events: EventItem[];
@@ -11,29 +12,34 @@ interface Props {
 }
 
 const { events, allHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <section id="events" class="events" aria-labelledby="events-title">
   <div class="events__inner container">
     <div class="events__head" data-reveal>
-      <SectionHeading id="events-title" title="Gatherings" label="Events" layout="stacked" />
+      <SectionHeading id="events-title" title={t.eventsTitle} label={t.eventsLabel} layout="stacked" />
       <p class="events__lead">
-        Whether this is your first visit or your fiftieth, there's always a reason to come together.
+        {t.eventsLead}
       </p>
     </div>
 
-    <ul class="events__cards" role="list">
-      {
-        events.slice(0, 2).map((event) => (
-          <li data-reveal>
-            <EventCard event={event} />
-          </li>
-        ))
-      }
-    </ul>
+    {
+      events.length > 0 ? (
+        <ul class="events__cards" role="list">
+          {events.slice(0, 2).map((event) => (
+            <li data-reveal>
+              <EventCard event={event} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="events__empty">{t.noEvents}</p>
+      )
+    }
 
     <div class="events__cta">
-      <Button href={allHref} blockOnMobile>All events</Button>
+      <Button href={allHref} blockOnMobile>{t.allEvents}</Button>
     </div>
   </div>
 </section>
@@ -77,6 +83,18 @@ const { events, allHref } = Astro.props;
 
   .events__cards > li > :global(*) {
     flex: 1;
+  }
+
+  .events__empty {
+    grid-area: cards;
+    align-self: start;
+    padding-block: 24px;
+    border-block: 1px solid var(--line);
+    color: var(--soft);
+    font-family: var(--serif-jp);
+    font-size: 14px;
+    line-height: 2;
+    letter-spacing: 0.04em;
   }
 
   .events__cta {

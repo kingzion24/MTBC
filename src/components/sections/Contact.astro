@@ -1,7 +1,8 @@
 ---
 /** Figma: desktop 11:172, mobile 19:215. No forms: prayer requests go by phone. */
 import { Image } from 'astro:assets';
-import { photos } from '../../data/content';
+import { getContent } from '../../data/content';
+import { toLang, ui } from '../../i18n';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 
@@ -12,6 +13,9 @@ interface Props {
 }
 
 const { visitHref, phone, officeHours } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { photos } = getContent(lang);
 ---
 
 <section id="contact" class="contact" aria-labelledby="contact-title">
@@ -21,18 +25,16 @@ const { visitHref, phone, officeHours } = Astro.props;
 
   <div class="contact__inner container">
     <div class="contact__text" data-reveal>
-      <SectionHeading id="contact-title" title="Come and See" label="Contact us" light />
+      <SectionHeading id="contact-title" title={t.contactTitle} label={t.contactLabel} light />
       <p class="contact__lead">
-        <span>You don't need to have anything figured out.</span>
-        <span>Bring your questions, your doubts, your whole self.</span>
-        <span>Our doors, and our lunch table, are always open.</span>
+        {t.contactLead.map((line) => <span>{line} </span>)}
       </p>
     </div>
 
     <div class="contact__actions" data-reveal>
-      <Button href={visitHref} variant="outline-light" large blockOnMobile>Plan your first visit</Button>
+      <Button href={visitHref} variant="outline-light" large blockOnMobile>{t.planFirstVisit}</Button>
       <Button href={`tel:${phone.tel}`} variant="filled-light" large blockOnMobile
-        >Request prayer<span class="visually-hidden"> by phone</span></Button
+        >{t.requestPrayer}<span class="visually-hidden"> {t.byPhone}</span></Button
       >
       <p class="contact__phone">
         <a class="contact__number" href={`tel:${phone.tel}`}>{phone.display}</a>

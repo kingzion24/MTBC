@@ -1,23 +1,19 @@
 ---
 /** Figma: desktop 11:102, mobile 19:96 */
-import { photos } from '../../data/content';
 import LinkList from '../ui/LinkList.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import Split from '../ui/Split.astro';
+import { getContent } from '../../data/content';
+import { toLang, ui } from '../../i18n';
+
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { photos } = getContent(lang);
+const anchors = ['#intro', '#pastor', '#ministries'];
 ---
 
 <Split id="about" labelledby="about-title" photo={photos.fellowshipGreeting}>
-  <SectionHeading id="about-title" title="About MTBC" label="Who we are" />
-  <p class="split-lead">
-    Manna Tabernacle Bible Church is a Bible-centred family meeting in Kisutu, in the heart of Dar es Salaam. Our hope
-    is simple: that everyone who comes hungry leaves fed.
-  </p>
-  <LinkList
-    items={[
-      { title: 'What we believe', note: 'Beliefs', href: '#intro' },
-      { title: 'Our leadership', note: 'Pastors & Elders', href: '#pastor' },
-      { title: 'Give & serve', note: 'Generosity', href: '#ministries' },
-    ]}
-  />
+  <SectionHeading id="about-title" title={t.aboutTitle} label={t.aboutLabel} />
+  <p class="split-lead">{t.aboutLead}</p>
+  <LinkList items={t.aboutLinks.map((link, i) => ({ ...link, href: anchors[i] ?? '#about' }))} />
 </Split>
-

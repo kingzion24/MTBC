@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../sections/Hero.astro';
+import Intro from '../sections/Intro.astro';
+import Newcomers from '../sections/Newcomers.astro';
+import LifeTogether from '../sections/LifeTogether.astro';
+import Events from '../sections/Events.astro';
+import PhotoStrip from '../sections/PhotoStrip.astro';
+import Ministries from '../sections/Ministries.astro';
+import About from '../sections/About.astro';
+import Pastor from '../sections/Pastor.astro';
+import Visit from '../sections/Visit.astro';
+import News from '../sections/News.astro';
+import Contact from '../sections/Contact.astro';
+import { getContent } from '../../data/content';
+import { pageUrl, toLang, ui } from '../../i18n';
+
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { site, stories, events, photoStrip, ministries, pastor, news } = getContent(lang);
+const visitHref = '#visit';
+---
+
+<BaseLayout title={t.homeTitle} description={t.homeDescription}>
+  <Hero serviceTime={site.serviceTime} visitHref={visitHref}>
+    <Intro onMedia />
+  </Hero>
+  <Newcomers venue={site.venue} visitHref={visitHref} />
+  <LifeTogether stories={stories} allHref={pageUrl(lang, '/stories/')} />
+  <Events events={events} allHref={pageUrl(lang, '/events/')} />
+  <PhotoStrip photos={photoStrip} />
+  <Ministries ministries={ministries} findHref="#contact" />
+  <About />
+  <Pastor pastor={pastor} />
+  <Visit venue={site.venue} serviceShort={site.serviceShort} mapUrl={site.mapUrl} />
+  <News posts={news} allHref={pageUrl(lang, '/news/')} />
+  <Contact visitHref={visitHref} phone={site.phone} officeHours={site.officeHours} />
+</BaseLayout>

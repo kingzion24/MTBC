@@ -1,4 +1,5 @@
 ---
+import { toLang, ui } from '../../i18n';
 /** Ruled list of links: title, italic note and a short line arrow (About / Visit Us). */
 export interface LinkItem {
   title: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <ul class="links">
@@ -26,7 +28,7 @@ const { items } = Astro.props;
           <span class="links__text">
             <span class="links__title">{item.title}</span>
             <span class="links__note">{item.note}</span>
-            {item.external && <span class="visually-hidden">(opens in a new tab)</span>}
+            {item.external && <span class="visually-hidden"> {t.opensInNewTab}</span>}
           </span>
           <span class="links__arrow" aria-hidden="true" />
         </a>

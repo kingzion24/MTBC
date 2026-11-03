@@ -2,10 +2,15 @@
 /** Figma: desktop 11:189, mobile 19:230 */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
-import { site } from '../data/content';
-import { sitemap } from '../data/navigation';
-import { withBase } from '../utils/url';
+import { getContent } from '../data/content';
+import { buildSitemap } from '../data/navigation';
+import { pageUrl, toLang, ui } from '../i18n';
 
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { site } = getContent(lang);
+const sitemap = buildSitemap(lang, site.youtube);
+const newTab = ` ${t.opensInNewTab}`;
 const year = new Date().getFullYear();
 const external = { target: '_blank', rel: 'noopener' };
 ---
@@ -14,23 +19,23 @@ const external = { target: '_blank', rel: 'noopener' };
   <div class="footer__inner container">
     <div class="footer__main">
       <div class="footer__info">
-        <a href={withBase('/')} class="footer__logo">
-          <Image src={logo} alt="Manna Tabernacle Bible Church — home" widths={[180, 240, 360, 480]} sizes="(min-width: 768px) 240px, 180px" />
+        <a href={pageUrl(lang, '/')} class="footer__logo">
+          <Image src={logo} alt={t.homeLogoAlt} widths={[180, 240, 360, 480]} sizes="(min-width: 768px) 240px, 180px" />
         </a>
         <address class="footer__address">
           <span class="footer__venue">{site.venue}</span>
           <span class="footer__street">{site.address}</span>
           <a class="footer__map-link" href={site.mapUrl} {...external}>
-            Google Map<span class="visually-hidden"> (opens in a new tab)</span>
+            {t.googleMap}<span class="visually-hidden">{newTab}</span>
           </a>
         </address>
         <a class="footer__map" href={site.mapUrl} {...external}>
-          <span>Map — Kisutu, Dar es Salaam</span>
-          <span class="visually-hidden"> (opens Google Maps in a new tab)</span>
+          <span>{t.mapLabel}</span>
+          <span class="visually-hidden"> {t.opensGoogleMaps}</span>
         </a>
       </div>
 
-      <nav class="footer__sitemap" aria-label="Sitemap">
+      <nav class="footer__sitemap" aria-label={t.sitemap}>
         {
           sitemap.map((group) => (
             <div class="footer__group">
@@ -43,7 +48,7 @@ const external = { target: '_blank', rel: 'noopener' };
                   <li>
                     <a href={link.href} {...(link.external ? external : {})}>
                       {link.label}
-                      {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+                      {link.external && <span class="visually-hidden">{newTab}</span>}
                     </a>
                   </li>
                 ))}
@@ -55,9 +60,9 @@ const external = { target: '_blank', rel: 'noopener' };
     </div>
 
     <div class="footer__bottom">
-      <p class="footer__tagline">Daily bread for every soul...</p>
+      <p class="footer__tagline">{t.tagline}</p>
       <ul class="footer__legal" role="list">
-        <li><a href={withBase('/#contact')}>Contact</a></li>
+        <li><a href={pageUrl(lang, '/#contact')}>{t.contact}</a></li>
         <li><a href={site.instagram} {...external}>Instagram</a></li>
         <li><a href={site.youtube} {...external}>YouTube</a></li>
       </ul>

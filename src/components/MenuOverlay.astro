@@ -6,9 +6,10 @@
  */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
-import { site } from '../data/content';
+import { getContent } from '../data/content';
+import { pageUrl, toLang, ui } from '../i18n';
 import Button from './ui/Button.astro';
-import { withBase } from '../utils/url';
+import LangSwitch from './ui/LangSwitch.astro';
 
 interface Props {
   visitHref: string;
@@ -16,37 +17,48 @@ interface Props {
 
 const { visitHref } = Astro.props;
 
-const items = [
-  { title: 'Visit Us', note: 'Kisutu Hall', href: withBase('/#visit') },
-  { title: 'Life Together', note: 'Stories', href: withBase('/#stories') },
-  { title: 'Gatherings', note: 'Events', href: withBase('/#events') },
-  { title: 'Ministries', note: 'Get involved', href: withBase('/#ministries') },
-  { title: 'About MTBC', note: 'Who we are', href: withBase('/#about') },
-  { title: 'Our Pastor', note: 'Head Pastor', href: withBase('/#pastor') },
-  { title: 'News', note: 'Announcements', href: withBase('/news/') },
-  { title: 'Come and See', note: 'Contact us', href: withBase('/#contact') },
-];
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { site } = getContent(lang);
+const targets = {
+  visit: '/#visit',
+  stories: '/#stories',
+  events: '/#events',
+  ministries: '/#ministries',
+  about: '/#about',
+  pastor: '/#pastor',
+  news: '/news/',
+  contact: '/#contact',
+} as const;
+const items = (Object.keys(targets) as (keyof typeof targets)[]).map((key) => ({
+  ...t.nav[key],
+  href: pageUrl(lang, targets[key]),
+}));
+const newTab = ` ${t.opensInNewTab}`;
 const external = { target: '_blank', rel: 'noopener' };
 ---
 
-<dialog id="site-menu" class="menu" aria-label="Site menu" data-menu>
+<dialog id="site-menu" class="menu" aria-label={t.siteMenu} data-menu>
   <div class="menu__bar">
-    <a class="menu__logo" href={withBase('/')} data-menu-link>
+    <a class="menu__logo" href={pageUrl(lang, '/')} data-menu-link>
       <Image
         src={logo}
-        alt="Manna Tabernacle Bible Church — home"
+        alt={t.homeLogoAlt}
         widths={[112, 160, 224, 320]}
         sizes="(min-width: 768px) 160px, 112px"
       />
     </a>
-    <button class="menu__close" type="button" data-menu-close>
-      <span class="menu__close-x" aria-hidden="true"></span>
-      <span class="menu__close-label">Close</span>
-    </button>
+    <div class="menu__bar-right">
+      <LangSwitch />
+      <button class="menu__close" type="button" data-menu-close>
+        <span class="menu__close-x" aria-hidden="true"></span>
+        <span class="menu__close-label">{t.close}</span>
+      </button>
+    </div>
   </div>
 
   <div class="menu__body">
-    <nav class="menu__nav" aria-label="Main">
+    <nav class="menu__nav" aria-label={t.mainNav}>
       <ol class="menu__list">
         {
           items.map((item, i) => (
@@ -65,35 +77,35 @@ const external = { target: '_blank', rel: 'noopener' };
       </ol>
     </nav>
 
-    <aside class="menu__aside" aria-label="Service details">
+    <aside class="menu__aside" aria-label={t.serviceDetails}>
       <div class="menu__block">
-        <p class="menu__kicker">Sunday Service</p>
+        <p class="menu__kicker">{t.sundayService}</p>
         <p class="menu__time">{site.serviceTime}</p>
       </div>
       <div class="menu__block">
-        <p class="menu__kicker">Where</p>
+        <p class="menu__kicker">{t.where}</p>
         <p class="menu__text">{site.venue}<br />{site.address}</p>
         <a class="menu__small-link" href={site.mapUrl} {...external}>
-          Google Map<span class="visually-hidden"> (opens in a new tab)</span>
+          {t.googleMap}<span class="visually-hidden">{newTab}</span>
         </a>
       </div>
       <div class="menu__block">
-        <p class="menu__kicker">Call us</p>
+        <p class="menu__kicker">{t.callUs}</p>
         <a class="menu__phone" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
       </div>
-      <Button href={visitHref} variant="filled-light" blockOnMobile data-menu-link>Plan your visit</Button>
+      <Button href={visitHref} variant="filled-light" blockOnMobile data-menu-link>{t.planYourVisit}</Button>
       <ul class="menu__social" role="list">
         <li>
-          <a href={site.instagram} {...external}>Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a href={site.instagram} {...external}>Instagram<span class="visually-hidden">{newTab}</span></a>
         </li>
         <li>
-          <a href={site.youtube} {...external}>YouTube<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a href={site.youtube} {...external}>YouTube<span class="visually-hidden">{newTab}</span></a>
         </li>
       </ul>
     </aside>
   </div>
 
-  <p class="menu__tagline" aria-hidden="true">Daily bread for every soul...</p>
+  <p class="menu__tagline" aria-hidden="true">{t.tagline}</p>
 </dialog>
 
 <script>
@@ -169,6 +181,12 @@ const external = { target: '_blank', rel: 'noopener' };
   .menu__logo img {
     width: 112px;
     height: auto;
+  }
+
+  .menu__bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
   .menu__close {
@@ -432,8 +450,8 @@ const external = { target: '_blank', rel: 'noopener' };
     }
 
     .menu__title {
-      font-size: clamp(1.375rem, 0.9rem + 0.9vw, 1.75rem); /* 22 → 28 */
-      letter-spacing: 0.12em;
+      font-size: clamp(1.25rem, 0.85rem + 0.75vw, 1.625rem); /* 20 → 26: fits the longer Kiswahili titles */
+      letter-spacing: 0.1em;
     }
 
     .menu__note {

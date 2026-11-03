@@ -11,7 +11,8 @@ import Loader from '../components/Loader.astro';
 import MenuOverlay from '../components/MenuOverlay.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { site } from '../data/content';
+import { getContent } from '../data/content';
+import { languages, locales, neutralPath, pageUrl, toLang, ui } from '../i18n';
 import { withBase } from '../utils/url';
 
 interface Props {
@@ -24,7 +25,15 @@ interface Props {
 }
 
 const { title, description, image = '/og-image.jpg', solidHeader = false } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { site } = getContent(lang);
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = neutralPath(Astro.url.pathname);
+const alternates = (Object.keys(languages) as (keyof typeof languages)[]).map((code) => ({
+  code,
+  href: new URL(pageUrl(code, path), Astro.site).href,
+}));
 const imageUrl = new URL(withBase(image), Astro.site);
 const home = new URL(withBase('/'), Astro.site);
 
@@ -35,8 +44,9 @@ const jsonLd = {
   '@id': `${home.href}#church`,
   name: 'Manna Tabernacle Bible Church',
   alternateName: 'MTBC',
-  description: 'A Bible-centred church family meeting every Sunday in Kisutu, Dar es Salaam.',
+  description: t.churchDescription,
   url: home.href,
+  inLanguage: ['sw', 'en'],
   logo: new URL(withBase('/apple-touch-icon.png'), Astro.site).href,
   image: imageUrl.href,
   telephone: site.phone.tel,
@@ -55,11 +65,11 @@ const jsonLd = {
   },
   sameAs: [site.instagram, site.youtube],
 };
-const visitHref = withBase('/#visit');
+const visitHref = pageUrl(lang, '/#visit');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locales[lang].html}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -67,20 +77,23 @@ const visitHref = withBase('/#visit');
     <meta name="description" content={description} />
     <meta name="theme-color" content="#23211f" />
     <link rel="canonical" href={canonical} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
+    <link rel="alternate" hreflang="x-default" href={alternates[0]?.href} />
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
     <link rel="sitemap" href={withBase('/sitemap.xml')} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Manna Tabernacle Bible Church" />
-    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale" content={locales[lang].og} />
+    {alternates.filter((alt) => alt.code !== lang).map((alt) => <meta property="og:locale:alternate" content={locales[alt.code].og} />)}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={imageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Manna Tabernacle Bible Church logo over a full Sunday service in Kisutu Hall" />
+    <meta property="og:image:alt" content={t.shareImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -105,7 +118,7 @@ const visitHref = withBase('/#visit');
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t.skipToContent}</a>
     <Loader framed={!solidHeader} />
     <SiteHeader serviceTime={site.serviceTime} visitHref={visitHref} solid={solidHeader} />
     <main id="main" class:list={{ 'main--offset': solidHeader }}>

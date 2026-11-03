@@ -6,15 +6,17 @@
  */
 import { Image } from 'astro:assets';
 import type { Photo } from '../../data/content';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   photos: Photo[];
 }
 
 const { photos } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
-<section class="strip" aria-label="Photos from church life" data-strip>
+<section class="strip" aria-label={t.photoStrip} data-strip>
   <div class="strip__viewport">
     <ul class="strip__track" role="list">
       {
@@ -34,7 +36,16 @@ const { photos } = Astro.props;
       }
     </ul>
   </div>
-  <button class="strip__toggle" type="button" aria-pressed="false" data-strip-toggle>Pause</button>
+  <button
+    class="strip__toggle"
+    type="button"
+    aria-pressed="false"
+    data-strip-toggle
+    data-label-pause={t.pause}
+    data-label-play={t.play}
+  >
+    {t.pause}
+  </button>
 </section>
 
 <script>
@@ -43,7 +54,7 @@ const { photos } = Astro.props;
     toggle?.addEventListener('click', () => {
       const paused = strip.toggleAttribute('data-paused');
       toggle.setAttribute('aria-pressed', String(paused));
-      toggle.textContent = paused ? 'Play' : 'Pause';
+      toggle.textContent = (paused ? toggle.dataset['labelPlay'] : toggle.dataset['labelPause']) ?? '';
     });
   }
 </script>

@@ -1,8 +1,12 @@
 /**
- * Static site content, seeded exactly as it appears in Figma.
- * Phase 3 replaces this module with Sanity queries that return the same shapes.
+ * All site content, in Kiswahili (default) and English.
+ *
+ * Text fields are written as { sw, en } pairs; everything else (URLs, times, photos) is shared.
+ * Components call getContent(lang) and receive plain strings in that language.
+ * Kiswahili copy is a first draft: have it reviewed by a native speaker before launch.
  */
 import type { ImageMetadata } from 'astro';
+import type { Lang } from '../i18n';
 
 import worshipHandsRaised from '../assets/photos/worship-hands-raised.jpg';
 import prayerKneeling from '../assets/photos/prayer-kneeling.jpg';
@@ -22,84 +26,65 @@ import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
 import prayerKneelingPoster from '../assets/photos/prayer-kneeling-poster.jpg';
 import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
 
+/* ------------------------------------------------------------------ */
+/* Localisation helpers                                                */
+/* ------------------------------------------------------------------ */
+
+/** A piece of text in both languages. */
+export interface L10n {
+  sw: string;
+  en: string;
+}
+
+/** The authoring shape of T: any string may be written as an { sw, en } pair. */
+type Raw<T> = T extends string
+  ? string | L10n
+  : T extends ImageMetadata
+    ? T
+    : T extends readonly (infer U)[]
+      ? Raw<U>[]
+      : T extends object
+        ? { [K in keyof T]: Raw<T[K]> }
+        : T;
+
+const isL10n = (value: unknown): value is L10n =>
+  typeof value === 'object' && value !== null && 'sw' in value && 'en' in value && Object.keys(value).length === 2;
+
+const isImage = (value: object) => 'src' in value && 'width' in value && 'format' in value;
+
+/** Resolves every { sw, en } pair in a value to the given language. */
+const localize = <T>(value: Raw<T>, lang: Lang): T => {
+  const walk = (v: unknown): unknown => {
+    if (isL10n(v)) return v[lang];
+    if (Array.isArray(v)) return v.map(walk);
+    if (typeof v === 'object' && v !== null && !isImage(v)) {
+      return Object.fromEntries(Object.entries(v).map(([k, inner]) => [k, walk(inner)]));
+    }
+    return v;
+  };
+  return walk(value) as T;
+};
+
+/* ------------------------------------------------------------------ */
+/* Shapes the components receive (single language)                    */
+/* ------------------------------------------------------------------ */
+
 export interface Photo {
   src: ImageMetadata;
   alt: string;
 }
 
-const address = 'Kisutu Primary School Hall, Posta Mpya, Dar es Salaam';
-
-export const site = {
-  serviceTime: '10:00 – 13:00',
-  serviceShort: 'Sundays 10:00',
-  venue: 'Kisutu Hall',
-  address,
-  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-  phone: { display: '+255 700 000 000', tel: '+255700000000' },
-  officeHours: 'Office hours 9:00 – 17:00 · Closed Mondays',
-  instagram: 'https://www.instagram.com/carloskirimbai/',
-  youtube: 'https://www.youtube.com/channel/UCY2Bpc2UZqd_4Px-B7ZuhtQ',
-} as const;
-
-export const photos = {
-  worshipHandsRaised: {
-    src: worshipHandsRaised,
-    alt: 'Young people in the congregation lift their hands in worship beside an open window.',
-  },
-  prayerKneeling: {
-    src: prayerKneeling,
-    alt: 'Members kneel with their foreheads to the floor in prayer.',
-  },
-  congregationWorship: {
-    src: congregationWorship,
-    alt: 'The congregation stands with hands raised in front of the stage and lyrics screen.',
-  },
-  worshipTeam: {
-    src: worshipTeam,
-    alt: 'Two worship leaders sing into microphones on stage, in black and white.',
-  },
-  youthFellowship: {
-    src: youthFellowship,
-    alt: 'Young people sing and clap together during Youth Fellowship.',
-  },
-  fellowshipGreeting: {
-    src: fellowshipGreeting,
-    alt: 'Two women share a smile and clasp hands between rows of chairs after the service.',
-  },
-  youngProfessionals: {
-    src: youngProfessionals,
-    alt: 'A woman in a white blouse sits listening among rows of red and gold chairs.',
-  },
-  womenOfGrace: {
-    src: womenOfGrace,
-    alt: 'A woman in a pink patterned dress prays with her eyes closed.',
-  },
-  contactPreacher: {
-    src: contactPreacher,
-    alt: 'A preacher raises his arms on stage as the congregation lifts their hands.',
-  },
-  sundayServiceHall: {
-    src: sundayServiceHall,
-    alt: 'A full hall on Sunday: the congregation lifts their hands as the worship team leads from the stage beneath “JESUS” signs.',
-  },
-  sundayWorshipStage: {
-    src: sundayWorshipStage,
-    alt: 'The worship team leads from the stage while the congregation stands among rows of red chairs.',
-  },
-  childrenPraying: {
-    src: childrenPraying,
-    alt: 'A young boy kneels with his hands clasped in prayer beside a man bowed over a chair.',
-  },
-  prayerBowed: { src: prayerBowedPoster, alt: 'A woman in blue bows her head over a chair in prayer.' },
-  prayerKneelingMoment: {
-    src: prayerKneelingPoster,
-    alt: 'A young man kneels between the chairs, hands clasped in prayer.',
-  },
-  prayerCircle: {
-    src: prayerCirclePoster,
-    alt: 'Members stand holding hands in prayer between rows of chairs.',
-  },
-} satisfies Record<string, Photo>;
+export interface Site {
+  serviceTime: string;
+  serviceShort: string;
+  venue: string;
+  address: string;
+  mapUrl: string;
+  phone: { display: string; tel: string };
+  officeHours: string;
+  instagram: string;
+  youtube: string;
+}
 
 /** A short silent clip (encoded by scripts/encode-videos.sh) shown in place of a photo. */
 export interface Moment {
@@ -117,28 +102,6 @@ export interface Story {
   /** Small caption under the photo. */
   caption?: string;
 }
-
-export const stories: Story[] = [
-  {
-    photo: photos.worshipHandsRaised,
-    caption: 'Every Sunday, voices from across the city lift one song. Swahili, English, and everything in between.',
-  },
-  {
-    photo: photos.prayerBowed,
-    moment: { src: '/videos/moments/prayer-bowed.mp4', position: '55% 12%' },
-    quote: 'A place to belong,\nbefore you believe',
-    caption: 'In prayer we lay everything down, and find that we are carried.',
-  },
-  {
-    photo: photos.prayerKneelingMoment,
-    moment: { src: '/videos/moments/prayer-kneeling.mp4', position: '50% 60%' },
-    quote: 'Faith that shows up\nin ordinary places',
-  },
-  {
-    photo: photos.worshipTeam,
-    caption: 'Our worship team leads us in song every Sunday, in Swahili and English.',
-  },
-];
 
 export interface OnlineMeeting {
   /** Zoom join link. The passcode is shown separately so it can be typed in. */
@@ -163,35 +126,6 @@ export interface EventItem {
   endDate?: string;
 }
 
-export const events: EventItem[] = [
-  {
-    title: 'Prayer & Fasting',
-    subtitle: 'Grand Finale 2026',
-    photo: photos.prayerCircle,
-    moment: { src: '/videos/moments/prayer-circle.mp4' },
-    category: 'Prayer',
-    tags: ['40 days', '26 Oct – 18 Dec'],
-    when: ['Mon–Thu · 17:00–20:00', 'Fri · 21:00–05:00 overnight'],
-    place: 'Prayer Room, Kisutu Girls High School',
-    online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
-    endDate: '2026-12-18',
-  },
-];
-
-/** Events whose end date hasn't passed yet, judged in Dar es Salaam time at build. */
-export const currentEvents = (now = new Date()): EventItem[] => {
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Dar_es_Salaam' }).format(now);
-  return events.filter((event) => !event.endDate || event.endDate >= today);
-};
-
-export const photoStrip: Photo[] = [
-  photos.prayerKneeling,
-  photos.youthFellowship,
-  photos.fellowshipGreeting,
-  photos.congregationWorship,
-  photos.sundayWorshipStage,
-];
-
 export interface Ministry {
   title: string;
   /** One line. Draft copy until the church confirms it. */
@@ -201,49 +135,18 @@ export interface Ministry {
   tags?: string[];
 }
 
-export const ministries: Ministry[] = [
-  {
-    title: "Men's Ministry",
-    description: 'Men growing in faith together, at home, at work and in the church.',
-    photo: photos.worshipTeam,
-  },
-  {
-    title: "Mothers' Ministry",
-    description: 'Mothers encouraging one another in prayer and the Word.',
-    photo: photos.womenOfGrace,
-  },
-  {
-    title: 'Young Adults',
-    description: 'Faith, friendship and purpose for the next generation.',
-    photo: photos.youngProfessionals,
-  },
-  {
-    title: 'Prayer Ministry',
-    description: 'Standing together in prayer for the church, our families and our city.',
-    photo: photos.prayerKneeling,
-  },
-  {
-    title: "Children's Ministry",
-    description: 'Bible teaching, worship and care for our youngest.',
-    photo: photos.childrenPraying,
-  },
-];
-
-export const pastor = {
-  name: 'Pastor Carlos Kirimbai',
-  title: 'Senior Pastor, Manna Tabernacle Bible Church',
-  bio: 'Pastor Carlos Kirimbai believes God has called him to teach the Body of Christ, a calling he holds to from Isaiah 45:13. Alongside leading MTBC, he teaches Bible seminars and speaks at institutions of higher learning.',
-  instagram: { handle: '@carloskirimbai', url: site.instagram },
-  youtube: { handle: '@carloskirimbai', url: site.youtube, channelId: 'UCY2Bpc2UZqd_4Px-B7ZuhtQ' },
-  podcast: { live: false, url: '' },
-  portrait: {
-    src: pastorPortrait,
-    alt: 'Pastor Carlos Kirimbai, in a green shirt, speaks into a microphone at the lectern.',
-  },
+export interface Pastor {
+  name: string;
+  title: string;
+  bio: string;
+  instagram: { handle: string; url: string };
+  youtube: { handle: string; url: string; channelId: string };
+  podcast: { live: boolean; url: string };
+  portrait: Photo;
   /** Fallback image and title for the latest-message block if the YouTube feed can't be read at build. */
-  preaching: { src: pastorPreaching, alt: '' },
-  latestMessage: 'Bread for the Journey — Part 1',
-} as const;
+  preaching: Photo;
+  latestMessage: string;
+}
 
 export interface NewsPost {
   date: string; // ISO yyyy-mm-dd
@@ -251,9 +154,311 @@ export interface NewsPost {
   title: string;
 }
 
-export const news: NewsPost[] = [
-  { date: '2026-10-28', tag: 'Notice', title: 'Christmas service times are now confirmed' },
-  { date: '2026-10-26', tag: 'Event', title: 'Prayer & Fasting Grand Finale: 40 days, 26 Oct – 18 Dec' },
-  { date: '2026-10-14', tag: 'Outreach', title: 'Thank you for a wonderful Youth Sunday' },
-  { date: '2026-09-30', tag: 'Sermon', title: 'New series begins: “Bread for the Journey”' },
+/* ------------------------------------------------------------------ */
+/* Content                                                             */
+/* ------------------------------------------------------------------ */
+
+const mapAddress = 'Kisutu Primary School Hall, Posta Mpya, Dar es Salaam';
+const instagram = 'https://www.instagram.com/carloskirimbai/';
+const youtube = 'https://www.youtube.com/channel/UCY2Bpc2UZqd_4Px-B7ZuhtQ';
+
+const site: Raw<Site> = {
+  serviceTime: '10:00 – 13:00',
+  serviceShort: { sw: 'Jumapili 10:00', en: 'Sundays 10:00' },
+  venue: { sw: 'Ukumbi wa Kisutu', en: 'Kisutu Hall' },
+  address: {
+    sw: 'Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam',
+    en: mapAddress,
+  },
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`,
+  phone: { display: '+255 700 000 000', tel: '+255700000000' },
+  officeHours: {
+    sw: 'Saa za ofisi 9:00 – 17:00 · Tunafunga Jumatatu',
+    en: 'Office hours 9:00 – 17:00 · Closed Mondays',
+  },
+  instagram,
+  youtube,
+};
+
+const photos = {
+  worshipHandsRaised: {
+    src: worshipHandsRaised,
+    alt: {
+      sw: 'Vijana katika kusanyiko wakiinua mikono yao katika ibada karibu na dirisha lililo wazi.',
+      en: 'Young people in the congregation lift their hands in worship beside an open window.',
+    },
+  },
+  prayerKneeling: {
+    src: prayerKneeling,
+    alt: {
+      sw: 'Waumini wakiwa wamepiga magoti, vipaji vya nyuso sakafuni, wakiomba.',
+      en: 'Members kneel with their foreheads to the floor in prayer.',
+    },
+  },
+  congregationWorship: {
+    src: congregationWorship,
+    alt: {
+      sw: 'Kusanyiko limesimama mikono juu mbele ya jukwaa na skrini ya nyimbo.',
+      en: 'The congregation stands with hands raised in front of the stage and lyrics screen.',
+    },
+  },
+  worshipTeam: {
+    src: worshipTeam,
+    alt: {
+      sw: 'Waimbaji wawili wa sifa wakiimba kwa vipaza sauti jukwaani, picha nyeusi na nyeupe.',
+      en: 'Two worship leaders sing into microphones on stage, in black and white.',
+    },
+  },
+  youthFellowship: {
+    src: youthFellowship,
+    alt: {
+      sw: 'Vijana wakiimba na kupiga makofi pamoja.',
+      en: 'Young people sing and clap together.',
+    },
+  },
+  fellowshipGreeting: {
+    src: fellowshipGreeting,
+    alt: {
+      sw: 'Wanawake wawili wakitabasamu na kushikana mikono kati ya safu za viti baada ya ibada.',
+      en: 'Two women share a smile and clasp hands between rows of chairs after the service.',
+    },
+  },
+  youngProfessionals: {
+    src: youngProfessionals,
+    alt: {
+      sw: 'Mwanamke aliyevaa blauzi nyeupe ameketi akisikiliza kati ya safu za viti vyekundu.',
+      en: 'A woman in a white blouse sits listening among rows of red and gold chairs.',
+    },
+  },
+  womenOfGrace: {
+    src: womenOfGrace,
+    alt: {
+      sw: 'Mwanamke aliyevaa gauni la waridi akiomba huku amefumba macho.',
+      en: 'A woman in a pink patterned dress prays with her eyes closed.',
+    },
+  },
+  contactPreacher: {
+    src: contactPreacher,
+    alt: {
+      sw: 'Mhubiri akiinua mikono jukwaani huku kusanyiko likiinua mikono yao.',
+      en: 'A preacher raises his arms on stage as the congregation lifts their hands.',
+    },
+  },
+  sundayServiceHall: {
+    src: sundayServiceHall,
+    alt: {
+      sw: 'Ukumbi umejaa Jumapili: kusanyiko likiinua mikono huku timu ya sifa ikiongoza jukwaani chini ya maandishi “JESUS”.',
+      en: 'A full hall on Sunday: the congregation lifts their hands as the worship team leads from the stage beneath “JESUS” signs.',
+    },
+  },
+  sundayWorshipStage: {
+    src: sundayWorshipStage,
+    alt: {
+      sw: 'Timu ya sifa ikiongoza kutoka jukwaani huku kusanyiko likiwa limesimama kati ya safu za viti vyekundu.',
+      en: 'The worship team leads from the stage while the congregation stands among rows of red chairs.',
+    },
+  },
+  childrenPraying: {
+    src: childrenPraying,
+    alt: {
+      sw: 'Mvulana mdogo amepiga magoti akiwa ameshika mikono akiomba, kando ya mwanamume aliyeinama juu ya kiti.',
+      en: 'A young boy kneels with his hands clasped in prayer beside a man bowed over a chair.',
+    },
+  },
+  prayerBowed: {
+    src: prayerBowedPoster,
+    alt: {
+      sw: 'Mwanamke aliyevaa bluu ameinamisha kichwa juu ya kiti akiomba.',
+      en: 'A woman in blue bows her head over a chair in prayer.',
+    },
+  },
+  prayerKneelingMoment: {
+    src: prayerKneelingPoster,
+    alt: {
+      sw: 'Kijana amepiga magoti kati ya viti, mikono imeshikana akiomba.',
+      en: 'A young man kneels between the chairs, hands clasped in prayer.',
+    },
+  },
+  prayerCircle: {
+    src: prayerCirclePoster,
+    alt: {
+      sw: 'Waumini wamesimama wakishikana mikono wakiomba kati ya safu za viti.',
+      en: 'Members stand holding hands in prayer between rows of chairs.',
+    },
+  },
+} satisfies Record<string, Raw<Photo>>;
+
+const stories: Raw<Story>[] = [
+  {
+    photo: photos.worshipHandsRaised,
+    caption: {
+      sw: 'Kila Jumapili, sauti kutoka kila pembe ya jiji zinainua wimbo mmoja. Kiswahili, Kiingereza, na kila kitu katikati.',
+      en: 'Every Sunday, voices from across the city lift one song. Swahili, English, and everything in between.',
+    },
+  },
+  {
+    photo: photos.prayerBowed,
+    moment: { src: '/videos/moments/prayer-bowed.mp4', position: '55% 12%' },
+    quote: { sw: 'Mahali pa kukubalika,\nhata kabla ya kuamini', en: 'A place to belong,\nbefore you believe' },
+    caption: {
+      sw: 'Katika maombi tunaweka kila kitu chini, na tunagundua kwamba tumebebwa.',
+      en: 'In prayer we lay everything down, and find that we are carried.',
+    },
+  },
+  {
+    photo: photos.prayerKneelingMoment,
+    moment: { src: '/videos/moments/prayer-kneeling.mp4', position: '50% 60%' },
+    quote: { sw: 'Imani inayoonekana\nmahali pa kawaida', en: 'Faith that shows up\nin ordinary places' },
+  },
+  {
+    photo: photos.worshipTeam,
+    caption: {
+      sw: 'Timu yetu ya sifa inatuongoza kwa nyimbo kila Jumapili, kwa Kiswahili na Kiingereza.',
+      en: 'Our worship team leads us in song every Sunday, in Swahili and English.',
+    },
+  },
 ];
+
+const events: Raw<EventItem>[] = [
+  {
+    title: { sw: 'Maombi na Kufunga', en: 'Prayer & Fasting' },
+    subtitle: 'Grand Finale 2026',
+    photo: photos.prayerCircle,
+    moment: { src: '/videos/moments/prayer-circle.mp4' },
+    category: { sw: 'Maombi', en: 'Prayer' },
+    tags: [
+      { sw: 'Siku 40', en: '40 days' },
+      { sw: '26 Okt – 18 Des', en: '26 Oct – 18 Dec' },
+    ],
+    when: [
+      { sw: 'Jumatatu – Alhamisi · 17:00–20:00', en: 'Mon–Thu · 17:00–20:00' },
+      { sw: 'Ijumaa · 21:00–05:00 usiku kucha', en: 'Fri · 21:00–05:00 overnight' },
+    ],
+    place: { sw: 'Chumba cha Maombi, Kisutu Girls High School', en: 'Prayer Room, Kisutu Girls High School' },
+    online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
+    endDate: '2026-12-18',
+  },
+];
+
+const photoStrip: Raw<Photo>[] = [
+  photos.prayerKneeling,
+  photos.youthFellowship,
+  photos.fellowshipGreeting,
+  photos.congregationWorship,
+  photos.sundayWorshipStage,
+];
+
+const ministries: Raw<Ministry>[] = [
+  {
+    title: { sw: 'Huduma ya Wanaume', en: "Men's Ministry" },
+    description: {
+      sw: 'Wanaume wakikua pamoja katika imani, nyumbani, kazini na kanisani.',
+      en: 'Men growing in faith together, at home, at work and in the church.',
+    },
+    photo: photos.worshipTeam,
+  },
+  {
+    title: { sw: 'Huduma ya Akina Mama', en: "Mothers' Ministry" },
+    description: {
+      sw: 'Akina mama wakitiana moyo katika maombi na Neno.',
+      en: 'Mothers encouraging one another in prayer and the Word.',
+    },
+    photo: photos.womenOfGrace,
+  },
+  {
+    title: { sw: 'Vijana', en: 'Young Adults' },
+    description: {
+      sw: 'Imani, urafiki na kusudi kwa kizazi kijacho.',
+      en: 'Faith, friendship and purpose for the next generation.',
+    },
+    photo: photos.youngProfessionals,
+  },
+  {
+    title: { sw: 'Huduma ya Maombi', en: 'Prayer Ministry' },
+    description: {
+      sw: 'Tukisimama pamoja katika maombi kwa ajili ya kanisa, familia zetu na jiji letu.',
+      en: 'Standing together in prayer for the church, our families and our city.',
+    },
+    photo: photos.prayerKneeling,
+  },
+  {
+    title: { sw: 'Huduma ya Watoto', en: "Children's Ministry" },
+    description: {
+      sw: 'Mafundisho ya Biblia, ibada na malezi kwa watoto wetu.',
+      en: 'Bible teaching, worship and care for our youngest.',
+    },
+    photo: photos.childrenPraying,
+  },
+];
+
+const pastor: Raw<Pastor> = {
+  name: { sw: 'Mchungaji Carlos Kirimbai', en: 'Pastor Carlos Kirimbai' },
+  title: {
+    sw: 'Mchungaji Kiongozi, Manna Tabernacle Bible Church',
+    en: 'Senior Pastor, Manna Tabernacle Bible Church',
+  },
+  bio: {
+    sw: 'Mchungaji Carlos Kirimbai anaamini kwamba Mungu amemwita kufundisha Mwili wa Kristo, wito anaoushikilia kutoka Isaya 45:13. Mbali na kuiongoza MTBC, hufundisha semina za Biblia na kuhudumu katika vyuo vya elimu ya juu.',
+    en: 'Pastor Carlos Kirimbai believes God has called him to teach the Body of Christ, a calling he holds to from Isaiah 45:13. Alongside leading MTBC, he teaches Bible seminars and speaks at institutions of higher learning.',
+  },
+  instagram: { handle: '@carloskirimbai', url: instagram },
+  youtube: { handle: '@carloskirimbai', url: youtube, channelId: 'UCY2Bpc2UZqd_4Px-B7ZuhtQ' },
+  podcast: { live: false, url: '' },
+  portrait: {
+    src: pastorPortrait,
+    alt: {
+      sw: 'Mchungaji Carlos Kirimbai, aliyevaa shati la kijani, akizungumza kwa kipaza sauti kwenye mimbari.',
+      en: 'Pastor Carlos Kirimbai, in a green shirt, speaks into a microphone at the lectern.',
+    },
+  },
+  preaching: { src: pastorPreaching, alt: '' },
+  latestMessage: { sw: 'Mkate wa Safari — Sehemu ya 1', en: 'Bread for the Journey — Part 1' },
+};
+
+const news: Raw<NewsPost>[] = [
+  {
+    date: '2026-10-28',
+    tag: { sw: 'Taarifa', en: 'Notice' },
+    title: { sw: 'Muda wa ibada za Krismasi umethibitishwa', en: 'Christmas service times are now confirmed' },
+  },
+  {
+    date: '2026-10-26',
+    tag: { sw: 'Tukio', en: 'Event' },
+    title: {
+      sw: 'Maombi na Kufunga, Grand Finale: siku 40, 26 Okt – 18 Des',
+      en: 'Prayer & Fasting Grand Finale: 40 days, 26 Oct – 18 Dec',
+    },
+  },
+  {
+    date: '2026-10-14',
+    tag: { sw: 'Uinjilisti', en: 'Outreach' },
+    title: { sw: 'Asante kwa Jumapili ya Vijana iliyobarikiwa', en: 'Thank you for a wonderful Youth Sunday' },
+  },
+  {
+    date: '2026-09-30',
+    tag: { sw: 'Mahubiri', en: 'Sermon' },
+    title: { sw: 'Mfululizo mpya unaanza: “Mkate wa Safari”', en: 'New series begins: “Bread for the Journey”' },
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Access                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Events whose end date hasn't passed yet, judged in Dar es Salaam time at build. */
+const isCurrent = (event: { endDate?: string | undefined }, now: Date) => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Dar_es_Salaam' }).format(now);
+  return !event.endDate || event.endDate >= today;
+};
+
+/** All content in one language. */
+export const getContent = (lang: Lang, now = new Date()) => ({
+  site: localize<Site>(site, lang),
+  photos: localize<Record<keyof typeof photos, Photo>>(photos, lang),
+  stories: localize<Story[]>(stories, lang),
+  events: localize<EventItem[]>(events, lang).filter((event) => isCurrent(event, now)),
+  photoStrip: localize<Photo[]>(photoStrip, lang),
+  ministries: localize<Ministry[]>(ministries, lang),
+  pastor: localize<Pastor>(pastor, lang),
+  news: localize<NewsPost[]>(news, lang),
+});

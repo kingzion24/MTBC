@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import type { Ministry } from '../../data/content';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { toLang, ui } from '../../i18n';
 import Tag from '../ui/Tag.astro';
 
 interface Props {
@@ -16,20 +17,20 @@ interface Props {
 }
 
 const { ministries, findHref } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <section id="ministries" class="ministries" aria-labelledby="ministries-title">
   <div class="container" data-reveal>
-    <SectionHeading id="ministries-title" title="Ministries" label="Get involved" />
+    <SectionHeading id="ministries-title" title={t.ministriesTitle} label={t.ministriesLabel} />
   </div>
 
   <div class="ministries__body container">
     <div class="ministries__intro">
       <p class="ministries__lead" data-reveal>
-        Church is not something you watch, it's something you are part of. Find the ministry where you belong, and
-        a family that will grow with you.
+        {t.ministriesLead}
       </p>
-      <Button href={findHref} blockOnMobile>Find your place</Button>
+      <Button href={findHref} blockOnMobile>{t.findYourPlace}</Button>
     </div>
 
     <ul class="ministries__cards" role="list">
@@ -44,7 +45,7 @@ const { ministries, findHref } = Astro.props;
               class="ministry__img"
             />
             {item.tags && item.tags.length > 0 && (
-              <ul class="ministry__tags" aria-label="Where and when">
+              <ul class="ministry__tags" aria-label={t.whereAndWhen}>
                 {item.tags.map((tag) => (
                   <li>
                     <Tag>{tag}</Tag>

@@ -1,0 +1,72 @@
+---
+/** SW | EN switch: links to the same page in the other language. */
+import { languages, neutralPath, pageUrl, toLang, ui, type Lang } from '../../i18n';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const current = toLang(Astro.currentLocale);
+const path = neutralPath(Astro.url.pathname);
+const codes = Object.keys(languages) as Lang[];
+---
+
+<nav class:list={['lang', className]} aria-label={ui[current].language}>
+  {
+    codes.map((code, i) => (
+      <>
+        {i > 0 && (
+          <span class="lang__sep" aria-hidden="true">
+            /
+          </span>
+        )}
+        <a
+          class="lang__link"
+          href={pageUrl(code, path)}
+          hreflang={code}
+          lang={code}
+          aria-current={code === current ? 'true' : undefined}
+          aria-label={languages[code]}
+        >
+          {code.toUpperCase()}
+        </a>
+      </>
+    ))
+  }
+</nav>
+
+<style>
+  .lang {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.16em;
+  }
+
+  .lang__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 44px;
+    opacity: 0.6;
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .lang__link[aria-current] {
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .lang__link:hover {
+      opacity: 1;
+    }
+  }
+
+  .lang__sep {
+    opacity: 0.4;
+  }
+</style>

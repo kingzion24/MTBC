@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsList from '../NewsList.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { getContent } from '../../data/content';
+import { toLang, ui } from '../../i18n';
+
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { news } = getContent(lang);
+---
+
+<BaseLayout title={t.newsPageTitle} description={t.newsPageDescription} solidHeader>
+  <div class="page container">
+    <SectionHeading id="page-title" title={t.newsTitle} label={t.newsLabel} layout="stacked" level="h1" />
+    <NewsList posts={news} />
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 960px;
+    padding-block: 64px 96px;
+  }
+
+  @media (min-width: 1024px) {
+    .page {
+      gap: 48px;
+      padding-block: 120px 160px;
+    }
+  }
+</style>

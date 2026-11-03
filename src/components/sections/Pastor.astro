@@ -9,21 +9,25 @@ import PlayIcon from '../../assets/icons/icon-play.svg';
 import AudioIcon from '../../assets/icons/icon-audio.svg';
 import PlayLarge from '../../assets/icons/play-large.svg';
 import { Image } from 'astro:assets';
-import type { pastor as PastorData } from '../../data/content';
+import type { Pastor } from '../../data/content';
+import { locales, toLang, ui } from '../../i18n';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { getLatestVideo } from '../../utils/youtube';
 
 interface Props {
-  pastor: typeof PastorData;
+  pastor: Pastor;
 }
 
 const { pastor } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const newTab = ` ${t.opensInNewTab}`;
 const latest = await getLatestVideo(pastor.youtube.channelId);
 const isMaxres = latest?.thumbnail.includes('maxresdefault') ?? false;
 const messageTitle = latest?.title ?? pastor.latestMessage;
 const messageDate = latest
-  ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Dar_es_Salaam' }).format(
+  ? new Intl.DateTimeFormat(locales[lang].intl, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Dar_es_Salaam' }).format(
       new Date(latest.published),
     )
   : undefined;
@@ -33,24 +37,24 @@ const channels = [
   {
     name: 'Instagram',
     handle: pastor.instagram.handle,
-    description: 'Daily devotions & moments',
-    action: 'Follow',
+    description: t.instagramDesc,
+    action: t.follow,
     href: pastor.instagram.url,
     Icon: CamIcon,
   },
   {
     name: 'YouTube',
     handle: pastor.youtube.handle,
-    description: 'Sermons & teaching series',
-    action: 'Watch',
+    description: t.youtubeDesc,
+    action: t.watch,
     href: pastor.youtube.url,
     Icon: PlayIcon,
   },
   {
     name: 'Spotify',
-    handle: 'MTBC Podcast',
-    description: podcastLive ? 'Listen to the MTBC Podcast' : 'Coming soon',
-    action: podcastLive ? 'Listen' : 'Soon',
+    handle: t.podcastName,
+    description: podcastLive ? t.podcastLive : t.comingSoon,
+    action: podcastLive ? t.listen : t.soon,
     href: podcastLive ? pastor.podcast.url : undefined,
     Icon: AudioIcon,
   },
@@ -60,7 +64,7 @@ const channels = [
 <section id="pastor" class="pastor" aria-labelledby="pastor-title">
   <div class="pastor__inner container">
     <div class="pastor__heading" data-reveal>
-      <SectionHeading id="pastor-title" title="Our Pastor" label="Head Pastor" />
+      <SectionHeading id="pastor-title" title={t.pastorTitle} label={t.pastorLabel} />
     </div>
 
     <div class="pastor__portrait">
@@ -80,7 +84,7 @@ const channels = [
     <p class="pastor__bio" data-reveal>{pastor.bio}</p>
 
     <div class="pastor__channels" data-reveal>
-      <p class="pastor__kicker">Follow · Watch · Listen</p>
+      <p class="pastor__kicker">{t.followWatchListen}</p>
       <ul class="channels" role="list">
         {
           channels.map(({ name, handle, description, action, href, Icon }) => {
@@ -96,7 +100,7 @@ const channels = [
                     <span class="channel__name">{name}</span>
                     <span class="channel__handle">
                       {handle}
-                      {!href && <span class="channel__soon-inline"> · coming soon</span>}
+                      {!href && <span class="channel__soon-inline"> · {t.comingSoonInline}</span>}
                     </span>
                     <span class="channel__desc">{description}</span>
                   </span>
@@ -104,7 +108,7 @@ const channels = [
                     {action}
                     <span class="channel__line" aria-hidden="true" />
                   </span>
-                  {href && <span class="visually-hidden">(opens in a new tab)</span>}
+                  {href && <span class="visually-hidden">{newTab}</span>}
                 </Tag>
               </li>
             );
@@ -135,7 +139,7 @@ const channels = [
                 class="video__img"
               />
               <PlayLarge class="video__play" aria-hidden="true" />
-              <span class="visually-hidden">Play “{latest.title}”</span>
+              <span class="visually-hidden">{t.playVideo} “{latest.title}”</span>
             </a>
           ) : (
             <a class="video" href={pastor.youtube.url} target="_blank" rel="noopener">
@@ -147,7 +151,7 @@ const channels = [
                 class="video__img"
               />
               <PlayLarge class="video__play" aria-hidden="true" />
-              <span class="visually-hidden">Watch sermons on YouTube (opens in a new tab)</span>
+              <span class="visually-hidden">{t.watchSermons}{newTab}</span>
             </a>
           )
         }
@@ -155,11 +159,11 @@ const channels = [
       <div class="pastor__message-row">
         <p class="pastor__message-text">
           <span class="pastor__message-label">
-            Latest message{messageDate && latest && <> · <time datetime={latest.published}>{messageDate}</time></>}
+            {t.latestMessage}{messageDate && latest && <> · <time datetime={latest.published}>{messageDate}</time></>}
           </span>
           <span class="pastor__message-title">{messageTitle}</span>
         </p>
-        <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>All sermons</Button>
+        <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>{t.allSermons}</Button>
       </div>
     </div>
   </div>

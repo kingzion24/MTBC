@@ -1,6 +1,7 @@
 ---
 /** Figma: desktop 10:49, mobile 18:53 */
 import Button from '../ui/Button.astro';
+import { toLang, ui } from '../../i18n';
 
 interface Props {
   /** Light text for when the section scrolls over the pinned hero film. */
@@ -9,30 +10,15 @@ interface Props {
 
 const { onMedia = false } = Astro.props;
 
-const points = [
-  {
-    title: 'Rooted in the Word.',
-    body: 'Everything we do starts with the Bible. Clear, faithful teaching that meets you where you live, Monday to Saturday too.',
-  },
-  {
-    title: 'Worship in Spirit and truth.',
-    body: 'Heartfelt praise and honest prayer. We come expecting to meet God, and we leave room for what He wants to do.',
-  },
-  {
-    title: 'Always, a seat at the table.',
-    body: 'No dress code, no prerequisites, no one too far gone. Every person who walks in is someone we have been waiting for.',
-  },
-];
----
+const t = ui[toLang(Astro.currentLocale)];
+const points = t.introPoints;---
 
 <section id="intro" class:list={['intro container', { 'intro--on-media': onMedia }]} aria-labelledby="intro-title">
   <h2 id="intro-title" class="intro__title" data-reveal>
-    <span>Not only to welcome you,</span>
-    <span>but to feed you.</span>
+    {t.introTitle.map((line) => <span>{line}</span>)}
   </h2>
   <p class="intro__lead" data-reveal>
-    Like manna in the wilderness, God's Word is fresh every morning. At MTBC we gather to be fed by Scripture, to
-    worship together, and to carry that bread out into our city.
+    {t.introLead}
   </p>
 
   <ol class="intro__points">
@@ -50,7 +36,7 @@ const points = [
   </ol>
 
   <div class="intro__cta" data-reveal>
-    <Button href="#about" variant={onMedia ? 'outline-light' : 'outline'}>About MTBC</Button>
+    <Button href="#about" variant={onMedia ? 'outline-light' : 'outline'}>{t.aboutMtbc}</Button>
   </div>
 </section>
 

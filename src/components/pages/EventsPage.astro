@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventCard from '../EventCard.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { getContent } from '../../data/content';
+import { toLang, ui } from '../../i18n';
+
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { events } = getContent(lang);
+---
+
+<BaseLayout title={t.eventsPageTitle} description={t.eventsPageDescription} solidHeader>
+  <div class="page container">
+    <SectionHeading id="page-title" title={t.eventsTitle} label={t.eventsLabel} layout="stacked" level="h1" />
+    <p class="page__lead">{t.eventsLead}</p>
+    {
+      events.length > 0 ? (
+        <ul class="page__grid" role="list">
+          {events.map((event) => (
+            <li>
+              <EventCard event={event} headingLevel="h2" />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="page__lead">{t.noEvents}</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-block: 64px 96px;
+  }
+
+  .page__lead {
+    max-width: 32em;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem);
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 32px;
+  }
+
+  .page__grid > li {
+    display: flex;
+    background: var(--sand);
+  }
+
+  .page__grid > li > :global(*) {
+    flex: 1;
+    border: 1px solid var(--line);
+  }
+
+  @media (min-width: 1024px) {
+    .page {
+      gap: 48px;
+      padding-block: 120px 160px;
+    }
+  }
+</style>

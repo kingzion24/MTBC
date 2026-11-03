@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import type { EventItem } from '../data/content';
 import MomentVideo from './ui/MomentVideo.astro';
 import Tag from './ui/Tag.astro';
+import { toLang, ui } from '../i18n';
 
 interface Props {
   event: EventItem;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const { event, headingLevel = 'h3' } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 const Heading = headingLevel;
 ---
 
@@ -35,7 +37,7 @@ const Heading = headingLevel;
     )
   }
   <div class="event__body">
-    <ul class="event__tags" aria-label="Tags">
+    <ul class="event__tags" aria-label={t.tags}>
       <li><Tag active>{event.category}</Tag></li>
       {
         event.tags.map((tag) => (
@@ -53,11 +55,11 @@ const Heading = headingLevel;
       event.online && (
         <div class="event__online">
           <a class="event__zoom" href={event.online.url} target="_blank" rel="noopener">
-            Join on Zoom<span class="visually-hidden"> (opens in a new tab)</span>
+            {t.joinOnZoom}<span class="visually-hidden"> {t.opensInNewTab}</span>
             <span class="event__zoom-line" aria-hidden="true" />
           </a>
           <p class="event__zoom-meta">
-            Meeting ID <span>{event.online.meetingId}</span> · Passcode <span>{event.online.passcode}</span>
+            {t.meetingId} <span>{event.online.meetingId}</span> · {t.passcode} <span>{event.online.passcode}</span>
           </p>
         </div>
       )

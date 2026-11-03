@@ -9,19 +9,21 @@
  */
 import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
+import { toLang, ui } from '../i18n';
 
 interface Props {
   framed?: boolean;
 }
 
 const { framed = false } = Astro.props;
+const t = ui[toLang(Astro.currentLocale)];
 ---
 
 <div class:list={['loader', { 'loader--framed': framed }]} aria-hidden="true" data-loader>
   <div class="loader__inner">
     <Image src={logo} alt="" widths={[160, 320]} sizes="160px" loading="eager" class="loader__logo" />
     <div class="loader__progress">
-      <p class="loader__count">Loading <span data-loader-count>0</span>%</p>
+      <p class="loader__count">{t.loading} <span data-loader-count>0</span>%</p>
       <span class="loader__bar"><span class="loader__fill" data-loader-fill></span></span>
     </div>
   </div>
