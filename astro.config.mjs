@@ -1,8 +1,14 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+// Set by the GitHub Pages workflow from actions/configure-pages:
+//   SITE_URL  e.g. https://kingzion24.github.io (or the custom domain once one is added)
+//   BASE_PATH e.g. /MTBC (empty once a custom domain is used)
+const site = process.env.SITE_URL || 'https://kingzion24.github.io';
+const base = process.env.BASE_PATH || '/';
+
 export default defineConfig({
-  // Replaced with the production domain before launch (used for canonical URLs and Open Graph).
-  site: 'https://mtbc.example',
+  site,
+  base,
   output: 'static',
 });

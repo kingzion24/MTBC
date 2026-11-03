@@ -12,6 +12,7 @@ import MenuOverlay from '../components/MenuOverlay.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { site } from '../data/content';
+import { withBase } from '../utils/url';
 
 interface Props {
   title: string;
@@ -21,7 +22,7 @@ interface Props {
 }
 
 const { title, description, solidHeader = false } = Astro.props;
-const visitHref = '/#visit';
+const visitHref = withBase('/#visit');
 ---
 
 <!doctype html>

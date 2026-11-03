@@ -11,6 +11,7 @@ import poster1 from '../../assets/photos/hero-poster-1.jpg';
 import poster2 from '../../assets/photos/hero-poster-2.jpg';
 import poster3 from '../../assets/photos/hero-poster-3.jpg';
 import Button from '../ui/Button.astro';
+import { withBase } from '../../utils/url';
 
 interface Props {
   serviceTime: string;
@@ -23,7 +24,7 @@ const { serviceTime, visitHref, nextHref } = Astro.props;
 
 const clips = await Promise.all(
   [poster1, poster2, poster3].map(async (poster, i) => ({
-    src: `/videos/hero/hero-${i + 1}.mp4`,
+    src: withBase(`/videos/hero/hero-${i + 1}.mp4`),
     poster: (await getImage({ src: poster, width: 480, format: 'webp', quality: 70 })).src,
   })),
 );

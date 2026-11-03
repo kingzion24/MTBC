@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
 import { site } from '../data/content';
 import Button from './ui/Button.astro';
+import { withBase } from '../utils/url';
 
 interface Props {
   visitHref: string;
@@ -16,21 +17,21 @@ interface Props {
 const { visitHref } = Astro.props;
 
 const items = [
-  { title: 'Visit Us', note: 'Kisutu Hall', href: '/#visit' },
-  { title: 'Life Together', note: 'Stories', href: '/#stories' },
-  { title: 'Gatherings', note: 'Events', href: '/#events' },
-  { title: 'Ministries', note: 'Get involved', href: '/#ministries' },
-  { title: 'About MTBC', note: 'Who we are', href: '/#about' },
-  { title: 'Our Pastor', note: 'Head Pastor', href: '/#pastor' },
-  { title: 'News', note: 'Announcements', href: '/news' },
-  { title: 'Come and See', note: 'Contact us', href: '/#contact' },
+  { title: 'Visit Us', note: 'Kisutu Hall', href: withBase('/#visit') },
+  { title: 'Life Together', note: 'Stories', href: withBase('/#stories') },
+  { title: 'Gatherings', note: 'Events', href: withBase('/#events') },
+  { title: 'Ministries', note: 'Get involved', href: withBase('/#ministries') },
+  { title: 'About MTBC', note: 'Who we are', href: withBase('/#about') },
+  { title: 'Our Pastor', note: 'Head Pastor', href: withBase('/#pastor') },
+  { title: 'News', note: 'Announcements', href: withBase('/news/') },
+  { title: 'Come and See', note: 'Contact us', href: withBase('/#contact') },
 ];
 const external = { target: '_blank', rel: 'noopener' };
 ---
 
 <dialog id="site-menu" class="menu" aria-label="Site menu" data-menu>
   <div class="menu__bar">
-    <a class="menu__logo" href="/" data-menu-link>
+    <a class="menu__logo" href={withBase('/')} data-menu-link>
       <Image
         src={logo}
         alt="Manna Tabernacle Bible Church — home"

@@ -22,6 +22,7 @@ import {
   site,
   stories,
 } from '../data/content';
+import { withBase } from '../utils/url';
 
 const visitHref = '#visit';
 ---
@@ -33,13 +34,13 @@ const visitHref = '#visit';
   <Hero serviceTime={site.serviceTime} visitHref={visitHref} nextHref="#intro" />
   <Intro />
   <Newcomers venue={site.venue} visitHref={visitHref} />
-  <LifeTogether stories={stories} allHref="/stories" />
-  <Events events={events} allHref="/events" />
+  <LifeTogether stories={stories} allHref={withBase('/stories/')} />
+  <Events events={events} allHref={withBase('/events/')} />
   <PhotoStrip photos={photoStrip} />
   <Ministries categories={ministryCategories} ministries={ministries} findHref="#contact" />
   <About />
   <Pastor pastor={pastor} />
   <Visit venue={site.venue} serviceShort={site.serviceShort} mapUrl={site.mapUrl} />
-  <News posts={news} allHref="/news" />
+  <News posts={news} allHref={withBase('/news/')} />
   <Contact visitHref={visitHref} phone={site.phone} officeHours={site.officeHours} />
 </BaseLayout>

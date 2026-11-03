@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import logo from '../assets/mtbc-logo-white.png';
 import { site } from '../data/content';
 import { sitemap } from '../data/navigation';
+import { withBase } from '../utils/url';
 
 const year = new Date().getFullYear();
 const external = { target: '_blank', rel: 'noopener' };
@@ -13,7 +14,7 @@ const external = { target: '_blank', rel: 'noopener' };
   <div class="footer__inner container">
     <div class="footer__main">
       <div class="footer__info">
-        <a href="/" class="footer__logo">
+        <a href={withBase('/')} class="footer__logo">
           <Image src={logo} alt="Manna Tabernacle Bible Church — home" widths={[180, 240, 360, 480]} sizes="(min-width: 768px) 240px, 180px" />
         </a>
         <address class="footer__address">
@@ -56,7 +57,7 @@ const external = { target: '_blank', rel: 'noopener' };
     <div class="footer__bottom">
       <p class="footer__tagline">Daily bread for every soul...</p>
       <ul class="footer__legal" role="list">
-        <li><a href="/#contact">Contact</a></li>
+        <li><a href={withBase('/#contact')}>Contact</a></li>
         <li><a href={site.instagram} {...external}>Instagram</a></li>
         <li><a href={site.youtube} {...external}>YouTube</a></li>
       </ul>
