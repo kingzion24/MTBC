@@ -1,7 +1,8 @@
 ---
 /**
  * Figma: desktop 17:34, mobile 19:119.
- * The video block becomes a lite YouTube embed of the latest upload in phase 4.
+ * The video block shows the newest upload from the YouTube feed (read at build) as a lite embed:
+ * a thumbnail link that swaps in the player on click. If the feed fails, a photo links to the channel.
  */
 import CamIcon from '../../assets/icons/icon-cam.svg';
 import PlayIcon from '../../assets/icons/icon-play.svg';
@@ -11,12 +12,21 @@ import { Image } from 'astro:assets';
 import type { pastor as PastorData } from '../../data/content';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { getLatestVideo } from '../../utils/youtube';
 
 interface Props {
   pastor: typeof PastorData;
 }
 
 const { pastor } = Astro.props;
+const latest = await getLatestVideo(pastor.youtube.channelId);
+const isMaxres = latest?.thumbnail.includes('maxresdefault') ?? false;
+const messageTitle = latest?.title ?? pastor.latestMessage;
+const messageDate = latest
+  ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Dar_es_Salaam' }).format(
+      new Date(latest.published),
+    )
+  : undefined;
 const podcastLive = pastor.podcast.live && pastor.podcast.url !== '';
 
 const channels = [
@@ -104,27 +114,73 @@ const channels = [
     </div>
 
     <div class="pastor__message" data-reveal>
-      <a class="video" href={pastor.youtube.url} target="_blank" rel="noopener">
-        <Image
-          src={pastor.preaching.src}
-          alt={pastor.preaching.alt}
-          widths={[480, 624, 960, 1248]}
-          sizes="(min-width: 1200px) 624px, 100vw"
-          class="video__img"
-        />
-        <PlayLarge class="video__play" aria-hidden="true" />
-        <span class="visually-hidden">Watch the latest message on YouTube (opens in a new tab)</span>
-      </a>
+      <div class="player" data-player>
+        {
+          latest ? (
+            <a
+              class="video"
+              href={latest.url}
+              target="_blank"
+              rel="noopener"
+              data-yt-id={latest.id}
+              data-yt-title={latest.title}
+            >
+              <Image
+                src={latest.thumbnail}
+                alt=""
+                width={isMaxres ? 1280 : 480}
+                height={isMaxres ? 720 : 360}
+                widths={isMaxres ? [480, 624, 960, 1248] : [480]}
+                sizes="(min-width: 1200px) 624px, 100vw"
+                class="video__img"
+              />
+              <PlayLarge class="video__play" aria-hidden="true" />
+              <span class="visually-hidden">Play “{latest.title}”</span>
+            </a>
+          ) : (
+            <a class="video" href={pastor.youtube.url} target="_blank" rel="noopener">
+              <Image
+                src={pastor.preaching.src}
+                alt={pastor.preaching.alt}
+                widths={[480, 624, 960, 1248]}
+                sizes="(min-width: 1200px) 624px, 100vw"
+                class="video__img"
+              />
+              <PlayLarge class="video__play" aria-hidden="true" />
+              <span class="visually-hidden">Watch sermons on YouTube (opens in a new tab)</span>
+            </a>
+          )
+        }
+      </div>
       <div class="pastor__message-row">
         <p class="pastor__message-text">
-          <span class="pastor__message-label">Latest message</span>
-          <span class="pastor__message-title">{pastor.latestMessage}</span>
+          <span class="pastor__message-label">
+            Latest message{messageDate && latest && <> · <time datetime={latest.published}>{messageDate}</time></>}
+          </span>
+          <span class="pastor__message-title">{messageTitle}</span>
         </p>
         <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>All sermons</Button>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  // Lite YouTube embed: load the player only when someone asks for it.
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-yt-id]')) {
+    link.addEventListener('click', (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey) return; // let "open in new tab" work
+      event.preventDefault();
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${link.dataset['ytId']}?autoplay=1&rel=0`;
+      iframe.title = link.dataset['ytTitle'] ?? 'YouTube video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      link.replaceWith(iframe);
+      iframe.focus();
+    });
+  }
+</script>
 
 <style>
   .pastor {
@@ -291,15 +347,28 @@ const channels = [
     gap: 14px;
   }
 
-  .video {
-    --focus: var(--gold);
-
+  .player {
     position: relative;
-    display: grid;
-    place-items: center;
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: var(--night);
+  }
+
+  .player :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video {
+    --focus: var(--gold);
+
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
   }
 
   .video::after {

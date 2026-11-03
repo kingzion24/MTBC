@@ -11,4 +11,6 @@ export default defineConfig({
   site,
   base,
   output: 'static',
+  // YouTube thumbnails for the latest-message block are downloaded and optimised at build.
+  image: { domains: ['i.ytimg.com'] },
 });

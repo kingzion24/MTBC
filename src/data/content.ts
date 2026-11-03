@@ -240,13 +240,13 @@ export const pastor = {
   title: 'Senior Pastor, Manna Tabernacle Bible Church',
   bio: 'Pastor Carlos Kirimbai believes God has called him to teach the Body of Christ, a calling he holds to from Isaiah 45:13. Alongside leading MTBC, he teaches Bible seminars and speaks at institutions of higher learning.',
   instagram: { handle: '@carloskirimbai', url: site.instagram },
-  youtube: { handle: '@carloskirimbai', url: site.youtube },
+  youtube: { handle: '@carloskirimbai', url: site.youtube, channelId: 'UCY2Bpc2UZqd_4Px-B7ZuhtQ' },
   podcast: { live: false, url: '' },
   portrait: {
     src: pastorPortrait,
     alt: 'Pastor Carlos Kirimbai, in a green shirt, speaks into a microphone at the lectern.',
   },
-  /** Behind the play button of the latest-message block (until the YouTube thumbnail is wired in). */
+  /** Fallback image and title for the latest-message block if the YouTube feed can't be read at build. */
   preaching: { src: pastorPreaching, alt: '' },
   latestMessage: 'Bread for the Journey — Part 1',
 } as const;

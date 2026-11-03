@@ -95,6 +95,8 @@ const clips = await Promise.all(
     let active = 0;
     let paused = false;
     let visible = true;
+    // Don't compete with fonts and images for the first paint: start the clips after `load`.
+    let ready = document.readyState === 'complete';
 
     const play = (video: HTMLVideoElement) => {
       video.play().catch(() => {
@@ -108,7 +110,7 @@ const clips = await Promise.all(
     };
 
     const start = () => {
-      if (paused || !visible) return;
+      if (paused || !visible || !ready) return;
       if (triptych.matches) {
         for (const clip of clips) {
           clip.loop = true;
@@ -165,7 +167,16 @@ const clips = await Promise.all(
       }).observe(wrap);
     }
 
-    start();
+    if (ready) start();
+    else
+      window.addEventListener(
+        'load',
+        () => {
+          ready = true;
+          start();
+        },
+        { once: true },
+      );
   }
 </script>
 
