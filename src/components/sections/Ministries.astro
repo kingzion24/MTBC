@@ -1,8 +1,8 @@
 ---
 /**
  * Figma: desktop 11:54, mobile 19:51.
- * ARIA tabs filter the cards by category. Without JS every panel is shown in turn.
- * Cards swipe horizontally on mobile.
+ * The Figma tabs (Small Groups / Serve Teams / Care & Prayer) are dropped: the church has five
+ * ministries with no sub-groups, so they're shown as cards. Cards swipe sideways on mobile.
  */
 import { Image } from 'astro:assets';
 import type { Ministry } from '../../data/content';
@@ -11,125 +11,55 @@ import SectionHeading from '../ui/SectionHeading.astro';
 import Tag from '../ui/Tag.astro';
 
 interface Props {
-  categories: readonly string[];
   ministries: Ministry[];
   findHref: string;
 }
 
-const { categories, ministries, findHref } = Astro.props;
-const panels = categories.map((label, i) => ({
-  label,
-  id: `ministry-panel-${i}`,
-  tabId: `ministry-tab-${i}`,
-  items: ministries.filter((m) => m.category === label),
-}));
+const { ministries, findHref } = Astro.props;
 ---
 
-<section id="ministries" class="ministries" aria-labelledby="ministries-title" data-tabs>
-  <div class="container ministries__head" data-reveal>
+<section id="ministries" class="ministries" aria-labelledby="ministries-title">
+  <div class="container" data-reveal>
     <SectionHeading id="ministries-title" title="Ministries" label="Get involved" />
-  </div>
-
-  <div class="ministries__tabs-wrap container" data-reveal>
-    <div class="ministries__tabs" role="tablist" aria-labelledby="ministries-title">
-      {
-        panels.map((panel, i) => (
-          <button
-            class="ministries__tab"
-            type="button"
-            role="tab"
-            id={panel.tabId}
-            aria-controls={panel.id}
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? 0 : -1}
-          >
-            {panel.label}
-          </button>
-        ))
-      }
-    </div>
   </div>
 
   <div class="ministries__body container">
     <div class="ministries__intro">
       <p class="ministries__lead" data-reveal>
-        Church is not something you watch, it's something you are part of. Find a group that meets near you, or a team
-        where your gifts can make a difference.
+        Church is not something you watch, it's something you are part of. Find the ministry where you belong, and
+        a family that will grow with you.
       </p>
       <Button href={findHref} blockOnMobile>Find your place</Button>
     </div>
 
-    {
-      panels.map((panel, i) => (
-        <div class="ministries__panel" role="tabpanel" id={panel.id} aria-labelledby={panel.tabId} hidden={i !== 0}>
-          {panel.items.length > 0 ? (
-            <ul class="ministries__cards" role="list">
-              {panel.items.map((item) => (
-                <li class="ministry">
-                  <Image
-                    src={item.photo.src}
-                    alt={item.photo.alt}
-                    widths={[212, 260, 424, 520]}
-                    sizes="(min-width: 1024px) 212px, 260px"
-                    class="ministry__img"
-                  />
-                  <ul class="ministry__tags" aria-label="Where and when">
-                    <li>
-                      <Tag>{item.place}</Tag>
-                    </li>
-                    <li>
-                      <Tag>{item.time}</Tag>
-                    </li>
-                  </ul>
-                  <h3 class="ministry__title">{item.title}</h3>
-                  <p class="ministry__desc">{item.description}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="ministries__empty">
-              {panel.label} details are on their way. Ask any of us on Sunday and we'll help you find your place.
-            </p>
-          )}
-        </div>
-      ))
-    }
+    <ul class="ministries__cards" role="list">
+      {
+        ministries.map((item) => (
+          <li class="ministry" data-reveal>
+            <Image
+              src={item.photo.src}
+              alt={item.photo.alt}
+              widths={[212, 260, 424, 520]}
+              sizes="(min-width: 1024px) 212px, 260px"
+              class="ministry__img"
+            />
+            {item.tags && item.tags.length > 0 && (
+              <ul class="ministry__tags" aria-label="Where and when">
+                {item.tags.map((tag) => (
+                  <li>
+                    <Tag>{tag}</Tag>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <h3 class="ministry__title">{item.title}</h3>
+            <p class="ministry__desc">{item.description}</p>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
-
-<script>
-  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
-    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-
-    const select = (next: HTMLButtonElement, focus: boolean) => {
-      for (const tab of tabs) {
-        const selected = tab === next;
-        tab.setAttribute('aria-selected', String(selected));
-        tab.tabIndex = selected ? 0 : -1;
-        const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
-        if (panel) panel.hidden = !selected;
-      }
-      if (focus) next.focus();
-    };
-
-    for (const [i, tab] of tabs.entries()) {
-      tab.addEventListener('click', () => select(tab, false));
-      tab.addEventListener('keydown', (e) => {
-        const last = tabs.length - 1;
-        const target =
-          e.key === 'ArrowRight' ? tabs[i === last ? 0 : i + 1]
-          : e.key === 'ArrowLeft' ? tabs[i === 0 ? last : i - 1]
-          : e.key === 'Home' ? tabs[0]
-          : e.key === 'End' ? tabs[last]
-          : undefined;
-        if (target) {
-          e.preventDefault();
-          select(target, true);
-        }
-      });
-    }
-  }
-</script>
 
 <style>
   .ministries {
@@ -139,84 +69,34 @@ const panels = categories.map((label, i) => ({
     padding-block: 96px;
   }
 
-  /* Tabs scroll sideways on narrow screens (Figma mobile shows the last tab cut off). */
-  .ministries__tabs-wrap {
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .ministries__tabs-wrap::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ministries__tabs {
-    display: flex;
-    min-width: max-content;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .ministries__tab {
-    margin-bottom: -1px;
-    padding: 12px 14px;
-    border-bottom: 2px solid transparent;
-    color: var(--soft);
-    font-family: var(--serif-jp);
-    font-weight: 500;
-    font-size: 13px;
-    line-height: normal;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-    transition:
-      color 0.3s var(--ease-out),
-      border-color 0.3s var(--ease-out);
-  }
-
-  .ministries__tab[aria-selected='true'] {
-    border-bottom-color: var(--ink);
-    color: var(--ink);
-  }
-
-  @media (hover: hover) {
-    .ministries__tab:hover {
-      color: var(--ink);
-    }
-  }
-
-  .ministries__tab:focus-visible {
-    outline-offset: -2px;
-  }
-
   .ministries__body {
     display: grid;
-    grid-template-areas: 'intro' 'panel';
+    grid-template-areas: 'lead' 'cards' 'cta';
     gap: 32px;
   }
 
+  /* Mobile: lead, then cards, then the button. */
   .ministries__intro {
     display: contents;
   }
 
   .ministries__lead {
-    grid-area: intro;
+    grid-area: lead;
     font-family: var(--serif-jp);
     font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
     line-height: 2.2;
     letter-spacing: 0.04em;
   }
 
-  /* Mobile: the CTA sits after the cards. */
   .ministries__intro :global(.btn) {
-    grid-row: 3;
-  }
-
-  .ministries__panel {
-    grid-area: panel;
-    min-width: 0;
+    grid-area: cta;
   }
 
   .ministries__cards {
+    grid-area: cards;
     display: flex;
     gap: 16px;
+    min-width: 0;
     margin-inline: calc(-1 * var(--gutter));
     padding-inline: var(--gutter);
     overflow-x: auto;
@@ -248,10 +128,10 @@ const panels = categories.map((label, i) => ({
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    padding-top: 6px;
   }
 
   .ministry__title {
+    padding-top: 6px;
     font-family: var(--serif-jp);
     font-weight: 500;
     font-size: 16px;
@@ -267,32 +147,15 @@ const panels = categories.map((label, i) => ({
     letter-spacing: 0.04em;
   }
 
-  .ministries__empty {
-    max-width: 32em;
-    padding-block: 24px;
-    border-block: 1px solid var(--line);
-    color: var(--soft);
-    font-family: var(--serif-jp);
-    font-size: 14px;
-    line-height: 2;
-    letter-spacing: 0.04em;
-  }
-
   @media (min-width: 1024px) {
     .ministries {
       gap: 56px;
       padding-block: 180px;
     }
 
-    .ministries__tab {
-      padding: 16px 40px;
-      font-size: 16px;
-      letter-spacing: 0.12em;
-    }
-
     .ministries__body {
       grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-      grid-template-areas: 'intro panel';
+      grid-template-areas: 'intro cards';
       column-gap: clamp(40px, 5.5vw, 80px);
     }
 
@@ -308,14 +171,10 @@ const panels = categories.map((label, i) => ({
       line-height: 2.3;
     }
 
-    .ministries__intro :global(.btn) {
-      grid-row: auto;
-    }
-
     .ministries__cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 32px;
+      gap: 48px 32px;
       margin: 0;
       padding: 0;
       overflow: visible;
@@ -330,12 +189,8 @@ const panels = categories.map((label, i) => ({
       aspect-ratio: 212 / 220;
     }
 
-    .ministry__tags {
-      gap: 8px;
-      padding-top: 8px;
-    }
-
     .ministry__title {
+      padding-top: 8px;
       font-size: 18px;
       line-height: 1.7;
       letter-spacing: 0.08em;

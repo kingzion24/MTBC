@@ -15,6 +15,7 @@ import womenOfGrace from '../assets/photos/women-of-grace.jpg';
 import contactPreacher from '../assets/photos/contact-preacher.jpg';
 import sundayServiceHall from '../assets/photos/sunday-service-hall.jpg';
 import sundayWorshipStage from '../assets/photos/sunday-worship-stage.jpg';
+import childrenPraying from '../assets/photos/children-praying.jpg';
 import pastorPortrait from '../assets/photos/pastor-portrait.jpg';
 import pastorPreaching from '../assets/photos/pastor-preaching.jpg';
 import prayerBowedPoster from '../assets/photos/prayer-bowed-poster.jpg';
@@ -84,6 +85,10 @@ export const photos = {
   sundayWorshipStage: {
     src: sundayWorshipStage,
     alt: 'The worship team leads from the stage while the congregation stands among rows of red chairs.',
+  },
+  childrenPraying: {
+    src: childrenPraying,
+    alt: 'A young boy kneels with his hands clasped in prayer beside a man bowed over a chair.',
   },
   prayerBowed: { src: prayerBowedPoster, alt: 'A woman in blue bows her head over a chair in prayer.' },
   prayerKneelingMoment: {
@@ -171,15 +176,6 @@ export const events: EventItem[] = [
     online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
     endDate: '2026-12-18',
   },
-  {
-    title: 'Youth Fellowship',
-    subtitle: 'Worship, Word and real talk',
-    photo: photos.youthFellowship,
-    category: 'Youth',
-    tags: ['Music'],
-    when: ['Every Friday · 18:30'],
-    place: 'Kisutu Hall',
-  },
 ];
 
 /** Events whose end date hasn't passed yet, judged in Dar es Salaam time at build. */
@@ -196,42 +192,40 @@ export const photoStrip: Photo[] = [
   photos.sundayWorshipStage,
 ];
 
-export const ministryCategories = ['Small Groups', 'Serve Teams', 'Care & Prayer'] as const;
-export type MinistryCategory = (typeof ministryCategories)[number];
-
 export interface Ministry {
   title: string;
+  /** One line. Draft copy until the church confirms it. */
   description: string;
   photo: Photo;
-  category: MinistryCategory;
-  place: string;
-  time: string;
+  /** Optional details shown as tags, e.g. "Kisutu Hall", "Sat 08:00". */
+  tags?: string[];
 }
 
 export const ministries: Ministry[] = [
   {
-    title: 'Young Professionals',
-    description: 'Faith, career and friendship over dinner.',
-    photo: photos.youngProfessionals,
-    category: 'Small Groups',
-    place: 'Kisutu Hall',
-    time: 'Tue 19:00',
-  },
-  {
-    title: 'Women of Grace',
-    description: 'Bible study and mutual encouragement.',
-    photo: photos.womenOfGrace,
-    category: 'Small Groups',
-    place: 'Kisutu Hall',
-    time: 'Wed 18:00',
-  },
-  {
-    title: "Men's Breakfast",
-    description: 'Coffee, scripture and honest conversation.',
+    title: "Men's Ministry",
+    description: 'Men growing in faith together, at home, at work and in the church.',
     photo: photos.worshipTeam,
-    category: 'Small Groups',
-    place: 'Kisutu Hall',
-    time: 'Sat 08:00',
+  },
+  {
+    title: "Mothers' Ministry",
+    description: 'Mothers encouraging one another in prayer and the Word.',
+    photo: photos.womenOfGrace,
+  },
+  {
+    title: 'Young Adults',
+    description: 'Faith, friendship and purpose for the next generation.',
+    photo: photos.youngProfessionals,
+  },
+  {
+    title: 'Prayer Ministry',
+    description: 'Standing together in prayer for the church, our families and our city.',
+    photo: photos.prayerKneeling,
+  },
+  {
+    title: "Children's Ministry",
+    description: 'Bible teaching, worship and care for our youngest.',
+    photo: photos.childrenPraying,
   },
 ];
 

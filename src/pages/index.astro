@@ -15,7 +15,6 @@ import Contact from '../components/sections/Contact.astro';
 import {
   currentEvents,
   ministries,
-  ministryCategories,
   news,
   pastor,
   photoStrip,
@@ -38,7 +37,7 @@ const visitHref = '#visit';
   <LifeTogether stories={stories} allHref={withBase('/stories/')} />
   <Events events={currentEvents()} allHref={withBase('/events/')} />
   <PhotoStrip photos={photoStrip} />
-  <Ministries categories={ministryCategories} ministries={ministries} findHref="#contact" />
+  <Ministries ministries={ministries} findHref="#contact" />
   <About />
   <Pastor pastor={pastor} />
   <Visit venue={site.venue} serviceShort={site.serviceShort} mapUrl={site.mapUrl} />
