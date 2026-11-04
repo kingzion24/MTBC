@@ -1,0 +1,237 @@
+---
+/**
+ * Our Foundation: the scriptures that birthed MTBC, in the Head Pastor's words.
+ * Not in Figma; built in the Intro's language (heading left, ruled entries right) and closing
+ * on the core verse (Colossians 1:28) across the full width.
+ */
+import SectionHeading from '../ui/SectionHeading.astro';
+import { toLang, ui } from '../../i18n';
+
+const t = ui[toLang(Astro.currentLocale)];
+---
+
+<section id="foundation" class="foundation" aria-labelledby="foundation-title">
+  <div class="foundation__inner container">
+    <div class="foundation__head" data-reveal>
+      <SectionHeading id="foundation-title" title={t.foundationTitle} label={t.foundationLabel} layout="stacked" />
+      <p class="foundation__lead">{t.foundationLead}</p>
+    </div>
+
+    <ol class="foundation__verses">
+      {
+        t.foundationVerses.map((verse, i) => (
+          <li class="verse" data-reveal>
+            <span class="verse__num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <figure class="verse__quote">
+              <blockquote>
+                <p>“{verse.text}”</p>
+              </blockquote>
+              <figcaption>
+                {verse.reference} <span class="verse__version">{t.bibleVersion}</span>
+              </figcaption>
+            </figure>
+            <p class="verse__body">{verse.body}</p>
+            {'support' in verse && verse.support && (
+              <figure class="verse__support">
+                <blockquote>
+                  <p>“{verse.support.text}”</p>
+                </blockquote>
+                <figcaption>
+                  {verse.support.reference} <span class="verse__version">{t.bibleVersion}</span>
+                </figcaption>
+              </figure>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="foundation__core container" data-reveal>
+    <p class="core__label">{t.foundationCoreLabel}</p>
+    <figure class="core__quote">
+      <blockquote>
+        <p>“{t.foundationCore.text}”</p>
+      </blockquote>
+      <figcaption>
+        {t.foundationCore.reference} <span class="verse__version">{t.bibleVersion}</span>
+      </figcaption>
+    </figure>
+    <p class="core__summary">{t.foundationCore.summary}</p>
+  </div>
+</section>
+
+<style>
+  .foundation {
+    padding-block: 96px;
+  }
+
+  .foundation__inner {
+    display: grid;
+    gap: 40px;
+  }
+
+  .foundation__head {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .foundation__lead {
+    max-width: 30em;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem);
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .foundation__verses {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .verse {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 16px;
+    row-gap: 16px;
+    padding-block: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .verse > :not(.verse__num) {
+    grid-column: 2;
+  }
+
+  .verse__num {
+    grid-row: 1;
+    color: var(--gold);
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: clamp(1.875rem, 1.55rem + 1.3333vw, 2.75rem);
+    line-height: 1;
+  }
+
+  blockquote {
+    margin: 0;
+  }
+
+  .verse__quote blockquote p {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1rem, 0.93rem + 0.2857vw, 1.1875rem); /* 16 → 19 */
+    line-height: 1.9;
+    letter-spacing: 0.04em;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+  }
+
+  .verse__version {
+    font-style: normal;
+    font-size: 0.75em;
+    letter-spacing: 0.14em;
+  }
+
+  .verse__body {
+    color: var(--soft);
+    font-weight: 300;
+    font-size: clamp(0.8125rem, 0.7893rem + 0.0952vw, 0.875rem);
+    line-height: 2;
+    letter-spacing: 0.04em;
+  }
+
+  .verse__support {
+    padding-left: 16px;
+    border-left: 1px solid var(--gold);
+  }
+
+  .verse__support blockquote p {
+    font-family: var(--serif-jp);
+    font-size: 15px;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+
+  .verse__support figcaption {
+    font-size: 14px;
+  }
+
+  .foundation__core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 72px;
+    text-align: center;
+  }
+
+  .core__label {
+    color: var(--soft);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .core__quote {
+    max-width: 44em;
+  }
+
+  .core__quote blockquote p {
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 2.125rem); /* 22 → 34 */
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  .core__summary {
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.946rem + 0.4762vw, 1.375rem); /* 17 → 22 */
+    letter-spacing: 0.1em;
+  }
+
+  @media (min-width: 1024px) {
+    .foundation {
+      padding-block: 180px 160px;
+    }
+
+    .foundation__inner {
+      grid-template-columns: minmax(0, 420fr) minmax(0, 680fr);
+      column-gap: var(--gutter);
+      align-items: start;
+    }
+
+    .foundation__head {
+      position: sticky;
+      top: calc(var(--header-h) + 40px);
+      gap: 40px;
+    }
+
+    .foundation__lead {
+      line-height: 2.3;
+    }
+
+    .verse {
+      grid-template-columns: 96px 1fr;
+      column-gap: 0;
+      row-gap: 20px;
+      padding-block: 44px;
+    }
+
+    .foundation__core {
+      margin-top: 120px;
+      gap: 28px;
+    }
+  }
+</style>

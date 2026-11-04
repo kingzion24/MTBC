@@ -9,7 +9,7 @@ import { toLang, ui } from '../../i18n';
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const { photos } = getContent(lang);
-const anchors = ['#intro', '#pastor', '#ministries'];
+const anchors = ['#foundation', '#pastor', '#ministries'];
 ---
 
 <Split id="about" labelledby="about-title" photo={photos.fellowshipGreeting}>

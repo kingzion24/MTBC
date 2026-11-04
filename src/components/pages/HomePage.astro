@@ -8,6 +8,7 @@ import Events from '../sections/Events.astro';
 import PhotoStrip from '../sections/PhotoStrip.astro';
 import Ministries from '../sections/Ministries.astro';
 import About from '../sections/About.astro';
+import Foundation from '../sections/Foundation.astro';
 import Pastor from '../sections/Pastor.astro';
 import Visit from '../sections/Visit.astro';
 import News from '../sections/News.astro';
@@ -31,6 +32,7 @@ const visitHref = '#visit';
   <PhotoStrip photos={photoStrip} />
   <Ministries ministries={ministries} findHref="#contact" />
   <About />
+  <Foundation />
   <Pastor pastor={pastor} />
   <Visit venue={site.venue} serviceShort={site.serviceShort} mapUrl={site.mapUrl} />
   <News posts={news} allHref={pageUrl(lang, '/news/')} />

@@ -59,16 +59,16 @@ const en = {
     "Like manna in the wilderness, God's Word is fresh every morning. At MTBC we gather to be fed by Scripture, to worship together, and to carry that bread out into our city.",
   introPoints: [
     {
-      title: 'Rooted in the Word.',
-      body: 'Everything we do starts with the Bible. Clear, faithful teaching that meets you where you live, Monday to Saturday too.',
+      title: 'The ministry of the Word.',
+      body: 'We are a Word-based, apostolic teaching ministry. As God’s Word is taught, His people come into the knowledge of the truth, and the truth makes them free.',
     },
     {
-      title: 'Worship in Spirit and truth.',
-      body: 'Heartfelt praise and honest prayer. We come expecting to meet God, and we leave room for what He wants to do.',
+      title: 'Corporate worship.',
+      body: 'We gather to worship God together, with one heart and one voice, expecting to meet Him.',
     },
     {
-      title: 'Always, a seat at the table.',
-      body: 'No dress code, no prerequisites, no one too far gone. Every person who walks in is someone we have been waiting for.',
+      title: 'Prayer.',
+      body: 'Prayer is the life of this house. We stand together before God for one another, for our families and for our city.',
     },
   ],
   aboutMtbc: 'About MTBC',
@@ -108,12 +108,38 @@ const en = {
   aboutTitle: 'About MTBC',
   aboutLabel: 'Who we are',
   aboutLead:
-    'Manna Tabernacle Bible Church is a Bible-centred family meeting in Kisutu, in the heart of Dar es Salaam. Our hope is simple: that everyone who comes hungry leaves fed.',
+    'Manna Tabernacle Bible Church is a Word-based, apostolic teaching ministry with a strong emphasis on corporate worship, prayer and the ministry of the Word. We meet in Kisutu, in the heart of Dar es Salaam.',
   aboutLinks: [
     { title: 'What we believe', note: 'Beliefs' },
     { title: 'Our leadership', note: 'Pastors & Elders' },
     { title: 'Give & serve', note: 'Generosity' },
   ],
+
+
+  // Foundation (from the Head Pastor)
+  foundationTitle: 'Our Foundation',
+  foundationLabel: 'The Word that birthed us',
+  foundationLead: 'Two scriptures birthed this ministry. They shape how we teach, pray and serve.',
+  foundationVerses: [
+    {
+      reference: 'Isaiah 45:13',
+      text: 'I have raised him up in righteousness, and I will direct all his ways: he shall build my city, and he shall let go my captives, not for price nor reward, saith the LORD of hosts.',
+      body: 'We are a ministry that builds, and brings deliverance to God’s people through the teaching of the Word of God. As we minister the Word, God’s people come into the knowledge of the truth, and that truth sets them free. Knowledge of the truth brings deliverance, healing and complete freedom.',
+      support: { reference: 'Proverbs 11:9', text: 'But through knowledge shall the just be delivered.' },
+    },
+    {
+      reference: 'Isaiah 49:8',
+      text: 'In an acceptable time have I heard thee, and in a day of salvation have I helped thee: and I will preserve thee, and give thee for a covenant of the people, to establish the earth, to cause to inherit the desolate heritages.',
+      body: 'As we bring an on-time Word to the people, they are established and come into their inheritance in Christ, by the grace and anointing of God on our lives and ministry.',
+    },
+  ],
+  foundationCoreLabel: 'At the core of our ministry',
+  foundationCore: {
+    reference: 'Colossians 1:28',
+    text: 'Whom we preach, warning every man, and teaching every man in all wisdom; that we may present every man perfect in Christ Jesus.',
+    summary: 'To present everyone complete in Christ.',
+  },
+  bibleVersion: 'KJV',
 
   // Pastor
   pastorTitle: 'Our Pastor',
@@ -166,14 +192,14 @@ const en = {
   // Pages
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
   homeDescription:
-    'Manna Tabernacle Bible Church is a Bible-centred family meeting every Sunday 10:00–13:00 at Kisutu Primary School Hall, Posta Mpya, Dar es Salaam.',
+    'Manna Tabernacle Bible Church is a Word-based, apostolic teaching ministry in Dar es Salaam: corporate worship, prayer and the ministry of the Word, every Sunday 10:00–13:00 at Kisutu Primary School Hall.',
   eventsPageTitle: 'Gatherings & Events — MTBC Dar es Salaam',
   eventsPageDescription:
     'Gatherings at Manna Tabernacle Bible Church, Dar es Salaam: prayer, fasting and fellowship.',
   newsPageTitle: 'News & Announcements — MTBC Dar es Salaam',
   newsPageDescription: 'Announcements from Manna Tabernacle Bible Church, Kisutu Hall, Dar es Salaam.',
   shareImageAlt: 'Manna Tabernacle Bible Church logo over a full Sunday service in Kisutu Hall',
-  churchDescription: 'A Bible-centred church family meeting every Sunday in Kisutu, Dar es Salaam.',
+  churchDescription: 'A Word-based, apostolic teaching ministry meeting every Sunday in Kisutu, Dar es Salaam.',
 
   // Menu items (title + italic note)
   nav: {
@@ -226,16 +252,16 @@ const sw: UI = {
     'Kama mana jangwani, Neno la Mungu ni jipya kila asubuhi. Hapa MTBC tunakusanyika ili tulishwe na Maandiko, tuabudu pamoja, na tuupeleke mkate huo katika jiji letu.',
   introPoints: [
     {
-      title: 'Tumejengwa juu ya Neno.',
-      body: 'Kila tunachofanya kinaanzia kwenye Biblia. Mafundisho yaliyo wazi na ya uaminifu yanayokufikia katika maisha yako ya kila siku.',
+      title: 'Huduma ya Neno.',
+      body: 'Sisi ni huduma ya mafundisho ya kitume iliyojengwa juu ya Neno. Neno la Mungu linapofundishwa, watu wake wanaifikia kweli, na kweli hiyo inawaweka huru.',
     },
     {
-      title: 'Ibada katika Roho na kweli.',
-      body: 'Sifa za moyoni na maombi ya kweli. Tunakuja tukitarajia kukutana na Mungu, na tunampa nafasi ndani yetu.',
+      title: 'Ibada ya pamoja.',
+      body: 'Tunakusanyika kumwabudu Mungu pamoja, kwa moyo mmoja na sauti moja, tukitarajia kukutana naye.',
     },
     {
-      title: 'Daima, kuna nafasi mezani.',
-      body: 'Hakuna masharti, hakuna aliye mbali mno. Kila anayeingia ni mtu tuliyekuwa tukimsubiri.',
+      title: 'Maombi.',
+      body: 'Maombi ni uhai wa nyumba hii. Tunasimama pamoja mbele za Mungu kwa ajili ya kila mmoja wetu, familia zetu na jiji letu.',
     },
   ],
   aboutMtbc: 'Kuhusu MTBC',
@@ -269,12 +295,37 @@ const sw: UI = {
   aboutTitle: 'Kuhusu MTBC',
   aboutLabel: 'Sisi ni nani',
   aboutLead:
-    'Manna Tabernacle Bible Church ni familia iliyojengwa juu ya Biblia, inayokutana Kisutu, katikati ya Dar es Salaam. Tumaini letu ni rahisi: kila anayekuja akiwa na njaa aondoke ameshiba.',
+    'Manna Tabernacle Bible Church ni huduma ya mafundisho ya kitume iliyojengwa juu ya Neno, yenye msisitizo mkubwa katika ibada ya pamoja, maombi na huduma ya Neno. Tunakutana Kisutu, katikati ya Dar es Salaam.',
   aboutLinks: [
     { title: 'Tunachoamini', note: 'Imani' },
     { title: 'Uongozi wetu', note: 'Wachungaji na Wazee' },
     { title: 'Toa na Hudumu', note: 'Ukarimu' },
   ],
+
+
+  foundationTitle: 'Msingi Wetu',
+  foundationLabel: 'Neno lililotuzaa',
+  foundationLead: 'Maandiko mawili ndiyo yaliyozaa huduma hii. Yanaongoza jinsi tunavyofundisha, tunavyoomba na tunavyotumika.',
+  foundationVerses: [
+    {
+      reference: 'Isaya 45:13',
+      text: 'Mimi nimemwinua katika haki, nami nitazinyosha njia zake zote; yeye ataujenga mji wangu, naye atawaachilia watu wangu waliohamishwa, si kwa fedha wala si kwa thawabu, asema BWANA wa majeshi.',
+      body: 'Sisi ni huduma inayojenga na kuleta ukombozi kwa watu wa Mungu kupitia mafundisho ya Neno la Mungu. Tunapolihudumia Neno, watu wa Mungu wanaifikia kweli, na kweli hiyo inawaweka huru. Kuijua kweli huleta ukombozi, uponyaji na uhuru kamili.',
+      support: { reference: 'Mithali 11:9', text: 'Bali kwa maarifa wenye haki wataokolewa.' },
+    },
+    {
+      reference: 'Isaya 49:8',
+      text: 'BWANA asema hivi, Wakati uliokubalika nimekujibu, na siku ya wokovu nimekusaidia; nami nitakuhifadhi, na kukutoa uwe agano la watu, ili kuiinua nchi, na kuwarithisha urithi uliokuwa ukiwa.',
+      body: 'Tunapowaletea watu Neno la wakati wake, wanathibitishwa na kuurithi urithi wao katika Kristo, kwa neema na upako wa Mungu juu ya maisha na huduma yetu.',
+    },
+  ],
+  foundationCoreLabel: 'Kiini cha huduma yetu',
+  foundationCore: {
+    reference: 'Wakolosai 1:28',
+    text: 'Ambaye sisi tunamhubiri, tukimwonya kila mtu na kumfundisha kila mtu katika hekima yote, ili tumlete kila mtu akiwa mtimilifu katika Kristo.',
+    summary: 'Kumleta kila mtu akiwa mkamilifu katika Kristo.',
+  },
+  bibleVersion: 'SUV',
 
   pastorTitle: 'Mchungaji Wetu',
   pastorLabel: 'Mchungaji Mkuu',
@@ -321,13 +372,13 @@ const sw: UI = {
 
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
   homeDescription:
-    'Manna Tabernacle Bible Church ni familia iliyojengwa juu ya Biblia, inayokutana kila Jumapili saa 4 asubuhi – 7 mchana katika Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam.',
+    'Manna Tabernacle Bible Church ni huduma ya mafundisho ya kitume Dar es Salaam: ibada ya pamoja, maombi na huduma ya Neno, kila Jumapili saa 4 asubuhi – 7 mchana katika Ukumbi wa Shule ya Msingi Kisutu.',
   eventsPageTitle: 'Matukio — MTBC Dar es Salaam',
   eventsPageDescription: 'Mikusanyiko ya Manna Tabernacle Bible Church, Dar es Salaam: maombi, kufunga na ushirika.',
   newsPageTitle: 'Habari na Matangazo — MTBC Dar es Salaam',
   newsPageDescription: 'Matangazo kutoka Manna Tabernacle Bible Church, Ukumbi wa Kisutu, Dar es Salaam.',
   shareImageAlt: 'Nembo ya Manna Tabernacle Bible Church juu ya ibada ya Jumapili iliyojaa katika Ukumbi wa Kisutu',
-  churchDescription: 'Familia ya kanisa iliyojengwa juu ya Biblia, inayokutana kila Jumapili Kisutu, Dar es Salaam.',
+  churchDescription: 'Huduma ya mafundisho ya kitume iliyojengwa juu ya Neno, inayokutana kila Jumapili Kisutu, Dar es Salaam.',
 
   nav: {
     visit: { title: 'Tutembelee', note: 'Ukumbi wa Kisutu' },
