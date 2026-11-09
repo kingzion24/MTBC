@@ -53,7 +53,9 @@ const t = ui[toLang(Astro.currentLocale)];
     <p class="core__label">{t.foundationCoreLabel}</p>
     <figure class="core__quote">
       <blockquote>
-        <p>“{t.foundationCore.text}”</p>
+        <p class="core__typed" data-typed-text={`“${t.foundationCore.text}”`} aria-label={`“${t.foundationCore.text}”`}>
+          <span class="core__typed-out" aria-hidden="true"></span><span class="core__caret" aria-hidden="true"></span>
+        </p>
       </blockquote>
       <figcaption>
         {t.foundationCore.reference} <span class="verse__version">{t.bibleVersion}</span>
@@ -201,6 +203,37 @@ const t = ui[toLang(Astro.currentLocale)];
     letter-spacing: 0.1em;
   }
 
+  .core__typed {
+    min-height: 1.5em;
+  }
+
+  .core__caret {
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    margin-left: 0.08em;
+    background: var(--gold);
+    vertical-align: baseline;
+    animation: core-caret-blink 1s step-end infinite;
+  }
+
+  /* Hide the caret once typing is done and the line has settled. */
+  .core__typed[data-typed-done] .core__caret {
+    animation-iteration-count: 6;
+  }
+
+  @keyframes core-caret-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .core__caret {
+      animation: none;
+      opacity: 0;
+    }
+  }
+
   @media (min-width: 1024px) {
     .foundation {
       padding-block: 180px 160px;
@@ -235,3 +268,45 @@ const t = ui[toLang(Astro.currentLocale)];
     }
   }
 </style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('.core__typed');
+  if (el) {
+    const out = el.querySelector<HTMLElement>('.core__typed-out');
+    const full = el.dataset.typedText ?? '';
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const finish = () => {
+      if (out) out.textContent = full;
+      el.setAttribute('data-typed-done', '');
+    };
+
+    if (reduce || !out) {
+      finish();
+    } else {
+      let started = false;
+      const type = (i: number) => {
+        if (i > full.length) {
+          el.setAttribute('data-typed-done', '');
+          return;
+        }
+        out.textContent = full.slice(0, i);
+        window.setTimeout(() => type(i + 1), 45);
+      };
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting && !started) {
+              started = true;
+              io.disconnect();
+              type(0);
+            }
+          }
+        },
+        { threshold: 0.5 },
+      );
+      io.observe(el);
+    }
+  }
+</script>
