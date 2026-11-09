@@ -180,7 +180,7 @@ const site: Raw<Site> = {
   mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`,
   /** Google Maps embed (no API key) shown in the footer. */
   mapEmbed: `https://maps.google.com/maps?q=${encodeURIComponent('Kisutu Primary School, Dar es Salaam')}&z=16&output=embed`,
-  phone: { display: '+255 700 000 000', tel: '+255700000000' },
+  phone: { display: '+255 754 079 301', tel: '+255754079301' },
   officeHours: {
     sw: 'Saa za ofisi: saa 3 asubuhi – 11 jioni · Tunafunga Jumatatu',
     en: 'Office hours 9:00 – 17:00 · Closed Mondays',
