@@ -14,6 +14,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import { getContent } from '../data/content';
 import { languages, locales, neutralPath, pageUrl, toLang, ui } from '../i18n';
 import { withBase } from '../utils/url';
+import { breadcrumbSchema, websiteSchema, type BreadcrumbItem } from '../utils/schema';
 
 interface Props {
   title: string;
@@ -22,9 +23,13 @@ interface Props {
   image?: `/${string}`;
   /** Pages without a full-bleed hero get a solid header and top padding. */
   solidHeader?: boolean;
+  /** Breadcrumb trail (Home is prepended automatically). */
+  breadcrumbs?: BreadcrumbItem[];
+  /** Extra JSON-LD nodes (e.g. Event) merged into the page's @graph. */
+  extraSchema?: object[];
 }
 
-const { title, description, image = '/og-image.jpg', solidHeader = false } = Astro.props;
+const { title, description, image = '/og-image.jpg', solidHeader = false, breadcrumbs, extraSchema = [] } = Astro.props;
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const { site } = getContent(lang);
@@ -38,15 +43,16 @@ const imageUrl = new URL(withBase(image), Astro.site);
 const home = new URL(withBase('/'), Astro.site);
 
 // Structured data for search engines: the church, its Sunday service and its channels.
-const jsonLd = {
-  '@context': 'https://schema.org',
+const churchId = `${home.href}#church`;
+const church = {
   '@type': 'Church',
-  '@id': `${home.href}#church`,
+  '@id': churchId,
   name: 'Manna Tabernacle Bible Church',
   alternateName: 'MTBC',
   description: t.churchDescription,
   url: home.href,
   inLanguage: ['sw', 'en'],
+  knowsLanguage: ['sw', 'en'],
   logo: new URL(withBase('/apple-touch-icon.png'), Astro.site).href,
   image: imageUrl.href,
   telephone: site.phone.tel,
@@ -55,6 +61,15 @@ const jsonLd = {
     streetAddress: 'Kisutu Primary School Hall, Posta Mpya',
     addressLocality: 'Dar es Salaam',
     addressCountry: 'TZ',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: -6.813791,
+    longitude: 39.284494,
+  },
+  areaServed: {
+    '@type': 'City',
+    name: 'Dar es Salaam',
   },
   hasMap: site.mapUrl,
   openingHoursSpecification: {
@@ -65,6 +80,19 @@ const jsonLd = {
   },
   sameAs: [site.instagram, site.youtube],
 };
+
+// One @graph per page: the church, the website, an optional breadcrumb trail
+// (Home prepended), and any page-specific nodes such as Event schema.
+const graph: object[] = [
+  church,
+  websiteSchema({ url: home.href, name: 'Manna Tabernacle Bible Church', inLanguage: ['sw', 'en'], publisherId: churchId }),
+];
+if (breadcrumbs && breadcrumbs.length > 0) {
+  graph.push(breadcrumbSchema([{ name: 'Home', url: home.href }, ...breadcrumbs]));
+}
+for (const node of extraSchema) graph.push(node);
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+
 const visitHref = pageUrl(lang, '/#visit');
 ---
 
@@ -75,6 +103,7 @@ const visitHref = pageUrl(lang, '/#visit');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#23211f" />
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
@@ -91,6 +120,8 @@ const visitHref = pageUrl(lang, '/#visit');
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:secure_url" content={imageUrl} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={t.shareImageAlt} />

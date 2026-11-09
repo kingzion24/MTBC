@@ -3,14 +3,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import NewsList from '../NewsList.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { getContent } from '../../data/content';
-import { toLang, ui } from '../../i18n';
+import { pageUrl, toLang, ui } from '../../i18n';
 
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const { news } = getContent(lang);
+
+const newsUrl = new URL(pageUrl(lang, '/news/'), Astro.site).href;
+const breadcrumbs = [{ name: t.newsTitle, url: newsUrl }];
 ---
 
-<BaseLayout title={t.newsPageTitle} description={t.newsPageDescription} solidHeader>
+<BaseLayout title={t.newsPageTitle} description={t.newsPageDescription} solidHeader breadcrumbs={breadcrumbs}>
   <div class="page container">
     <SectionHeading id="page-title" title={t.newsTitle} label={t.newsLabel} layout="stacked" level="h1" />
     <NewsList posts={news} />
