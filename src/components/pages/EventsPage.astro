@@ -3,14 +3,41 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import EventCard from '../EventCard.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { getContent } from '../../data/content';
-import { toLang, ui } from '../../i18n';
+import { pageUrl, toLang, ui } from '../../i18n';
+import { withBase } from '../../utils/url';
+import { eventSchema } from '../../utils/schema';
 
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const { events } = getContent(lang);
+
+// Event JSON-LD for the current events, so services can surface as rich results.
+const churchId = `${new URL(withBase('/'), Astro.site).href}#church`;
+const eventsUrl = new URL(pageUrl(lang, '/events/'), Astro.site).href;
+const eventNodes = events
+  .map((event) =>
+    eventSchema(
+      { title: event.title, subtitle: event.subtitle, place: event.place, online: event.online, schedule: event.schedule },
+      {
+        image: new URL(event.photo.src.src, Astro.site).href,
+        organizerId: churchId,
+        timeZone: 'Africa/Dar_es_Salaam',
+        addressLocality: 'Dar es Salaam',
+        addressCountry: 'TZ',
+      },
+    ),
+  )
+  .filter((node): node is object => node !== null);
+const breadcrumbs = [{ name: t.eventsTitle, url: eventsUrl }];
 ---
 
-<BaseLayout title={t.eventsPageTitle} description={t.eventsPageDescription} solidHeader>
+<BaseLayout
+  title={t.eventsPageTitle}
+  description={t.eventsPageDescription}
+  solidHeader
+  breadcrumbs={breadcrumbs}
+  extraSchema={eventNodes}
+>
   <div class="page container">
     <SectionHeading id="page-title" title={t.eventsTitle} label={t.eventsLabel} layout="stacked" level="h1" />
     <p class="page__lead">{t.eventsLead}</p>

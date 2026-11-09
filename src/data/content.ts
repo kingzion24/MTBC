@@ -114,6 +114,23 @@ export interface OnlineMeeting {
   passcode: string;
 }
 
+/**
+ * Machine-readable recurrence for Event structured data (JSON-LD), in local
+ * Africa/Dar es Salaam time. Human-readable times still live in `when`; this is
+ * the parallel, parseable form search engines need for event rich results.
+ */
+export interface EventSchedule {
+  /** First day the series runs, yyyy-mm-dd. */
+  startDate: string;
+  /** Last day the series runs, yyyy-mm-dd. Omit for an open-ended weekly rhythm. */
+  endDate?: string;
+  /** Days it recurs, as full English weekday names: 'Monday' … 'Sunday'. */
+  byDay: string[];
+  /** Local clock times, 'HH:mm'. `endTime` may be before `startTime` for overnight slots. */
+  startTime: string;
+  endTime: string;
+}
+
 export interface EventItem {
   title: string;
   subtitle: string;
@@ -128,6 +145,8 @@ export interface EventItem {
   online?: OnlineMeeting;
   /** Last day (yyyy-mm-dd, Dar es Salaam time). The event disappears on the first build after it. */
   endDate?: string;
+  /** Parseable recurrence for Event JSON-LD; one entry per distinct time pattern. */
+  schedule?: EventSchedule[];
 }
 
 export interface Ministry {
@@ -367,6 +386,10 @@ const events: Raw<EventItem>[] = [
     place: { sw: 'Chumba cha Maombi, Kisutu Girls High School', en: 'Prayer Room, Kisutu Girls High School' },
     online: { url: 'https://us02web.zoom.us/j/83444042651', meetingId: '834 4404 2651', passcode: '946985' },
     endDate: '2026-12-18',
+    schedule: [
+      { startDate: '2026-10-26', endDate: '2026-12-18', byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'], startTime: '17:00', endTime: '20:00' },
+      { startDate: '2026-10-30', endDate: '2026-12-18', byDay: ['Friday'], startTime: '21:00', endTime: '05:00' },
+    ],
   },
   {
     title: { sw: 'Maombi ya Jumapili', en: 'Sunday Morning Prayer' },
@@ -377,6 +400,7 @@ const events: Raw<EventItem>[] = [
     tags: [{ sw: 'Kila Jumapili', en: 'Every Sunday' }],
     when: [{ sw: 'Jumapili · saa 2 – 4 asubuhi', en: 'Sunday · 08:00–10:00' }],
     place: { sw: 'Ukumbi wa Kisutu', en: 'Kisutu Hall' },
+    schedule: [{ startDate: '2025-01-05', byDay: ['Sunday'], startTime: '08:00', endTime: '10:00' }],
   },
 ];
 
