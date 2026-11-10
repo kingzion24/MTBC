@@ -23,3 +23,8 @@ src/assets/photos/pastor/
 src/assets/photos/IMG_*.jpg
 src/assets/posters/
 src/assets/photos/*.ARW
+# Per-department camera originals; web-sized crops/posters live in src/assets/photos
+src/assets/photos/kids/
+src/assets/photos/ladies/
+src/assets/photos/mens/
+src/assets/photos/women/

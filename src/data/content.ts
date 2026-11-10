@@ -28,6 +28,11 @@ import prayerCirclePoster from '../assets/photos/prayer-circle-poster.jpg';
 import sundayPrayerPoster from '../assets/photos/sunday-prayer-poster.jpg';
 import sundayWelcome from '../assets/photos/sunday-welcome.jpg';
 import sundayHallBack from '../assets/photos/sunday-hall-back.jpg';
+import mensFellowshipPoster from '../assets/photos/mens-fellowship-poster.jpg';
+import fellowshipGatheringPoster from '../assets/photos/fellowship-gathering-poster.jpg';
+import destinyFighters from '../assets/photos/destiny-fighters.jpg';
+import womenOfWisdom from '../assets/photos/women-of-wisdom.jpg';
+import daughtersOfFaith from '../assets/photos/daughters-of-faith.jpg';
 
 /* ------------------------------------------------------------------ */
 /* Localisation helpers                                                */
@@ -156,6 +161,8 @@ export interface Ministry {
   photo: Photo;
   /** Optional details shown as tags, e.g. "Kisutu Hall", "Sat 08:00". */
   tags?: string[];
+  /** Optional short video loop played behind the card; `photo` is its poster. */
+  moment?: { src: string; position?: string };
 }
 
 export interface Pastor {
@@ -214,6 +221,41 @@ const photos = {
     alt: {
       sw: 'Vijana katika kusanyiko wakiinua mikono yao katika ibada karibu na dirisha lililo wazi.',
       en: 'Young people in the congregation lift their hands in worship beside an open window.',
+    },
+  },
+  mensFellowship: {
+    src: mensFellowshipPoster,
+    alt: {
+      sw: 'Wanaume wakizungumza na kucheka pamoja nje ya kanisa.',
+      en: 'Men talking and laughing together outside the church.',
+    },
+  },
+  fellowshipGathering: {
+    src: fellowshipGatheringPoster,
+    alt: {
+      sw: 'Waumini wakikusanyika nje baada ya ibada.',
+      en: 'Members gathering outside after the service.',
+    },
+  },
+  destinyFighters: {
+    src: destinyFighters,
+    alt: {
+      sw: 'Watoto wakishikana mikono katika duara wakati wa huduma ya watoto.',
+      en: 'Children holding hands in a circle during children’s ministry.',
+    },
+  },
+  womenOfWisdom: {
+    src: womenOfWisdom,
+    alt: {
+      sw: 'Akina mama waliovalia mavazi ya rangi wakiwa wameketi pamoja katika mkutano.',
+      en: 'Women in colourful dress seated together at a gathering.',
+    },
+  },
+  daughtersOfFaith: {
+    src: daughtersOfFaith,
+    alt: {
+      sw: 'Wanawake vijana watatu wakitabasamu wakiwa wamevalia sare zinazofanana.',
+      en: 'Three young women in matching outfits smiling together.',
     },
   },
   prayerKneeling: {
@@ -419,23 +461,33 @@ const ministries: Raw<Ministry>[] = [
       sw: 'Wanaume wakikua pamoja katika imani, nyumbani, kazini na kanisani.',
       en: 'Men growing in faith together, at home, at work and in the church.',
     },
-    photo: photos.worshipTeam,
+    photo: photos.mensFellowship,
+    moment: { src: '/videos/moments/mens-fellowship.mp4' },
   },
   {
-    title: { sw: 'Idara ya Akina Mama', en: "Mothers' Ministry" },
+    title: { sw: 'Women of Wisdom', en: 'Women of Wisdom' },
     description: {
       sw: 'Akina mama wakitiana moyo katika maombi na Neno.',
       en: 'Mothers encouraging one another in prayer and the Word.',
     },
-    photo: photos.womenOfGrace,
+    photo: photos.womenOfWisdom,
   },
   {
-    title: { sw: 'Vijana', en: 'Young Adults' },
+    title: { sw: 'Daughters of Faith', en: 'Daughters of Faith' },
+    description: {
+      sw: 'Wanawake vijana wakikua pamoja katika imani, usafi na kusudi.',
+      en: 'Young women growing together in faith, purity and purpose.',
+    },
+    photo: photos.daughtersOfFaith,
+  },
+  {
+    title: { sw: 'Youth with Purpose', en: 'Youth with Purpose' },
     description: {
       sw: 'Imani, urafiki na kusudi kwa kizazi kijacho.',
       en: 'Faith, friendship and purpose for the next generation.',
     },
-    photo: photos.youngProfessionals,
+    photo: photos.fellowshipGathering,
+    moment: { src: '/videos/moments/fellowship-gathering.mp4' },
   },
   {
     title: { sw: 'Idara ya Maombi', en: 'Prayer Ministry' },
@@ -446,12 +498,12 @@ const ministries: Raw<Ministry>[] = [
     photo: photos.prayerKneeling,
   },
   {
-    title: { sw: 'Idara ya Watoto', en: "Children's Ministry" },
+    title: { sw: 'Destiny Fighters', en: 'Destiny Fighters' },
     description: {
       sw: 'Mafundisho ya Biblia, ibada na malezi kwa watoto wetu.',
       en: 'Bible teaching, worship and care for our youngest.',
     },
-    photo: photos.childrenPraying,
+    photo: photos.destinyFighters,
   },
 ];
 

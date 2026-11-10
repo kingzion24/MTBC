@@ -18,6 +18,9 @@ CLIPS=(
   "prayer/ZNV1185.MP4|10|5|540|moments/prayer-kneeling"
   "prayer/ZNV1205.MP4|1|5|540|moments/prayer-circle"
   "prayer/ZNV1207.MP4|5|2.9|540|moments/sunday-prayer"
+  # Ministry-card moments (sources live in src/assets/videos/moments/).
+  "moments/ZNV0534.MP4|0|4.4|540|moments/mens-fellowship"
+  "moments/ZNV0823.MP4|0|4.4|540|moments/fellowship-gathering"
 )
 
 for line in "${CLIPS[@]}"; do
@@ -48,7 +51,7 @@ HERO=(
   "hero-1|Timeline 12.mov|22.4-26.3,9.9-12.6||45"
   "hero-2|WhatsApp Video 2026-11-03 at 00.45.03.mp4|3.4-6.3,8.3-10.7||45"
   "hero-3|WhatsApp Video 2026-11-03 at 00.46.13.mp4|6.2-11.1||none"
-  "hero-4|ZNV0084.MP4|0-6|crop=ih*9/16:ih:(iw-ih*9/16)/2:0|120"
+  "hero-4|ZNV0509.MP4|3-8||45"
   "hero-5|WhatsApp Video 2026-11-03 at 00.47.04.mp4|37.0-41.7||45"
 )
 TMP="$(mktemp -d)"

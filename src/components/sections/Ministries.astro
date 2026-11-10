@@ -10,6 +10,7 @@ import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { toLang, ui } from '../../i18n';
 import Tag from '../ui/Tag.astro';
+import MomentVideo from '../ui/MomentVideo.astro';
 
 interface Props {
   ministries: Ministry[];
@@ -37,13 +38,23 @@ const t = ui[toLang(Astro.currentLocale)];
       {
         ministries.map((item) => (
           <li class="ministry" data-reveal>
-            <Image
-              src={item.photo.src}
-              alt={item.photo.alt}
-              widths={[212, 260, 424, 520]}
-              sizes="(min-width: 1024px) 212px, 260px"
-              class="ministry__img"
-            />
+            {item.moment ? (
+              <MomentVideo
+                src={item.moment.src as `/${string}`}
+                poster={item.photo}
+                width={540}
+                position={item.moment.position}
+                class="ministry__img"
+              />
+            ) : (
+              <Image
+                src={item.photo.src}
+                alt={item.photo.alt}
+                widths={[212, 260, 424, 520]}
+                sizes="(min-width: 1024px) 212px, 260px"
+                class="ministry__img"
+              />
+            )}
             {item.tags && item.tags.length > 0 && (
               <ul class="ministry__tags" aria-label={t.whereAndWhen}>
                 {item.tags.map((tag) => (
