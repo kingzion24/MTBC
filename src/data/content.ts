@@ -33,6 +33,8 @@ import fellowshipGatheringPoster from '../assets/photos/fellowship-gathering-pos
 import destinyFighters from '../assets/photos/destiny-fighters.jpg';
 import womenOfWisdom from '../assets/photos/women-of-wisdom.jpg';
 import daughtersOfFaith from '../assets/photos/daughters-of-faith.jpg';
+import menOfValor from '../assets/photos/men-of-valor.jpg';
+import youthWithPurpose from '../assets/photos/youth-with-purpose.jpg';
 
 /* ------------------------------------------------------------------ */
 /* Localisation helpers                                                */
@@ -204,8 +206,8 @@ const site: Raw<Site> = {
     en: mapAddress,
   },
   mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`,
-  /** Google Maps embed (no API key) shown in the footer. */
-  mapEmbed: `https://maps.google.com/maps?q=${encodeURIComponent('Kisutu Primary School, Dar es Salaam')}&z=16&output=embed`,
+  /** Google Maps embed (no API key) shown in the footer, pinned on the church's coordinates. */
+  mapEmbed: 'https://maps.google.com/maps?q=-6.813791,39.284494&z=17&output=embed',
   phone: { display: '+255 754 079 301', tel: '+255754079301' },
   officeHours: {
     sw: 'Saa za ofisi: saa 3 asubuhi – 11 jioni · Tunafunga Jumatatu',
@@ -256,6 +258,20 @@ const photos = {
     alt: {
       sw: 'Wanawake vijana watatu wakitabasamu wakiwa wamevalia sare zinazofanana.',
       en: 'Three young women in matching outfits smiling together.',
+    },
+  },
+  menOfValor: {
+    src: menOfValor,
+    alt: {
+      sw: 'Wanaume wanne wakizungumza na kucheka pamoja ukumbini baada ya ibada.',
+      en: 'Four men talking and laughing together in the hall after the service.',
+    },
+  },
+  youthWithPurpose: {
+    src: youthWithPurpose,
+    alt: {
+      sw: 'Vijana sita wakitabasamu pamoja kwenye bustani kando ya bahari.',
+      en: 'Six young people smiling together in a garden by the sea.',
     },
   },
   prayerKneeling: {
@@ -373,8 +389,8 @@ const photos = {
   sundayPrayer: {
     src: sundayPrayerPoster,
     alt: {
-      sw: 'Wanaume wawili wakiomba pamoja, vichwa vimeinama, kabla ya ibada ya Jumapili.',
-      en: 'Two men pray together, heads bowed, before the Sunday service.',
+      sw: 'Waumini wakiombeana kwa kukumbatiana mbele ya ukumbi kabla ya ibada ya Jumapili.',
+      en: 'Members embrace as they pray for one another at the front of the hall before the Sunday service.',
     },
   },
 } satisfies Record<string, Raw<Photo>>;
@@ -437,7 +453,7 @@ const events: Raw<EventItem>[] = [
     title: { sw: 'Maombi ya Jumapili', en: 'Sunday Morning Prayer' },
     subtitle: { sw: 'Kabla ya ibada', en: 'Before the service' },
     photo: photos.sundayPrayer,
-    moment: { src: '/videos/moments/sunday-prayer.mp4', position: '50% 35%' },
+    moment: { src: '/videos/moments/sunday-prayer.mp4', position: '50% 40%' },
     category: { sw: 'Maombi', en: 'Prayer' },
     tags: [{ sw: 'Kila Jumapili', en: 'Every Sunday' }],
     when: [{ sw: 'Jumapili · saa 2 – 4 asubuhi', en: 'Sunday · 08:00–10:00' }],
@@ -456,13 +472,12 @@ const photoStrip: Raw<Photo>[] = [
 
 const ministries: Raw<Ministry>[] = [
   {
-    title: { sw: 'Idara ya Wanaume', en: "Men's Ministry" },
+    title: { sw: 'Men of Valor', en: 'Men of Valor' },
     description: {
       sw: 'Wanaume wakikua pamoja katika imani, nyumbani, kazini na kanisani.',
       en: 'Men growing in faith together, at home, at work and in the church.',
     },
-    photo: photos.mensFellowship,
-    moment: { src: '/videos/moments/mens-fellowship.mp4' },
+    photo: photos.menOfValor,
   },
   {
     title: { sw: 'Women of Wisdom', en: 'Women of Wisdom' },
@@ -486,11 +501,10 @@ const ministries: Raw<Ministry>[] = [
       sw: 'Imani, urafiki na kusudi kwa kizazi kijacho.',
       en: 'Faith, friendship and purpose for the next generation.',
     },
-    photo: photos.fellowshipGathering,
-    moment: { src: '/videos/moments/fellowship-gathering.mp4' },
+    photo: photos.youthWithPurpose,
   },
   {
-    title: { sw: 'Idara ya Maombi', en: 'Prayer Ministry' },
+    title: { sw: 'Prayer Warriors', en: 'Prayer Warriors' },
     description: {
       sw: 'Tukisimama pamoja katika maombi kwa ajili ya kanisa, familia zetu na jiji letu.',
       en: 'Standing together in prayer for the church, our families and our city.',

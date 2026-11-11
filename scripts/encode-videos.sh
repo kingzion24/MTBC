@@ -17,7 +17,7 @@ CLIPS=(
   "prayer/ZNV1183.MP4|2|5|540|moments/prayer-bowed"
   "prayer/ZNV1185.MP4|10|5|540|moments/prayer-kneeling"
   "prayer/ZNV1205.MP4|1|5|540|moments/prayer-circle"
-  "prayer/ZNV1207.MP4|5|2.9|540|moments/sunday-prayer"
+  "prayer/sunday-prayer-raw.MP4|3|4|540|moments/sunday-prayer"
   # Ministry-card moments (sources live in src/assets/videos/moments/).
   "moments/ZNV0534.MP4|0|4.4|540|moments/mens-fellowship"
   "moments/ZNV0823.MP4|0|4.4|540|moments/fellowship-gathering"
@@ -51,8 +51,8 @@ HERO=(
   "hero-1|Timeline 12.mov|22.4-26.3,9.9-12.6||45"
   "hero-2|WhatsApp Video 2026-11-03 at 00.45.03.mp4|3.4-6.3,8.3-10.7||45"
   "hero-3|WhatsApp Video 2026-11-03 at 00.46.13.mp4|6.2-11.1||none"
-  "hero-4|ZNV0509.MP4|3-8||45"
-  "hero-5|WhatsApp Video 2026-11-03 at 00.47.04.mp4|37.0-41.7||45"
+  "hero-4|WhatsApp Video 2026-10-26 at 14.36.42.mp4|31.95-34.05,19.95-22.25||none"
+  "hero-5|WhatsApp Video 2026-11-09 at 16.52.37.mp4|3.05-5.65,29.75-32.35||none"
 )
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
