@@ -49,7 +49,7 @@ const en = {
   pause: 'Pause',
   play: 'Play',
   backgroundVideo: 'background video',
-  heroTitle: ['Daily bread', 'for every soul.'],
+  heroTitle: ['The stronghold', "of the Lord's food."],
   heroLeadName: 'Manna Tabernacle Bible Church.',
   heroLead: ['A family gathered around the Word,', 'in the heart of Dar es Salaam.'],
 
@@ -212,7 +212,7 @@ const en = {
   footerPages: { title: 'Explore', note: 'On this site' },
   footerConnect: { title: 'Connect', note: 'Stay in touch' },
   mapTitle: 'Map: Kisutu Primary School Hall, Posta Mpya, Dar es Salaam',
-  tagline: 'Daily bread for every soul...',
+  tagline: "The stronghold of the Lord's food...",
 
   // Pages
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
