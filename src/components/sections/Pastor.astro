@@ -10,7 +10,7 @@ import AudioIcon from '../../assets/icons/icon-audio.svg';
 import PlayLarge from '../../assets/icons/play-large.svg';
 import { Image } from 'astro:assets';
 import type { Pastor } from '../../data/content';
-import { locales, toLang, ui } from '../../i18n';
+import { locales, pageUrl, toLang, ui } from '../../i18n';
 import Button from '../ui/Button.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import { getLatestVideo } from '../../utils/youtube';
@@ -163,7 +163,7 @@ const channels = [
           </span>
           <span class="pastor__message-title">{messageTitle}</span>
         </p>
-        <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>{t.allSermons}</Button>
+        <Button href={pageUrl(lang, '/pastor/')} blockOnMobile>{t.allSermons}</Button>
       </div>
     </div>
   </div>

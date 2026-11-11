@@ -1,11 +1,16 @@
 import type { APIRoute } from 'astro';
+import { getContent } from '../data/content';
 import { languages, pageUrl, type Lang } from '../i18n';
+import { getSermonLibrary } from '../utils/sermons';
 
 // Every public page (language-neutral path). Add new pages here.
-const pages = ['/', '/events/', '/news/'] as const;
+const staticPages: `/${string}`[] = ['/', '/events/', '/news/', '/pastor/'];
 const langs = Object.keys(languages) as Lang[];
 
-export const GET: APIRoute = ({ site }) => {
+export const GET: APIRoute = async ({ site }) => {
+  // One page per teaching series in the pastor's sermon library.
+  const library = await getSermonLibrary(getContent('sw').pastor.youtube.channelId);
+  const pages = [...staticPages, ...library.series.map((series): `/${string}` => `/pastor/${series.slug}/`)];
   const abs = (lang: Lang, path: `/${string}`) => new URL(pageUrl(lang, path), site).href;
   const urls = pages
     .flatMap((path) =>

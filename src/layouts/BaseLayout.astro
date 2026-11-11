@@ -108,7 +108,9 @@ const visitHref = pageUrl(lang, '/#visit');
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
     <link rel="alternate" hreflang="x-default" href={alternates[0]?.href} />
-    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    {/* "?v=2" makes browsers drop their cached copy of the old "M" icon; bump it if the icon changes again. */}
+    <link rel="icon" href={`${withBase('/favicon.ico')}?v=2`} sizes="48x48" />
+    <link rel="icon" href={`${withBase('/favicon.svg')}?v=2`} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
     <link rel="sitemap" href={withBase('/sitemap.xml')} />
 

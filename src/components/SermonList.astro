@@ -1,0 +1,116 @@
+---
+/**
+ * A grid of sermons. Each one links to YouTube; with JS, VideoDialog (on the same page) plays
+ * it in place instead. Thumbnails come straight from YouTube and load lazily.
+ */
+import type { Sermon } from '../utils/sermons';
+import { locales, toLang, ui } from '../i18n';
+
+interface Props {
+  sermons: Sermon[];
+  /** Number the list and show each sermon's part within its series. */
+  ordered?: boolean;
+}
+
+const { sermons, ordered = false } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const dateFormat = new Intl.DateTimeFormat(locales[lang].intl, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'Africa/Dar_es_Salaam',
+});
+const List = ordered ? 'ol' : 'ul';
+---
+
+<List class="sermons" role="list">
+  {
+    sermons.map((sermon) => (
+      <li>
+        <a class="sermon" href={sermon.url} target="_blank" rel="noopener" data-yt-id={sermon.id} data-yt-title={sermon.title}>
+          <span class="sermon__thumb">
+            <img src={sermon.thumbnail} alt="" width="320" height="180" loading="lazy" decoding="async" />
+          </span>
+          <span class="sermon__text">
+            <span class="sermon__meta">
+              {ordered && sermon.part !== undefined && (
+                <>
+                  {t.part} {sermon.part} ·{' '}
+                </>
+              )}
+              <time datetime={sermon.published}>{dateFormat.format(new Date(sermon.published))}</time>
+            </span>
+            <span class="sermon__title">{sermon.title}</span>
+          </span>
+          <span class="visually-hidden"> {t.opensInNewTab}</span>
+        </a>
+      </li>
+    ))
+  }
+</List>
+
+<style>
+  .sermons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+  }
+
+  @media (min-width: 640px) {
+    .sermons {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 28px 24px;
+    }
+  }
+
+  .sermon {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sermon__thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--night);
+  }
+
+  .sermon__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .sermon__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sermon__meta {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 15px;
+    line-height: normal;
+    letter-spacing: 0.04em;
+  }
+
+  .sermon__title {
+    font-family: var(--serif-jp);
+    font-size: 14px;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+  }
+
+  @media (hover: hover) {
+    .sermon:hover .sermon__thumb img {
+      transform: scale(1.04);
+    }
+  }
+</style>

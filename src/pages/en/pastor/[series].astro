@@ -1,0 +1,18 @@
+---
+import SeriesPage from '../../../components/pages/SeriesPage.astro';
+import { getContent } from '../../../data/content';
+import { getSermonLibrary, type Series } from '../../../utils/sermons';
+
+export async function getStaticPaths() {
+  const library = await getSermonLibrary(getContent('sw').pastor.youtube.channelId);
+  return library.series.map((series) => ({ params: { series: series.slug }, props: { series } }));
+}
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+---
+
+<SeriesPage series={series} />

@@ -1,0 +1,422 @@
+---
+/**
+ * The pastor in detail: who he is, where to follow him, and his whole sermon library
+ * (teaching series, seminars, Sunday services, single messages) read from YouTube at build.
+ */
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import SermonList from '../SermonList.astro';
+import VideoDialog from '../VideoDialog.astro';
+import { getContent } from '../../data/content';
+import { pageUrl, toLang, ui } from '../../i18n';
+import { getSermonLibrary } from '../../utils/sermons';
+
+const lang = toLang(Astro.currentLocale);
+const t = ui[lang];
+const { pastor } = getContent(lang);
+const library = await getSermonLibrary(pastor.youtube.channelId);
+
+const year = (iso: string) => iso.slice(0, 4);
+const span = (from: string, to: string) => (year(from) === year(to) ? year(from) : `${year(from)} – ${year(to)}`);
+
+const shelves = [
+  { id: 'series', title: t.seriesTitle, show: library.series.length > 0 },
+  { id: 'seminars', title: t.seminarsTitle, show: library.seminars.length > 0 },
+  { id: 'services', title: t.servicesTitle, show: library.services.length > 0 },
+  { id: 'singles', title: t.singlesTitle, show: library.singles.length > 0 },
+].filter((shelf) => shelf.show);
+
+const yearShelves = [
+  { id: 'seminars', title: t.seminarsTitle, label: t.seminarsLabel, groups: library.seminars },
+  { id: 'services', title: t.servicesTitle, label: t.servicesLabel, groups: library.services },
+  { id: 'singles', title: t.singlesTitle, label: t.singlesLabel, groups: library.singles },
+].filter((shelf) => shelf.groups.length > 0);
+
+const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/'), Astro.site).href }];
+---
+
+<BaseLayout title={t.pastorPageTitle} description={t.pastorPageDescription} solidHeader breadcrumbs={breadcrumbs}>
+  <div class="about">
+    <div class="about__inner container">
+      <div class="about__portrait">
+        <Image
+          src={pastor.portrait.src}
+          alt={pastor.portrait.alt}
+          widths={[342, 480, 684, 960]}
+          sizes="(min-width: 1024px) 420px, 100vw"
+          loading="eager"
+        />
+      </div>
+      <div class="about__text">
+        <SectionHeading id="page-title" title={pastor.name} label={pastor.title} layout="stacked" level="h1" />
+        <p class="about__bio">{pastor.bio}</p>
+        <div class="about__links">
+          <Button href={pastor.youtube.url} target="_blank" rel="noopener" blockOnMobile>
+            {t.watchOnYoutube}<span class="visually-hidden"> {t.opensInNewTab}</span>
+          </Button>
+          <Button href={pastor.instagram.url} target="_blank" rel="noopener" blockOnMobile>
+            Instagram<span class="visually-hidden"> {t.opensInNewTab}</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="library container">
+    <header class="library__head">
+      <SectionHeading id="library-title" title={t.sermonsTitle} label={t.sermonsLabel} />
+      <p class="library__lead">{t.sermonsLead}</p>
+      {
+        library.total > 0 && (
+          <p class="library__stats">
+            <span>
+              <strong>{library.total}</strong> {t.messagesCount}
+            </span>
+            <span>
+              <strong>{library.series.length}</strong> {t.seriesCount}
+            </span>
+          </p>
+        )
+      }
+      {
+        shelves.length > 1 && (
+          <nav class="library__nav" aria-label={t.libraryNav}>
+            <ul role="list">
+              {shelves.map((shelf) => (
+                <li>
+                  <a href={`#${shelf.id}`}>{shelf.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </header>
+
+    {
+      library.series.length > 0 && (
+        <section id="series" class="shelf" aria-labelledby="series-title">
+          <SectionHeading id="series-title" title={t.seriesTitle} label={t.seriesLabel} />
+          <p class="library__lead">{t.seriesLead}</p>
+          <ul class="series" role="list">
+            {library.series.map((item) => (
+              <li>
+                <a class="series__card" href={pageUrl(lang, `/pastor/${item.slug}/`)}>
+                  <span class="series__thumb">
+                    <img src={item.sermons[0]?.thumbnail} alt="" width="320" height="180" loading="lazy" decoding="async" />
+                  </span>
+                  <span class="series__meta">
+                    {item.sermons.length} {t.parts} · {span(item.from, item.to)}
+                  </span>
+                  <span class="series__title">{item.title}</span>
+                  <span class="series__open">
+                    {t.openSeries}
+                    <span class="series__line" aria-hidden="true" />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      yearShelves.map((shelf) => (
+        <section id={shelf.id} class="shelf" aria-labelledby={`${shelf.id}-title`}>
+          <SectionHeading id={`${shelf.id}-title`} title={shelf.title} label={shelf.label} />
+          <div class="years">
+            {shelf.groups.map((group, i) => (
+              <details class="year" open={i === 0}>
+                <summary>
+                  <span class="year__name">{group.year}</span>
+                  <span class="year__count">
+                    {group.sermons.length} {t.messagesCount}
+                  </span>
+                </summary>
+                <SermonList sermons={group.sermons} />
+              </details>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <VideoDialog />
+</BaseLayout>
+
+<style>
+  .about {
+    background: var(--sand);
+  }
+
+  .about__inner {
+    display: grid;
+    gap: 32px;
+    padding-block: 64px;
+  }
+
+  .about__portrait {
+    aspect-ratio: 342 / 420;
+    overflow: hidden;
+    background: var(--line);
+  }
+
+  .about__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
+  }
+
+  .about__text {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .about__bio,
+  .library__lead {
+    max-width: 36em;
+    font-family: var(--serif-jp);
+    font-size: clamp(0.875rem, 0.8286rem + 0.1905vw, 1rem); /* 14 → 16 */
+    line-height: 2.2;
+    letter-spacing: 0.04em;
+  }
+
+  .about__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .library {
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+    padding-block: 72px 96px;
+  }
+
+  .library__head,
+  .shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Anchor jumps land below the fixed header. */
+  .shelf {
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+
+  .library__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 32px;
+    color: var(--soft);
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .library__stats strong {
+    margin-right: 6px;
+    color: var(--ink);
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+  }
+
+  .library__nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .library__nav a {
+    display: block;
+    padding: 10px 16px;
+    border: 1px solid var(--line);
+    font-size: 12px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+    transition: border-color 0.3s var(--ease-out);
+  }
+
+  .series {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @media (min-width: 640px) {
+    .series {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
+    }
+  }
+
+  .series > li {
+    display: flex;
+  }
+
+  .series__card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 20px;
+    border: 1px solid var(--line);
+    background: var(--sand);
+    transition: border-color 0.3s var(--ease-out);
+  }
+
+  .series__thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 8px;
+    overflow: hidden;
+    background: var(--night);
+  }
+
+  .series__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .series__meta,
+  .series__title,
+  .series__open {
+    margin-inline: clamp(12px, 3vw, 20px);
+  }
+
+  .series__meta {
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 15px;
+    line-height: normal;
+    letter-spacing: 0.04em;
+  }
+
+  .series__title {
+    flex: 1;
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem); /* 13 → 15 */
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    overflow-wrap: break-word;
+  }
+
+  .series__open {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .series__line {
+    width: 18px;
+    height: 1px;
+    background: var(--ink);
+    transform-origin: left center;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .years {
+    border-top: 1px solid var(--line);
+  }
+
+  .year {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .year summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .year summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .year__name {
+    font-family: var(--serif-jp);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: normal;
+    letter-spacing: 0.1em;
+  }
+
+  .year__name::after {
+    content: '+';
+    margin-left: 12px;
+    color: var(--gold-text);
+    font-family: var(--serif-en);
+  }
+
+  .year[open] .year__name::after {
+    content: '–';
+  }
+
+  .year__count {
+    color: var(--soft);
+    font-size: 11px;
+    line-height: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .year > :global(.sermons) {
+    padding-block: 8px 40px;
+  }
+
+  @media (hover: hover) {
+    .library__nav a:hover,
+    .series__card:hover {
+      border-color: var(--ink);
+    }
+
+    .series__card:hover .series__line {
+      transform: scaleX(1.5);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .about__inner {
+      grid-template-columns: 420px 1fr;
+      align-items: center;
+      gap: 80px;
+      padding-block: 96px;
+    }
+
+    .about__text {
+      gap: 32px;
+    }
+
+    .library {
+      gap: 112px;
+      padding-block: 112px 160px;
+    }
+
+    .library__head,
+    .shelf {
+      gap: 32px;
+    }
+  }
+</style>
