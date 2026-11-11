@@ -40,19 +40,34 @@ const breadcrumbs = [
   breadcrumbs={breadcrumbs}
 >
   <div class="page container">
-    <a class="page__back" href={`${pastorUrl}#series`}>
+    <a class="page__back" data-reveal href={`${pastorUrl}#series`}>
       <span class="page__back-line" aria-hidden="true"></span>
       {t.allSeries}
     </a>
-    <SectionHeading id="page-title" title={series.title} label={label} layout="stacked" level="h1" />
-    <p class="page__lead">{pastor.name}. {t.seriesPageLead}</p>
-    <SermonList sermons={series.sermons} ordered />
+    <div class="page__head" data-reveal>
+      <SectionHeading id="page-title" title={series.title} label={label} layout="stacked" level="h1" />
+      <p class="page__lead">{pastor.name}. {t.seriesPageLead}</p>
+    </div>
+    <SermonList sermons={series.sermons} ordered reveal transitionName={`st-${series.slug}`} />
   </div>
 
   <VideoDialog />
 </BaseLayout>
 
 <style>
+  /* Pairs with the same rule on the pastor page: the series thumbnail glides between the two. */
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+      navigation: auto;
+    }
+  }
+
+  .page__head {
+    display: flex;
+    flex-direction: column;
+    gap: inherit;
+  }
+
   .page {
     display: flex;
     flex-direction: column;

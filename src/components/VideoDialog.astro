@@ -31,6 +31,13 @@ const t = ui[toLang(Astro.currentLocale)];
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
       iframe.allowFullscreen = true;
       frame.replaceChildren(iframe);
+
+      // Grow from the thumbnail that was clicked. The dialog sits centred, so the origin is
+      // the thumbnail's offset from the middle of the screen.
+      const from = (link.querySelector('img') ?? link).getBoundingClientRect();
+      const dx = from.left + from.width / 2 - window.innerWidth / 2;
+      const dy = from.top + from.height / 2 - window.innerHeight / 2;
+      dialog.style.transformOrigin = `calc(50% + ${Math.round(dx)}px) calc(50% + ${Math.round(dy)}px)`;
       dialog.showModal();
     });
 
@@ -55,10 +62,46 @@ const t = ui[toLang(Astro.currentLocale)];
     background: transparent;
     color: var(--paper);
     overflow: visible;
+
+    /* Closed state, which is also what it fades back to on close. */
+    opacity: 0;
+    transform: scale(0.86);
+    transition:
+      opacity 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out),
+      overlay 0.2s allow-discrete,
+      display 0.2s allow-discrete;
+  }
+
+  .vdialog[open] {
+    opacity: 1;
+    transform: none;
+    transition-duration: 0.45s;
   }
 
   .vdialog::backdrop {
     background: rgb(20 18 15 / 0.88);
+    opacity: 0;
+    transition:
+      opacity 0.2s var(--ease-out),
+      overlay 0.2s allow-discrete,
+      display 0.2s allow-discrete;
+  }
+
+  .vdialog[open]::backdrop {
+    opacity: 1;
+    transition-duration: 0.45s;
+  }
+
+  @starting-style {
+    .vdialog[open] {
+      opacity: 0;
+      transform: scale(0.86);
+    }
+
+    .vdialog[open]::backdrop {
+      opacity: 0;
+    }
   }
 
   .vdialog__bar {

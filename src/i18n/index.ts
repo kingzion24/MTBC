@@ -271,7 +271,7 @@ const sw: UI = {
   pause: 'Simamisha',
   play: 'Cheza',
   backgroundVideo: 'video ya nyuma',
-  heroTitle: ['Mkate wa kila siku', 'kwa kila nafsi.'],
+  heroTitle: ['Hema ya chakula', 'cha Bwana.'],
   heroLeadName: 'Manna Tabernacle Bible Church.',
   heroLead: ['Familia inayosimama ndani ya Neno,', 'katikati ya jiji la Dar es Salaam.'],
 
@@ -420,7 +420,7 @@ const sw: UI = {
   footerPages: { title: 'Gundua', note: 'Katika tovuti hii' },
   footerConnect: { title: 'Ungana nasi', note: 'Tuwasiliane' },
   mapTitle: 'Ramani: Ukumbi wa Shule ya Msingi Kisutu, Posta Mpya, Dar es Salaam',
-  tagline: 'Mkate wa kila siku kwa kila nafsi...',
+  tagline: 'Hema ya chakula cha Bwana...',
 
   homeTitle: 'Manna Tabernacle Bible Church (MTBC) — Dar es Salaam',
   homeDescription:

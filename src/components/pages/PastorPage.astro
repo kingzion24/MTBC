@@ -40,7 +40,7 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
 <BaseLayout title={t.pastorPageTitle} description={t.pastorPageDescription} solidHeader breadcrumbs={breadcrumbs}>
   <div class="about">
     <div class="about__inner container">
-      <div class="about__portrait">
+      <div class="about__portrait" data-reveal>
         <Image
           src={pastor.portrait.src}
           alt={pastor.portrait.alt}
@@ -49,7 +49,7 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
           loading="eager"
         />
       </div>
-      <div class="about__text">
+      <div class="about__text" data-reveal>
         <SectionHeading id="page-title" title={pastor.name} label={pastor.title} layout="stacked" level="h1" />
         <p class="about__bio">{pastor.bio}</p>
         <div class="about__links">
@@ -65,7 +65,7 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
   </div>
 
   <div class="library container">
-    <header class="library__head">
+    <header class="library__head" data-reveal>
       <SectionHeading id="library-title" title={t.sermonsTitle} label={t.sermonsLabel} />
       <p class="library__lead">{t.sermonsLead}</p>
       {
@@ -98,13 +98,15 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
     {
       library.series.length > 0 && (
         <section id="series" class="shelf" aria-labelledby="series-title">
-          <SectionHeading id="series-title" title={t.seriesTitle} label={t.seriesLabel} />
-          <p class="library__lead">{t.seriesLead}</p>
+          <div class="shelf__head" data-reveal>
+            <SectionHeading id="series-title" title={t.seriesTitle} label={t.seriesLabel} />
+            <p class="library__lead">{t.seriesLead}</p>
+          </div>
           <ul class="series" role="list">
-            {library.series.map((item) => (
-              <li>
+            {library.series.map((item, i) => (
+              <li data-reveal style={`--reveal-delay:${(i % 4) * 80}ms`}>
                 <a class="series__card" href={pageUrl(lang, `/pastor/${item.slug}/`)}>
-                  <span class="series__thumb">
+                  <span class="series__thumb" style={`view-transition-name:st-${item.slug}`}>
                     <img src={item.sermons[0]?.thumbnail} alt="" width="320" height="180" loading="lazy" decoding="async" />
                   </span>
                   <span class="series__meta">
@@ -126,8 +128,10 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
     {
       yearShelves.map((shelf) => (
         <section id={shelf.id} class="shelf" aria-labelledby={`${shelf.id}-title`}>
-          <SectionHeading id={`${shelf.id}-title`} title={shelf.title} label={shelf.label} />
-          <div class="years">
+          <div class="shelf__head" data-reveal>
+            <SectionHeading id={`${shelf.id}-title`} title={shelf.title} label={shelf.label} />
+          </div>
+          <div class="years" data-reveal>
             {shelf.groups.map((group, i) => (
               <details class="year" open={i === 0}>
                 <summary>
@@ -149,6 +153,25 @@ const breadcrumbs = [{ name: pastor.name, url: new URL(pageUrl(lang, '/pastor/')
 </BaseLayout>
 
 <style>
+  /* Moving between this page and a series page cross-fades, and the series thumbnail glides
+     into place (browsers without view transitions just load the page). */
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+      navigation: auto;
+    }
+  }
+
+  .shelf__head {
+    display: flex;
+    flex-direction: column;
+    gap: inherit;
+  }
+
+  /* Cards in a row arrive one after another. */
+  .series > li[data-reveal] {
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
   .about {
     background: var(--sand);
   }

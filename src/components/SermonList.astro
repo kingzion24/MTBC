@@ -10,9 +10,13 @@ interface Props {
   sermons: Sermon[];
   /** Number the list and show each sermon's part within its series. */
   ordered?: boolean;
+  /** Fade each sermon up as it scrolls into view. */
+  reveal?: boolean;
+  /** View-transition name for the first thumbnail. */
+  transitionName?: string;
 }
 
-const { sermons, ordered = false } = Astro.props;
+const { sermons, ordered = false, reveal = false, transitionName } = Astro.props;
 const lang = toLang(Astro.currentLocale);
 const t = ui[lang];
 const dateFormat = new Intl.DateTimeFormat(locales[lang].intl, {
@@ -26,10 +30,10 @@ const List = ordered ? 'ol' : 'ul';
 
 <List class="sermons" role="list">
   {
-    sermons.map((sermon) => (
-      <li>
+    sermons.map((sermon, i) => (
+      <li data-reveal={reveal ? '' : undefined} style={reveal ? `--reveal-delay:${(i % 4) * 80}ms` : undefined}>
         <a class="sermon" href={sermon.url} target="_blank" rel="noopener" data-yt-id={sermon.id} data-yt-title={sermon.title}>
-          <span class="sermon__thumb">
+          <span class="sermon__thumb" style={i === 0 && transitionName ? `view-transition-name:${transitionName}` : undefined}>
             <img src={sermon.thumbnail} alt="" width="320" height="180" loading="lazy" decoding="async" />
           </span>
           <span class="sermon__text">
@@ -62,6 +66,10 @@ const List = ordered ? 'ol' : 'ul';
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 28px 24px;
     }
+  }
+
+  .sermons > li[data-reveal] {
+    transition-delay: var(--reveal-delay, 0ms);
   }
 
   .sermon {
