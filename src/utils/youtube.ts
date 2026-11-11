@@ -18,24 +18,6 @@ const decode = (s: string) =>
     .replaceAll('&lt;', '<')
     .replaceAll('&gt;', '>');
 
-/** "LIVE: SOMO : UINJILISTI MMOJA_SEHEMU YA SITA." → "Somo: Uinjilisti mmoja — Sehemu ya sita" */
-export const tidyTitle = (raw: string): string => {
-  let t = decode(raw)
-    .replace(/^\s*live\s*:\s*/i, '')
-    .replace(/\s*_\s*/g, ' — ')
-    .replace(/\s+:\s*/g, ': ')
-    .replace(/\s+/g, ' ')
-    .replace(/[.\s]+$/, '')
-    .trim();
-  // Shouting titles read better in sentence case; mixed-case titles are left as typed.
-  if (t === t.toUpperCase()) {
-    t = t
-      .toLowerCase()
-      .replace(/(^|: |— )(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toUpperCase());
-  }
-  return t;
-};
-
 const pick = (xml: string, pattern: RegExp) => pattern.exec(xml)?.[1];
 
 const thumbnailFor = async (id: string) => {
@@ -66,7 +48,8 @@ export const getLatestVideo = (channelId: string): Promise<LatestVideo | null> =
       if (!id || !title || !published) throw new Error('no entries');
       return {
         id,
-        title: tidyTitle(title),
+        // Shown exactly as it is written on YouTube.
+        title: decode(title).trim(),
         published,
         url: `https://www.youtube.com/watch?v=${id}`,
         thumbnail: await thumbnailFor(id),

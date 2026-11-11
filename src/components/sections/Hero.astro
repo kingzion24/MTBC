@@ -1,21 +1,21 @@
 ---
 /**
- * Figma: desktop 10:22, mobile 18:37. The Figma photo is replaced by five short vertical clips:
- * - landscape screens: three panels side by side; when a panel's clip ends it moves on to a clip
- *   that isn't showing in another panel, so the panels never play the same video at once;
- * - portrait screens: one panel that cycles through all five.
+ * Figma: desktop 10:22, mobile 18:37. The Figma photo is replaced by short vertical clips
+ * (every hero-N.mp4 that has a hero-N-poster.jpg):
+ * - landscape screens: three panels side by side; as a panel's clip ends it cross-fades to a clip
+ *   that isn't showing, loading or fading out in another panel, so the panels never play the
+ *   same video at once;
+ * - portrait screens: one panel that cycles through all of them.
+ * Each panel holds two stacked videos: the next clip loads in the hidden one and fades in over
+ * the last moments of the current one, so there is no blank frame between clips.
  * Posters are shown without JS, with reduced motion, or with Data Saver on.
  * Clips are encoded by scripts/encode-videos.sh into public/videos/hero/.
  *
  * The clips are pinned (sticky) for the whole wrapper: the headline and then the slotted
  * content (the Intro) scroll over them, like a film behind changing words.
  */
+import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
-import poster1 from '../../assets/photos/hero-1-poster.jpg';
-import poster2 from '../../assets/photos/hero-2-poster.jpg';
-import poster3 from '../../assets/photos/hero-3-poster.jpg';
-import poster4 from '../../assets/photos/hero-4-poster.jpg';
-import poster5 from '../../assets/photos/hero-5-poster.jpg';
 import Button from '../ui/Button.astro';
 import { toLang, ui } from '../../i18n';
 import { withBase } from '../../utils/url';
@@ -29,11 +29,18 @@ const { serviceTime, visitHref } = Astro.props;
 const t = ui[toLang(Astro.currentLocale)];
 
 const PANELS = 3;
+const posters = import.meta.glob<ImageMetadata>('../../assets/photos/hero-*-poster.jpg', {
+  eager: true,
+  import: 'default',
+});
+const numberOf = (path: string) => Number(path.match(/hero-(\d+)-poster/)?.[1]);
 const clips = await Promise.all(
-  [poster1, poster2, poster3, poster4, poster5].map(async (poster, i) => ({
-    src: withBase(`/videos/hero/hero-${i + 1}.mp4`),
-    poster: (await getImage({ src: poster, width: 720, format: 'webp', quality: 70 })).src,
-  })),
+  Object.entries(posters)
+    .sort(([a], [b]) => numberOf(a) - numberOf(b))
+    .map(async ([path, poster]) => ({
+      src: withBase(`/videos/hero/hero-${numberOf(path)}.mp4`),
+      poster: (await getImage({ src: poster, width: 720, format: 'webp', quality: 70 })).src,
+    })),
 );
 ---
 
@@ -41,19 +48,29 @@ const clips = await Promise.all(
   <div class="hero__media" data-hero-media data-clips={JSON.stringify(clips)}>
     {
       clips.slice(0, PANELS).map((clip, i) => (
-        <video
-          class="hero__clip"
-          src={clip.src}
-          poster={clip.poster}
-          data-clip={i}
-          muted
-          playsinline
-          preload="none"
-          disablepictureinpicture
-          disableremoteplayback
-          aria-hidden="true"
-          data-active={i === 0 ? '' : undefined}
-        />
+        <div class="hero__panel" data-hero-panel data-active={i === 0 ? '' : undefined}>
+          <video
+            class="hero__clip"
+            src={clip.src}
+            poster={clip.poster}
+            muted
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            disableremoteplayback
+            aria-hidden="true"
+            data-front
+          />
+          <video
+            class="hero__clip"
+            muted
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            disableremoteplayback
+            aria-hidden="true"
+          />
+        </div>
       ))
     }
   </div>
@@ -102,6 +119,25 @@ const clips = await Promise.all(
     poster: string;
   }
 
+  /** One slot on screen: two stacked videos that take turns being in front. */
+  interface Panel {
+    front: HTMLVideoElement;
+    back: HTMLVideoElement;
+    /** Index of the clip in front. */
+    clip: number;
+    /** Index of the clip loading in `back`, if any. */
+    next: number | null;
+    /** Index of the clip still fading out underneath, if any. */
+    leaving: number | null;
+    /** The front clip has finished or failed: switch as soon as `back` can play. */
+    waiting: boolean;
+  }
+
+  /** Cross-fade length in seconds; keep in step with the .hero__clip transition. */
+  const FADE = 0.9;
+  /** Start loading the next clip this many seconds before the current one ends. */
+  const PRELOAD = 3;
+
   const media = document.querySelector<HTMLElement>('[data-hero-media]');
   const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
   const label = toggle?.querySelector('[data-hero-toggle-label]');
@@ -110,14 +146,19 @@ const clips = await Promise.all(
 
   if (media && toggle && !reduceMotion.matches && !saveData) {
     const library = JSON.parse(media.dataset['clips'] ?? '[]') as Clip[];
-    const panels = [...media.querySelectorAll<HTMLVideoElement>('video')];
+    const panels = [...media.querySelectorAll<HTMLElement>('[data-hero-panel]')].flatMap((el, i): Panel[] => {
+      const [front, back] = el.querySelectorAll('video');
+      return front && back ? [{ front, back, clip: i, next: null, leaving: null, waiting: false }] : [];
+    });
+    /** Clips that failed to load or decode: never picked again. */
+    const broken = new Set<number>();
     const triptych = window.matchMedia('(min-aspect-ratio: 6/5)');
     let paused = false;
     let visible = true;
     // Don't compete with fonts and images for the first paint: start the clips after `load`.
     let ready = document.readyState === 'complete';
 
-    const clipOf = (panel: HTMLVideoElement) => Number(panel.dataset['clip']);
+    const canRun = () => !paused && visible && ready;
     // Portrait shows only the first panel; landscape shows all three.
     const visiblePanels = () => (triptych.matches ? panels : panels.slice(0, 1));
 
@@ -127,61 +168,159 @@ const clips = await Promise.all(
       });
     };
 
-    const load = (panel: HTMLVideoElement, index: number) => {
-      const clip = library[index];
-      if (!clip) return;
-      panel.dataset['clip'] = String(index);
-      panel.poster = clip.poster;
-      panel.src = clip.src;
+    const unload = (video: HTMLVideoElement) => {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
     };
 
-    /** Next clip after `from` that no other visible panel is showing. */
-    const nextFor = (panel: HTMLVideoElement) => {
-      const taken = new Set(visiblePanels().filter((p) => p !== panel).map(clipOf));
-      for (let step = 1; step <= library.length; step++) {
-        const candidate = (clipOf(panel) + step) % library.length;
-        if (!taken.has(candidate)) return candidate;
+    /** Clips the other visible panels are showing, loading or still fading out. */
+    const reserved = (except: Panel) => {
+      const taken = new Set<number>();
+      for (const panel of visiblePanels()) {
+        if (panel === except) continue;
+        for (const clip of [panel.clip, panel.next, panel.leaving]) if (clip !== null) taken.add(clip);
       }
-      return clipOf(panel);
+      return taken;
+    };
+
+    /** Next clip after the panel's own that no other visible panel has claimed. */
+    const pick = (panel: Panel) => {
+      const taken = reserved(panel);
+      for (let step = 1; step < library.length; step++) {
+        const candidate = (panel.clip + step) % library.length;
+        if (!taken.has(candidate) && !broken.has(candidate)) return candidate;
+      }
+      return null;
+    };
+
+    /** Start loading the panel's next clip in its hidden video. */
+    const prepare = (panel: Panel) => {
+      // While the old clip is still fading out, `back` is busy; the swap's cleanup calls again if needed.
+      if (panel.next !== null || panel.leaving !== null) return;
+      const index = pick(panel);
+      const clip = index === null ? undefined : library[index];
+      if (index === null || !clip) return;
+      panel.next = index;
+      panel.back.poster = clip.poster;
+      panel.back.preload = 'auto';
+      panel.back.src = clip.src;
+      panel.back.load();
+    };
+
+    /** Bring the loaded clip to the front and fade it in over the old one. */
+    const swap = (panel: Panel) => {
+      if (panel.next === null || panel.back.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) return;
+      const incoming = panel.back;
+      const outgoing = panel.front;
+      panel.front = incoming;
+      panel.back = outgoing;
+      panel.leaving = panel.clip;
+      panel.clip = panel.next;
+      panel.next = null;
+      panel.waiting = false;
+
+      // The old clip stays fully opaque underneath while the new one fades in on top.
+      outgoing.dataset['leaving'] = '';
+      delete outgoing.dataset['front'];
+      incoming.dataset['front'] = '';
+      if (canRun()) play(incoming);
+
+      window.setTimeout(() => {
+        delete outgoing.dataset['leaving'];
+        unload(outgoing);
+        panel.leaving = null;
+        if (panel.waiting) advance(panel);
+      }, FADE * 1000 + 100);
+    };
+
+    /** The front clip is over (or broken): move on now, or as soon as the next clip can play. */
+    const advance = (panel: Panel) => {
+      panel.waiting = true;
+      prepare(panel);
+      swap(panel);
+      // Some phones only fetch a video once it is asked to play.
+      if (panel.waiting && panel.next !== null && canRun()) play(panel.back);
     };
 
     /** After switching layouts, make sure no two visible panels share a clip. */
     const dedupe = () => {
       const seen = new Set<number>();
       for (const panel of visiblePanels()) {
-        if (seen.has(clipOf(panel))) load(panel, nextFor(panel));
-        seen.add(clipOf(panel));
+        if (panel.next !== null && seen.has(panel.next)) {
+          panel.next = null;
+          unload(panel.back);
+        }
+        if (seen.has(panel.clip)) {
+          const index = pick(panel);
+          const clip = index === null ? undefined : library[index];
+          if (index !== null && clip) {
+            panel.clip = index;
+            panel.waiting = false;
+            panel.front.poster = clip.poster;
+            panel.front.src = clip.src;
+          }
+        }
+        for (const clip of [panel.clip, panel.next, panel.leaving]) if (clip !== null) seen.add(clip);
+      }
+    };
+
+    const stop = () => {
+      for (const panel of panels) {
+        panel.front.pause();
+        panel.back.pause();
       }
     };
 
     const start = () => {
-      if (paused || !visible || !ready) return;
+      if (!canRun()) return;
       dedupe();
-      panels.forEach((panel, i) => {
-        if (visiblePanels().includes(panel)) play(panel);
-        else if (i > 0) panel.pause();
-      });
+      const showing = visiblePanels();
+      for (const panel of panels) {
+        if (!showing.includes(panel)) {
+          panel.front.pause();
+          panel.back.pause();
+        } else if (panel.waiting) advance(panel);
+        else play(panel.front);
+      }
     };
 
     for (const panel of panels) {
-      // If a clip can't be decoded, skip to the next one (the poster shows meanwhile).
-      let failures = 0;
-      panel.addEventListener('error', () => {
-        if (!panel.getAttribute('src')) return;
-        if (++failures >= library.length) {
-          // Nothing decodes here: keep the poster and stop trying.
-          panel.removeAttribute('src');
-          panel.load();
-          return;
-        }
-        load(panel, nextFor(panel));
-        if (!paused && visible && ready) play(panel);
-      });
+      for (const video of [panel.front, panel.back]) {
+        video.addEventListener('timeupdate', () => {
+          if (video !== panel.front || !Number.isFinite(video.duration)) return;
+          const left = video.duration - video.currentTime;
+          if (left <= PRELOAD) prepare(panel);
+          if (left <= FADE) swap(panel);
+        });
 
-      panel.addEventListener('ended', () => {
-        load(panel, nextFor(panel));
-        if (!paused && visible) play(panel);
-      });
+        video.addEventListener('ended', () => {
+          // If the next clip isn't ready yet, the last frame holds until it is.
+          if (video === panel.front) advance(panel);
+        });
+
+        for (const type of ['canplay', 'playing']) {
+          video.addEventListener(type, () => {
+            if (video === panel.back && panel.waiting) swap(panel);
+          });
+        }
+
+        // If a clip can't be loaded or decoded, drop it and move on (the poster or last frame shows meanwhile).
+        video.addEventListener('error', () => {
+          if (!video.getAttribute('src')) return;
+          if (video === panel.back && panel.leaving === null) {
+            if (panel.next !== null) broken.add(panel.next);
+            panel.next = null;
+            unload(video);
+            if (panel.waiting) advance(panel);
+            else prepare(panel);
+          } else if (video === panel.front) {
+            broken.add(panel.clip);
+            if (canRun()) advance(panel);
+            else panel.waiting = true;
+          }
+        });
+      }
     }
 
     toggle.hidden = false;
@@ -189,7 +328,7 @@ const clips = await Promise.all(
       paused = !paused;
       toggle.setAttribute('aria-pressed', String(paused));
       if (label) label.textContent = (paused ? toggle.dataset['labelPlay'] : toggle.dataset['labelPause']) ?? '';
-      if (paused) for (const panel of panels) panel.pause();
+      if (paused) stop();
       else start();
     });
 
@@ -201,7 +340,7 @@ const clips = await Promise.all(
       new IntersectionObserver(([entry]) => {
         visible = entry?.isIntersecting ?? true;
         if (visible) start();
-        else for (const panel of panels) panel.pause();
+        else stop();
       }).observe(wrap);
     }
 
@@ -274,7 +413,21 @@ const clips = await Promise.all(
     background: linear-gradient(180deg, rgb(20 18 15 / 0) 0, rgb(20 18 15 / 0.62) min(40vh, 320px));
   }
 
-  /* Portrait: clips stacked, the active one visible. */
+  /* Portrait: panels stacked, only the first one visible. */
+  .hero__panel {
+    position: absolute;
+    inset: 0;
+    /* Keeps the clips' z-index below the scrim. */
+    isolation: isolate;
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  .hero__panel[data-active] {
+    opacity: 1;
+  }
+
+  /* Two clips per panel: the front one fades in over the one that is leaving. */
   .hero__clip {
     position: absolute;
     inset: 0;
@@ -282,22 +435,29 @@ const clips = await Promise.all(
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 1.2s var(--ease-out);
+    transition: opacity 0.9s linear; /* FADE in the script */
   }
 
-  .hero__clip[data-active] {
+  .hero__clip[data-front] {
+    z-index: 1;
     opacity: 1;
   }
 
-  /* Landscape: three clips side by side. */
+  .hero__clip[data-leaving] {
+    opacity: 1;
+    transition: none;
+  }
+
+  /* Landscape: three panels side by side. */
   @media (min-aspect-ratio: 6/5) {
     .hero__media {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
     }
 
-    .hero__clip {
-      position: static;
+    .hero__panel {
+      position: relative;
+      inset: auto;
       opacity: 1;
     }
   }

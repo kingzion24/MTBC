@@ -42,7 +42,7 @@ done
 # ---------------------------------------------------------------------------
 # Hero: steady shots only. Each source's shake was measured per shot (between cuts);
 # the steadiest shots are stabilised one by one (vid.stab, so it never smooths across a cut)
-# and joined into one clip per source video. The page rotates the five clips across the three
+# and joined into one clip per source video. The page rotates the clips across the three
 # panels so no two panels show the same video at once.
 #   output | source (in videos/hero) | shots "start-end,start-end" | crop | stabilise: none | 45 | 120
 #   (smoothing frames: 45 removes hand shake, 120 also flattens slow pans; "none" when the
@@ -53,6 +53,10 @@ HERO=(
   "hero-3|WhatsApp Video 2026-11-03 at 00.46.13.mp4|6.2-11.1||none"
   "hero-4|WhatsApp Video 2026-10-26 at 14.36.42.mp4|31.95-34.05,19.95-22.25||none"
   "hero-5|WhatsApp Video 2026-11-09 at 16.52.37.mp4|3.05-5.65,29.75-32.35||none"
+  # Chosen for the message: one family, together in love, committed to God.
+  "hero-6|WhatsApp Video 2026-11-11 at 11.03.35.mp4|14.95-18.25,27.15-29.1||none"
+  "hero-7|WhatsApp Video 2026-11-11 at 11.04.46.mp4|3.45-6.2,26.3-28.4||none"
+  "hero-8|WhatsApp Video 2026-11-11 at 11.09.53.mp4|9.15-12.05,12.2-14.6||none"
 )
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
